@@ -1,0 +1,29 @@
+## Core LaTeX auxiliary files
+*.aux
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.synctex.gz
+
+## Bibliography files
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+
+## PDF output
+# Normalment s'ignora el PDF perquè es genera automàticament
+main.pdf
+# Si vols ignorar tots els PDFs menys la portada, pots usar:
+# *.pdf
+# !portada.pdf
+
+## VS Code
+.vscode/
+
+## Others
+indent.log
