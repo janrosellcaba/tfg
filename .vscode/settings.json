@@ -1,0 +1,11 @@
+{
+    "latex-workshop.formatting.latex": "latexindent",
+    "latex-workshop.formatting.latexindent.args": [
+        "-c",
+        "%DIR%/",
+        "%TMPFILE%",
+        "-y=defaultIndent: '  '"
+    ],
+    "editor.wordWrap": "on"
+}
+

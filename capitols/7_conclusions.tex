@@ -1,0 +1,33 @@
+\chapter{Conclusions i Treball Futur}
+\label{ch:conclusions}
+
+Aquest capítol recull les conclusions finals derivades del disseny i la implementació de \textit{Web Core View}. Es realitza un balanç sobre l'assoliment dels objectius inicials, es proposen línies de millora per a futures versions i es detallen les reflexions personals sobre l'aprenentatge adquirit durant el desenvolupament del Treball de Final de Grau.
+
+\section{Assoliment dels objectius}
+Després de completar el cicle de desenvolupament i validació, es pot afirmar que s'han assolit els objectius plantejats en el Capítol 1:
+
+\begin{itemize}
+    \item \textbf{Modernització de la plataforma:} S'ha substituït amb èxit la dependència de l'aplicació nativa de Windows per una \textit{Single Page Application} (SPA) basada en Angular 19. La nova interfície és responsiva, ubiqüitària i accessible des de qualsevol navegador modern.
+    \item \textbf{Motor dinàmic (Schema-driven):} S'ha implementat un sistema de configuració que s'adapta automàticament a les capacitats del hardware Lanaccess mitjançant metadades JSON, eliminant la necessitat de reprogramar el \textit{frontend} per a cada actualització de \textit{firmware}.
+    \item \textbf{Visualització d'alt rendiment:} Mitjançant la integració de WebRTC, s'han assolit latències inferiors als 300ms en la visualització de vídeo en directe, complint els requeriments operatius de seguretat.
+    \item \textbf{Gestió reactiva d'alarmes:} L'ús de WebSockets (WSS) i \textit{Angular Signals} ha permès crear una interfície que reacciona en temps real als esdeveniments del gravador sense penalitzar el rendiment del terminal de l'usuari.
+\end{itemize}
+
+\section{Treball futur}
+Tot i que el sistema és totalment funcional, la naturalesa modular del projecte permet plantejar diverses línies d'evolució per a la versió 2.0:
+
+\begin{itemize}
+    \item \textbf{Analítica de vídeo amb IA:} Integrar metadades d'intel·ligència artificial directament sobre el reproductor de vídeo per dibuixar quadres de detecció d'objectes o mapes de calor en temps real.
+    \item \textbf{Multi-dispositiu centralitzat:} Desenvolupar un mòdul de gestió "Multi-NVR" que permeti visualitzar i configurar diversos gravadors Lanaccess des d'una única instància de l'aplicació web.
+    \item \textbf{Suport d'enregistrament avançat:} Ampliar les eines d'edició i exportació de vídeo directament des del navegador, permetent l'aplicació de marques d'aigua digitals o signatures legals en les descàrregues.
+    \item \textbf{Aplicació Mòbil Nativa:} Utilitzar tecnologies com \textit{Ionic} o \textit{Capacitor} per reutilitzar el codi d'Angular 19 i oferir una versió nativa a les botigues d'aplicacions (App Store / Play Store).
+\end{itemize}
+
+\section{Conclusions personals}
+La realització d'aquest TFG ha estat una experiència d'aprenentatge integral que ha anat molt més enllà de la simple programació. 
+
+A nivell tècnic, m'ha permès dominar les darreres funcionalitats d'Angular 19, especialment el canvi de paradigma que suposen els \textit{Signals} per a la gestió de l'estat reactiu. Així mateix, el repte de treballar amb protocols de vídeo com WebRTC i HLS m'ha proporcionat una visió profunda sobre la gestió de fluxos multimèdia en entorns de xarxa complexos.
+
+A nivell de gestió, el projecte m'ha ensenyat la importància de l'arquitectura \textit{schema-driven}. Desenvolupar un software que no sàpiga exactament què ha de configurar fins que rep les dades del servidor requereix un nivell d'abstracció i rigor en el disseny que ha posat a prova els meus coneixements d'arquitectura de software i principis SOLID.
+
+Finalment, el fet de desenvolupar el projecte per a una empresa real com Lanaccess m'ha permès entendre les necessitats de mantenibilitat i escalabilitat que exigeix el mercat industrial, on el software ha de ser, per sobre de tot, robust i eficient.

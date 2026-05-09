@@ -1,0 +1,86 @@
+\chapter{Introducció i Context}
+\label{ch:introduccio}
+
+En aquest primer capítol es defineix el marc en el qual es desenvolupa el projecte, s'analitza la problemàtica actual de l'empresa Lanaccess i es justifica la necessitat d'una nova plataforma web. Així mateix, es detallen els objectius, l'abast i els actors implicats en el cicle de vida del software.
+
+\section{Context del projecte}
+El present Treball de Final de Grau (TFG) consisteix en el disseny i desenvolupament de \textbf{Web Core View}, una aplicació web d'última generació destinada a la gestió centralitzada dels videogravadors de l'empresa Lanaccess Telecom, SA. El projecte es realitza en col·laboració amb aquesta empresa tecnològica, especialitzada en el desenvolupament de solucions professionals de videovigilància i seguretat electrònica.
+
+El treball s'emmarca dins de la \textbf{Modalitat B} del TFG i dins de l'especialitat d'Enginyeria de Software, posant èmfasi en arquitectures frontend modernes, seguretat en la comunicació i integració de protocols de \textit{streaming} en temps real. L'objectiu principal és liderar la transició digital de l'empresa, substituint el programari de gestió basat en aplicacions natives per a Windows per una solució \textit{Single Page Application} (SPA) basada en l'ecosistema Angular.
+
+\section{Identificació del problema i motivació}
+Històricament, la gestió operativa i tècnica dels gravadors de vídeo s'ha realitzat mitjançant aplicacions d'escriptori pesades. Aquest model presenta avui dia una obsolescència tecnològica que es tradueix en els següents problemes:
+
+\begin{itemize}
+  \item \textbf{Costos de manteniment elevats:} Les aplicacions natives obliguen a realitzar desplegaments manuals en cada terminal de client per a cada actualització, dificultant l'escalabilitat en grans infraestructures.
+  \item \textbf{Rigidesa davant hardware heterogeni:} Els gravadors moderns posseeixen capacitats i \textit{firmwares} molt diversos. Les interfícies estàtiques actuals no poden adaptar-se eficientment a la disparitat de paràmetres (IP, ports, lògiques d'alarma) de cada equip.
+  \item \textbf{Obsolescència d'experiència d'usuari (UX):} Les eines actuals requereixen una corba d'aprenentatge elevada i no compleixen els estàndards de reactivitat i claredat que exigeixen els operadors de seguretat.
+\end{itemize}
+
+\section{Estat de l'art i alternatives existents}
+
+\subsection{Estat de l'art}
+Actualment, el mercat de la videovigilància IP està dominat per grans fabricants com Hikvision o Dahua, que ofereixen interfícies web integrades. El principal inconvenient d'aquestes solucions és que sovint encara depenen de protocols propietaris o de la instal·lació de \textit{plugins} (com ActiveX) per poder visualitzar el vídeo, cosa que limita la seva compatibilitat a navegadors o sistemes operatius concrets.
+
+D'altra banda, els líders de programari VMS (\textit{Video Management System}) com Milestone o Genetec ofereixen solucions molt potents però amb arquitectures extremadament pesades i costos de llicenciament elevats, enfocades sovint a clients amb gran capacitat de còmput local.
+
+\subsection{Taula comparativa}
+A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre la solució nativa anterior, els líders de mercat i la proposta de Web Core View.
+
+\begin{table}[h!]
+  \centering
+  \caption{Comparativa de solucions de mercat.}
+  \label{tab:comparativa_mercat}
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    \textbf{Característica} & \textbf{App Windows} & \textbf{Market Leaders}    & \textbf{Web Core View}                     \\ \midrule
+    Accessibilitat          & Baixa (Windows)      & Mitjana (\textit{Plugins}) & \textbf{Alta (Navegador)}                  \\
+    Manteniment             & Difícil (Manual)     & Complex (Servidors)        & \textbf{Fàcil (Centralitzat)}              \\
+    Interfície (UX)         & Obsoleta             & Professional/Complexa      & \textbf{Moderna i Intuïtiva}               \\
+    Configuració            & Estàtica             & Propietària                & \textbf{Dinàmica (\textit{Schema-driven})} \\ \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \small Font: Elaboració pròpia.
+\end{table}
+
+\section{Solució proposada i valor afegit}
+\textbf{Web Core View} es proposa com una solució integral que aprofita el màxim potencial d'Angular 19. El seu valor diferencial resideix en:
+\begin{itemize}
+  \item \textbf{Arquitectura Schema-driven:} La interfície interpreta un esquema JSON enviat pel gravador i genera automàticament els controls de configuració, assegurant compatibilitat amb qualsevol versió de hardware.
+  \item \textbf{Gestió d'estat amb Signals:} L'ús de \textit{Angular Signals} optimitza el rendiment del \textit{frontend}, garantint fluïdesa fins i tot amb múltiples fluxos de vídeo.
+  \item \textbf{Control de concurrència:} Implementació d'un servei de bloqueig en temps real per evitar conflictes d'edició entre administradors.
+  \item \textbf{Arquitectura d'esdeveniments:} Ús de \textit{WebSockets} (WSS) per rebre notificacions d'alarmes de forma instantània.
+\end{itemize}
+
+\section{Objectius del projecte}
+\subsection{Objectiu general}
+Dissenyar i desenvolupar una plataforma web SPA modular, reactiva i d’alt rendiment que centralitzi la gestió tècnica i operativa dels dispositius Lanaccess, eliminant la dependència de programari natiu.
+
+\subsection{Objectius específics}
+\begin{itemize}
+  \item Desenvolupar un motor de configuració dinàmic basat en esquemes metadada.
+  \item Integrar un mòdul de visualització híbrid compatible amb WebRTC i HLS (H264/H265).
+  \item Implementar un sistema de gestió d'alarmes en temps real mitjançant comunicació bidireccional.
+  \item Facilitar el manteniment remot (firmware, llicències i logs) a través del navegador.
+\end{itemize}
+
+\section{Abast i Obstacles}
+\subsection{Abast funcional}
+L'aplicació ha d'oferir un cicle complet de gestió: des de l'autenticació segura de l'usuari fins a la monitorització de càmeres en directe, la cerca de gravacions històriques i la configuració avançada de xarxa i paràmetres de sistema.
+
+\subsection{Obstacles detectats}
+S'han identificat reptes tècnics que afecten diferents actors:
+\begin{itemize}
+  \item \textbf{Complexitat del vídeo natiu:} El repte de visualitzar H.265 sense \textit{plugins}. Afecta al \textbf{Projectista} (recerca de llibreries) i a l'\textbf{Usuari final} (potencial latència).
+  \item \textbf{Sincronització en temps real:} Requereix una gestió d'estat robusta perquè l'\textbf{Operador} vegi alarmes sense retard.
+  \item \textbf{Seguretat i NGINX:} Configuració de CORS i certificats que afecta al desplegament de l'\textbf{Empresa}.
+\end{itemize}
+
+\section{Actors implicats (Stakeholders)}
+\begin{enumerate}
+  \item \textbf{Usuari final (Operador):} Monitoritza càmeres i gestiona incidents.
+  \item \textbf{Administrador tècnic:} Configura el sistema i realitza manteniment.
+  \item \textbf{Lanaccess Telecom:} Proporciona el \textit{hardware} i coneixement de negoci.
+  \item \textbf{Projectista (Estudiant):} Responsable únic de l'anàlisi, disseny i implementació.
+  \item \textbf{Equip docent (Director i Ponent):} Supervisen el rigor acadèmic i tècnic.
+\end{enumerate}

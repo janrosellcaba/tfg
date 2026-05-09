@@ -1,0 +1,50 @@
+\chapter{Implementació}
+\label{ch:implementacio}
+
+En aquest capítol es detalla el procés de construcció del sistema \textit{Web Core View}. S'explica la configuració de l'entorn de desenvolupament i es desglossa la implementació de cada mòdul funcional, posant èmfasi en la lògica reactiva d'Angular 19 i la integració amb els serveis de baix nivell del gravador.
+
+\section{Entorn de desenvolupament i tecnologies}
+Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte segueix un enfocament de components de tipus \textit{stand\-alone}, eliminant la dependència de mòduls clàssics per optimitzar el procés de \textit{tree-shaking} i la càrrega inicial.
+
+Pel que fa als estils, s'ha utilitzat \textbf{SCSS modular}. S'han definit variables globals per mantenir la consistència visual i s'ha aplicat l'estratègia de detecció de canvis \texttt{OnPush} per garantir que la interfície només es refresqui quan realment hi hagi canvis d'estat significatius.
+
+\section{Mòdul d'Autenticació i Core}
+La seguretat de l'aplicació es gestiona en la capa \textit{Core}. S'ha implementat un servei d'usuari (\texttt{user.service.ts}) que centralitza les crides a l'API de \textit{login} i manté l'estat de la sessió mitjançant \textit{tokens}.
+
+\subsection{Protecció de rutes i Resolvers}
+S'ha programat un \textbf{AuthGuard} que verifica la validesa de la sessió. A més, s'ha implementat el resolver \texttt{Language\-Init\-Resolver} per carregar els fitxers de traducció abans de carregar la interfície principal i així evitar parpellejos en la \textit{inter\-nacionalització}.
+
+\section{Implementació del Motor Schema-Driven}
+Aquesta és la part més complexa de la implementació. El motor ha de ser capaç de transformar un esquema JSON abstracte en una interfície totalment funcional.
+
+\subsection{El component genèric de configuració}
+S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de forma recursiva segons l'estructura del JSON rebut. 
+\begin{itemize}
+    \item \textbf{Validació en temps real:} S'utilitzen els valors de metadades per configurar les validacions de formulari automàticament.
+    \item \textbf{Config Lock Service:} S'ha implementat una lògica de bloqueig per evitar edicions simultànies per part de diferents administradors.
+\end{itemize}
+
+\section{Visualització de Vídeo en Temps Real (WebRTC)}
+El repte principal ha estat la negociació del flux de vídeo entre el \textit{backend} en C++ i el navegador del client.
+
+\subsection{Negociació SDP i intercanvi de candidats}
+Per establir la connexió WebRTC, el frontend inicia una petició cap al servei de vídeo del gravador. El procés segueix la generació d'una \textit{Offer} SDP que s'envia via REST.
+
+\begin{lstlisting}[language=JavaScript, caption={Lògica simplificada de la PeerConnection en Angular.}]
+async startStreaming(cameraId: string) {
+  const pc = new RTCPeerConnection(this.config);
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+  
+  // Enviament al gravador Lanaccess via REST API
+  this.videoService.sendOffer(cameraId, offer).subscribe(answer => {
+    pc.setRemoteDescription(answer);
+  });
+}
+\end{lstlisting}
+
+\section{Sistema d'Alarmes i Comunicació asíncrona}
+S'ha implementat un servei de \textbf{WebSockets (WSS)} que es connecta al \textit{Core Notifier}. Quan arriba un missatge pel \textit{socket}, el servei el parseja i actualitza un \textit{Signal} global que refresca els components de la interfície de forma reactiva.
+
+\section{Mòdul de Manteniment i Logs}
+Finalment, s'ha implementat la gestió de \textit{firmware}. Aquesta secció inclou una barra de progrés real que rep el \textit{feedback} de l'escriptura. També s'ha dissenyat un visualitzador de \textit{logs} amb \textit{scroll} infinit per gestionar milers de línies de registre sense saturar la memòria del navegador.

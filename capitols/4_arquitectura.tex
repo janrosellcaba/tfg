@@ -1,0 +1,49 @@
+\chapter{Arquitectura i Disseny}
+\label{ch:arquitectura}
+
+L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de modularitat, escalabilitat i eficiència en el consum de recursos. Atès que el programari s'executa en un entorn \textit{embedded} (el videogravador), s'ha optat per una arquitectura desacoblada on el \textit{frontend} assumeix la major part de la lògica de presentació per tal d'alliberar la CPU del hardware per a les tasques crítiques de seguretat.
+
+\section{Arquitectura Global del Sistema}
+El sistema es basa en un model de microserveis interns coordinats dins del sistema operatiu del gravador. La comunicació amb l'exterior es centralitza a través d'un punt d'entrada robust que gestiona el trànsit de dades i el flux de vídeo.
+
+\subsection{Capa de comunicació i Microserveis}
+Com es va introduir a la Figura 1, la interacció entre la interfície i el hardware es divideix en tres canals principals:
+
+\begin{itemize}
+    \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
+    \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones, principalment a través del mòdul \textit{Core Legacy}. Aquest canal gestiona la consulta i l'enviament de paràmetres de configuració.
+    \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textit{Core Notifier} i \textit{Core Alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
+\end{itemize}
+
+Internament, els serveis es comuniquen mitjançant \textbf{gRPC} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu.
+
+\section{Disseny del Frontend (Angular 19)}
+L'elecció d'Angular 19 no és casual; el marc de treball proporciona una estructura opinada que facilita el manteniment a llarg termini d'una aplicació de gran envergadura.
+
+\subsection{Arquitectura Modular i Standalone Components}
+S'ha eliminat l'ús de mòduls clàssics d'Angular en favor dels \textit{Standalone Components}. Això redueix el \textit{boilerplate} del codi i millora el temps de càrrega de l'aplicació (\textit{lazy loading}), ja que només es descarreguen al navegador els components necessaris per a la vista actual (per exemple, el mòdul de configuració avançada no es carrega si l'usuari només vol veure vídeo).
+
+\subsection{Gestió de l'Estat amb Angular Signals}
+Aquest és un punt d'inflexió respecte a les versions anteriors del programari. Mentre que RxJS és excel·lent per a fluxos de dades complexos, \textbf{Angular Signals} permet una reactivitat granular.
+\begin{itemize}
+    \item \textbf{Eficiència:} En un sistema de vigilància on els estats de les càmeres canvien constantment, els \textit{Signals} asseguren que només es torni a renderitzar la part mínima de l'arbre del DOM afectada, reduint dràsticament l'ús de CPU al terminal del client.
+    \item \textbf{Sincronització:} Els valors calculats (\textit{computed signals}) faciliten que la interfície s'adapti automàticament a canvis en el \textit{lock} de configuració o en l'estat de connectivitat informat pel \textit{Keep-alive}.
+\end{itemize}
+
+\section{El Motor Schema-Driven}
+El component més innovador del sistema és el motor de configuració dinàmic. Aquest motor permet desacoblar totalment el desenvolupament del \textit{frontend} de l'evolució del \textit{firmware}.
+
+\subsection{Lògica de funcionament}
+En lloc de programar pantalles de configuració estàtiques, s'ha creat un intèrpret que segueix aquest flux:
+\begin{enumerate}
+    \item \textbf{Recepció del Schema:} El gravador envia un fitxer JSON que descriu les propietats (tipus de dades, límits, valors per defecte i dependències).
+    \item \textbf{Parseig:} El servei \texttt{ConfigInputComponent} processa la metadada i mapeja cada propietat a un component visual (un \textit{toggle} per a booleans, un \textit{slider} per a sensibilitat, etc.).
+    \item \textbf{Manipulació de camins:} S'utilitzen utilitats de \textit{Deep Access} per llegir i escriure en estructures d'objectes anidats (ex: \texttt{config.io.outputs[0].task}), garantint que l'enviament de tornada al servidor sigui un node vàlid.
+\end{enumerate}
+
+\section{Disseny de la Persistència i dades}
+Tot i que el sistema és principalment una interfície de gestió, l'arquitectura preveu la persistència en dos nivells:
+\begin{itemize}
+    \item \textbf{SQLite3:} Utilitzada en el costat del servidor (\textit{backend embedded}) per a la gestió ràpida de l'historial d'alarmes i la configuració persistent dels usuaris.
+    \item \textbf{Estratègia de Buffering:} El \textit{frontend} gestiona un estat local temporal per permetre a l'usuari realitzar múltiples canvis i validar-los abans d'adquirir el \textit{lock} i enviar la configuració final al hardware.
+\end{itemize}

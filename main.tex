@@ -1,0 +1,101 @@
+\PassOptionsToPackage{table}{xcolor}
+\documentclass[12pt,a4paper,oneside]{report}
+
+% --- Paquets Bàsics ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\babelprovide[main,import]{catalan}
+\usepackage{geometry} 
+\geometry{top=3cm, bottom=3cm, left=3.5cm, right=2.5cm}
+\usepackage{graphicx} 
+\usepackage{pdfpages} 
+\usepackage{hyperref} 
+\usepackage{titlesec} 
+\usepackage{booktabs} 
+\usepackage{listings} 
+\usepackage{xcolor}   
+\usepackage{amsmath}
+\usepackage{microtype}
+
+% --- Configuració de Colors ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% --- Definició Manual de JavaScript per evitar errors de "load language" ---
+\lstdefinelanguage{JavaScript}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with, as, async, await, const, let, signal, computed, effect},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywordstyle=\color{codepurple}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  commentstyle=\color{codegreen}\ttfamily,
+  stringstyle=\color{red}\ttfamily
+}
+
+% --- Configuració General de Listings ---
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    extendedchars=true,
+    literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+             {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+             {à}{{\`a}}1 {è}{{\`e}}1 {ò}{{\`o}}1
+             {À}{{\`A}}1 {È}{{\`E}}1 {Ò}{{\`O}}1
+             {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+             {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+             {ç}{{\c{c}}}1 {Ç}{{\c{C}}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1 {¡}{{!`}}1
+             {·}{{\textperiodcentered}}1
+}
+
+% --- Configuració de l'estil dels títols ---
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}{\chaptername\ \thechapter}{20pt}{\Huge}
+
+\begin{document}
+
+\includepdf{portada.pdf}
+
+\pagenumbering{roman}
+\chapter*{Resum}
+Aquí va el resum en català...
+\newpage
+\chapter*{Abstract}
+Aquí va el resum en anglès...
+
+\tableofcontents
+\listoftables
+\listoffigures
+
+\newpage
+\pagenumbering{arabic}
+
+\include{capitols/1_introduccio}
+\include{capitols/2_gestio}
+\include{capitols/3_requisits}
+\include{capitols/4_arquitectura}
+\include{capitols/5_implementacio}
+\include{capitols/6_validacio}
+\include{capitols/7_conclusions}
+
+\appendix
+\include{capitols/annexos}
+
+\end{document}

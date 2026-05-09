@@ -1,0 +1,76 @@
+\babel@toc {catalan}{}\relax 
+\contentsline {chapter}{\numberline {1}Introducció i Context}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Context del projecte}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Identificació del problema i motivació}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Estat de l'art i alternatives existents}{2}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Estat de l'art}{2}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Taula comparativa}{2}{subsection.1.3.2}%
+\contentsline {section}{\numberline {1.4}Solució proposada i valor afegit}{2}{section.1.4}%
+\contentsline {section}{\numberline {1.5}Objectius del projecte}{3}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Objectiu general}{3}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Objectius específics}{3}{subsection.1.5.2}%
+\contentsline {section}{\numberline {1.6}Abast i Obstacles}{3}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Abast funcional}{3}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Obstacles detectats}{3}{subsection.1.6.2}%
+\contentsline {section}{\numberline {1.7}Actors implicats (Stakeholders)}{4}{section.1.7}%
+\contentsline {chapter}{\numberline {2}Gestió del projecte}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Metodologia i eines de treball}{5}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Planificació temporal}{6}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Descripció de les fases i tasques}{6}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Recursos identificats}{6}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Estimació d'hores i Diagrama de Gantt}{6}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Gestió del risc i desviacions reals}{7}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}Anàlisi econòmica}{7}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Costos de personal}{8}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Costos totals i control de gestió}{8}{subsection.2.3.2}%
+\contentsline {section}{\numberline {2.4}Informe de sostenibilitat}{8}{section.2.4}%
+\contentsline {chapter}{\numberline {3}Especificació de Requisits}{9}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Metodologia d'extracció de requisits}{9}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Identificació d'actors}{9}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Històries d'Usuari (User Stories)}{10}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Mòdul de Visualització}{10}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Mòdul de Configuració (Schema-Driven)}{10}{subsection.3.3.2}%
+\contentsline {section}{\numberline {3.4}Requisits Funcionals (RF)}{10}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}RF-1: Gestió de l'Accés i Seguretat}{11}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}RF-2: Visualització Multimèdia}{11}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}RF-3: Motor de Configuració Dinàmica}{11}{subsection.3.4.3}%
+\contentsline {section}{\numberline {3.5}Requisits No Funcionals (RNF)}{11}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}RNF-1: Rendiment i Eficiència}{12}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}RNF-2: Robustesa i Disponibilitat}{12}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}RNF-3: Compatibilitat i Portabilitat}{12}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}Casos d'Ús detalla'ts}{12}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}UC-01: Gestió de l'actualització de firmware}{12}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}UC-02: Consulta de gravacions mitjançant Timeline}{12}{subsection.3.6.2}%
+\contentsline {section}{\numberline {3.7}Restriccions del sistema}{12}{section.3.7}%
+\contentsline {chapter}{\numberline {4}Arquitectura i Disseny}{16}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Arquitectura Global del Sistema}{16}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Capa de comunicació i Microserveis}{16}{subsection.4.1.1}%
+\contentsline {section}{\numberline {4.2}Disseny del Frontend (Angular 19)}{17}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Arquitectura Modular i Standalone Components}{17}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Gestió de l'Estat amb Angular Signals}{17}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}El Motor Schema-Driven}{17}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Lògica de funcionament}{17}{subsection.4.3.1}%
+\contentsline {section}{\numberline {4.4}Disseny de la Persistència i dades}{18}{section.4.4}%
+\contentsline {chapter}{\numberline {5}Implementació}{19}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Entorn de desenvolupament i tecnologies}{19}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Mòdul d'Autenticació i Core}{19}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Protecció de rutes i Resolvers}{19}{subsection.5.2.1}%
+\contentsline {section}{\numberline {5.3}Implementació del Motor Schema-Driven}{20}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}El component genèric de configuració}{20}{subsection.5.3.1}%
+\contentsline {section}{\numberline {5.4}Visualització de Vídeo en Temps Real (WebRTC)}{20}{section.5.4}%
+\contentsline {subsection}{\numberline {5.4.1}Negociació SDP i intercanvi de candidats}{20}{subsection.5.4.1}%
+\contentsline {section}{\numberline {5.5}Sistema d'Alarmes i Comunicació asíncrona}{20}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Mòdul de Manteniment i Logs}{21}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Validació i Proves}{22}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Estratègia de proves}{22}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Proves Unitàries i de Lògica}{22}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Validació del Parser de metadades}{22}{subsection.6.2.1}%
+\contentsline {section}{\numberline {6.3}Resultats de rendiment i latència}{23}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Proves de Robustesa i Comunicació asíncrona}{23}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Escenari de tall de connectivitat}{23}{subsection.6.4.1}%
+\contentsline {section}{\numberline {6.5}Validació d'Acceptació (UAT)}{24}{section.6.5}%
+\contentsline {chapter}{\numberline {7}Conclusions i Treball Futur}{25}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Assoliment dels objectius}{25}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Treball futur}{25}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Conclusions personals}{26}{section.7.3}%
+\contentsline {chapter}{\numberline {A}Annexos}{27}{appendix.A}%

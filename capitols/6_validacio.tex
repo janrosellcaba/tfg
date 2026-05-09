@@ -1,0 +1,64 @@
+\chapter{Validació i Proves}
+\label{ch:validacio}
+
+En aquest capítol es descriu l'estratègia de validació seguida per garantir que la plataforma \textit{Web Core View} compleix els requisits funcionals i no funcionals definits inicialment. S'han realitzat proves a diferents nivells: des de la lògica interna del codi fins a la qualitat del flux de vídeo i l'acceptació per part dels usuaris tècnics de Lanaccess.
+
+\section{Estratègia de proves}
+S'ha seguit un enfocament de proves basat en el risc i en el cicle de vida del software. Les proves s'han dividit en tres grans blocs:
+\begin{enumerate}
+    \item \textbf{Proves Unitàries i d'Integració:} Per validar la lògica del \textit{frontend} (Angular) i la comunicació amb l'API.
+    \item \textbf{Proves de Rendiment:} Centrades en la latència del vídeo i el consum de recursos.
+    \item \textbf{Proves de Robustesa:} Per verificar la capacitat de recuperació del sistema davant talls de xarxa.
+\end{enumerate}
+
+\section{Proves Unitàries i de Lògica}
+S'ha posat especial èmfasi en la validació del motor \textit{Schema-driven}. Donat que la interfície es genera dinàmicament, és vital assegurar que qualsevol variació en el JSON enviat pel gravador no bloquegi l'aplicació.
+
+\subsection{Validació del Parser de metadades}
+S'han creat casos de prova on s'envien esquemes JSON amb valors límit, tipus de dades erronis o nodes inexistents. El sistema ha demostrat ser capaç de:
+\begin{itemize}
+    \item Gestionar errors de tipatge sense degradar l'experiència d'usuari.
+    \item Aplicar les regles de validació (mínims i màxims) correctament als formularis dinàmics.
+    \item Mantenir la integritat del \textit{Config Lock} fins i tot si la petició de xarxa triga més de l'esperat.
+\end{itemize}
+
+\section{Resultats de rendiment i latència}
+La visualització de vídeo és el requeriment més crític. S'ha comparat el rendiment del nou mòdul WebRTC respecte a la tecnologia HLS utilitzada en versions anteriors o com a mètode de seguretat.
+
+Com es pot observar a la Taula \ref{tab:latencies}, el protocol WebRTC ofereix un rendiment molt superior, reduint el retard a valors operatius reals per a vigilància activa.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparativa de latència segons protocol de comunicació.}
+\label{tab:latencies}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Protocol} & \textbf{Latència mitjana (ms)} & \textbf{Estabilitat observada} \\ \midrule
+WebRTC (Directe)  & 150 -- 300                     & Alta (Xarxa LAN)     \\
+HLS (Fallback)    & 2.000 -- 5.000                 & Molt Alta            \\
+RTSP (App Nativa) & 200 -- 400                     & Alta                 \\ \bottomrule
+\end{tabular}
+\par\smallskip
+\small Font: Elaboració pròpia mitjançant proves en entorn de laboratori.
+\end{table}
+
+Aquests resultats validen que la solució web és capaç d'igualar o millorar la latència de l'antiga aplicació nativa Windows, eliminant un dels principals arguments en contra de les solucions basades en navegador.
+
+\section{Proves de Robustesa i Comunicació asíncrona}
+S'ha validat la persistència de la sessió i la recepció d'alarmes mitjançant el sistema \textit{Keep-alive} i la reconnexió automàtica de \textit{WebSockets}.
+
+\subsection{Escenari de tall de connectivitat}
+S'ha simulat una pèrdua de xarxa d'un minut durant una sessió activa de configuració. Els resultats han estat satisfactoris:
+\begin{itemize}
+    \item El sistema detecta el tall en menys de 3 segons gràcies al servei de connectivitat.
+    \item Es bloqueja la interfície amb una targeta d'error (\textit{connectivity-error-card}) per evitar canvis inconsistents.
+    \item Un cop restaurada la xarxa, el \textit{WebSocket} es renegocia automàticament i l'usuari recupera el control de la seva sessió sense haver de tornar a introduir les credencials.
+\end{itemize}
+
+\section{Validació d'Acceptació (UAT)}
+Finalment, l'aplicació s'ha presentat als tècnics d'instal·lació de Lanaccess per recollir el seu \textit{feedback}. S'ha utilitzat una simplificació del qüestionari \textit{System Usability Scale} (SUS).
+
+\begin{itemize}
+    \item \textbf{Usabilitat:} Els usuaris destaquen la facilitat de trobar els paràmetres de xarxa gràcies al nou disseny modular.
+    \item \textbf{Eficiència:} S'ha observat una reducció del 40\% en el temps necessari per actualitzar el \textit{firmware} de diversos equips simultàniament des de diferents pestanyes del navegador, validant així l'encert de la tecnologia web.
+\end{itemize}
