@@ -1,0 +1,23 @@
+\chapter{Integració de Coneixements}
+\label{ch:integracio}
+
+La realització d'aquest Treball de Final de Grau ha permès consolidar i aplicar de forma transversal un ampli ventall de competències i coneixements adquirits durant els estudis d'Enginyeria Informàtica. A continuació, es detalla la relació entre les diferents àrees de coneixement i la seva aplicació pràctica en el projecte \textit{Web Core View}.
+
+\section{Enginyeria del Software (ES)}
+Aquesta àrea ha estat la base estructural del projecte. S'han aplicat els principis de disseny \textbf{SOLID} per garantir que el codi del \textit{frontend} sigui modular i fàcil de mantenir. Així mateix, l'ús de patrons arquitectònics (com el \textit{Proxy} o l'\textit{Observer} implícit en els Signals) i la definició del cicle de vida del software mitjançant metodologies àgils (\textbf{Kanban}) han estat fonamentals per gestionar la complexitat del sistema.
+
+\section{Xarxes (X)}
+El coneixement de la pila de protocols d'internet ha estat crític per implementar el mòdul de vídeo. Entendre la diferència entre la transmissió fiable de \textbf{TCP} (utilitzada en HLS i REST) i la baixa latència de \textbf{UDP} (clau per a WebRTC) ha permès prendre decisions arquitectòniques encertades. També s'han aplicat coneixements sobre la negociació de protocols (\textbf{SDP}) i el trànsit a través de tallafocs.
+
+\section{Sistemes Operatius (SO)}
+Atès que l'aplicació interactua amb un dispositiu \textit{embedded}, ha estat necessari entendre la gestió de processos i la comunicació entre ells. El \textit{frontend} no és un element aïllat, sinó que es comunica amb microserveis interns del gravador que utilitzen \textbf{gRPC} i el bus de sistema \textbf{D-Bus}, requerint una comprensió profunda de com el sistema operatiu gestiona els recursos i la concurrència.
+
+\section{Projecte de Programació (PROP)}
+La gestió d'estructures de dades complexes ha estat un repte constant. El motor \textit{schema-driven} requereix processar i validar objectes \textbf{JSON} altament anidats i dinàmics. Les competències adquirides en matèria d'algorísmia han estat clau per implementar una lògica de parseig prou eficient per no bloquejar el fil principal d'execució del navegador ni degradar l'experiència d'usuari (UX), mantenint la fluïdesa de la interfície fins i tot durant la càrrega de configuracions extenses.
+
+\section{Aprenentatge autònom}
+Més enllà dels coneixements reglats, el projecte ha exigit una fase intensa d'autoformació en tecnologies d'última generació:
+\begin{itemize}
+  \item \textbf{Angular 19 i Signals:} Estudi de la nova reactivitat nativa per substituir el model de zones clàssic.
+  \item \textbf{Seguretat i NGINX:} Configuració avançada de servidors web, gestió de polítiques \textbf{CORS} i implementació de certificats \textbf{SSL/TLS} per garantir comunicacions \textit{end-to-end} xifrades mitjançant HTTPS i WSS.
+\end{itemize}

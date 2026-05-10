@@ -182,3 +182,28 @@ El desenvolupament s'ha de cenyir a les següents limitacions:
     \item \textbf{CORS:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
     \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}
+\section{Marc normatiu i regulacions}
+Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real i dades de configuració de dispositius de seguretat, el sistema s'ha dissenyat per complir amb el següent marc legal:
+
+\subsection{Protecció de Dades (RGPD)}
+El sistema compleix amb el \textbf{Reglament General de Protecció de Dades (Reglament UE 2016/679)}. Tot i que l'aplicació gestiona imatges de persones en directe, \textit{Web Core View} s'ha dissenyat sota el principi de \textit{Privacy by Design}:
+\begin{itemize}
+    \item No s'emmagatzemen dades personals ni metadades d'usuari de forma persistent en el navegador, exceptuant el \textit{token} de sessió protegit en el \textit{LocalStorage}.
+    \item L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només el personal autoritzat pugui visualitzar el vídeo.
+\end{itemize}
+
+\subsection{Seguretat en la comunicació}
+Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de tipus \textit{Man-in-the-Middle} (MitM), s'obliga a l'ús de protocols xifrats:
+\begin{itemize}
+    \item Totes les peticions a l'API REST s'han de realitzar via \textbf{HTTPS}.
+    \item La comunicació d'alarmes i esdeveniments es realitza mitjançant \textbf{WebSockets Segurs (WSS)}.
+    \item El flux de vídeo WebRTC utilitza el protocol \textbf{DTLS} per al xifratge d'extrem a extrem.
+\end{itemize}
+
+\subsection{Normativa de seguretat privada}
+El software s'ha concebut com una eina per al compliment de la \textbf{Llei d'Ordenació de l'Edificació (LOE)} i, especialment, la \textbf{Llei 5/2014 de Seguretat Privada}. Atès que Lanaccess opera en sectors d'infraestructures crítiques i banca, \textit{Web Core View} integra funcionalitats que faciliten el compliment normatiu per part del client final:
+\begin{itemize}
+    \item \textbf{Gestió de la caducitat de gravacions:} El sistema permet configurar polítiques de sobreescriptura automàtica per assegurar que les imatges no s'emmagatzemen més enllà dels 30 dies prescrits per la llei, tret que hi hagi un requeriment judicial.
+    \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació facilita el registre exhaustiu de qui ha accedit a quina càmera i en quin moment, garantint la traçabilitat exigida per les autoritats en cas d'inspecció o incident de seguretat.
+\end{itemize}
+Malgrat aquestes facilitats tècniques, el compliment final de la normativa depèn de la configuració i l'ús real que l'entitat de seguretat privada faci del sistema en la instal·lació del client.
