@@ -1,3 +1,4 @@
+% !BIB program = biber
 \PassOptionsToPackage{table}{xcolor}
 \documentclass[12pt,a4paper,oneside]{report}
 
@@ -17,8 +18,13 @@
 \usepackage{xcolor}   
 \usepackage{amsmath}
 \usepackage{microtype}
+\usepackage{csquotes}
+\usepackage[official]{eurosym}
+\DeclareQuoteAlias{spanish}{catalan}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{references.bib}
+\emergencystretch=1em % Help with overfull boxes in bibliography and text
 
-% --- Configuració de Colors ---
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
@@ -75,7 +81,7 @@
 
 \pagenumbering{roman}
 \chapter*{Resum}
-Aquest projecte presenta el disseny i desenvolupament de \textbf{Web Core View}, una plataforma web d'última generació destinada a la gestió centralitzada de videogravadors de seguretat. El treball neix de la necessitat de Lanaccess Telecom, SA de migrar la seva infraestructura de gestió d'aplicacions natives cap a una solució basada en navegador que garanteixi ubiqüitat i sostenibilitat. La solució s'ha implementat com una \textit{Single Page Application} (SPA) utilitzant \textbf{Angular 19} i el nou paradigma de reactivitat basat en \textbf{Signals}. Els dos pilars tecnològics més rellevants del projecte són el motor de configuració dinàmic (\textit{Schema-driven}), que permet desacoblar la interfície de l'evolució del \textit{firmware}, i la integració del protocol \textbf{WebRTC} per a la visualització de vídeo de baixa latència ($<300$ms) sense necessitat de \textit{plugins} externs. Els resultats validen que la solució web iguala o millora el rendiment de les eines clàssiques de l'empresa.
+Aquest projecte presenta el disseny i desenvolupament de \textbf{Web Core View}, una plataforma web d'última generació destinada a la gestió centralitzada de videogravadors de seguretat. El treball neix de la necessitat de Lanaccess Telecom, SA de migrar la seva infraestructura de gestió d'aplicacions natives cap a una solució basada en navegador que garanteixi ubiqüitat i sostenibilitat. La solució s'ha implementat com una \textit{Single Page Application} (SPA) utilitzant \textbf{Angular 19} i el nou paradigma de reactivitat basat en \textbf{Signals}. Els dos pilars tecnològics més rellevants del projecte són el motor de configuració dinàmic (\textit{Schema-driven}), que permet desacoblar la interfície de l'evolució del \textit{firmware}, i la integració del protocol \textbf{WebRTC} per a la visualització de vídeo de baixa latència ($<300$ ms) sense necessitat de \textit{plugins} externs. Els resultats validen que la solució web iguala o millora el rendiment de les eines clàssiques.
 \newpage
 \chapter*{Abstract}
 This project presents the design and development of \textbf{Web Core View}, a state-of-the-art web platform for the centralized management of security video recorders. The project arises from the need of Lanaccess Telecom, SA to migrate its management infrastructure from native desktop applications to a browser-based solution that ensures ubiquity and sustainability. The solution has been implemented as a \textit{Single Page Application} (SPA) using \textbf{Angular 19} and the new reactivity paradigm based on \textbf{Signals}. The two most significant technological pillars of the project are the dynamic configuration engine (\textit{Schema-driven}), which allows decoupling the interface from firmware evolution, and the integration of the \textbf{WebRTC} protocol for low-latency video streaming ($<300$ms) without the need for external plugins. The results validate that the web solution matches or improves the performance of the company's legacy tools.
@@ -95,6 +101,8 @@ This project presents the design and development of \textbf{Web Core View}, a st
 \include{capitols/6_validacio}
 \include{capitols/7_integracio_coneixements}
 \include{capitols/8_conclusions}
+
+\printbibliography[heading=bibintoc, title={Bibliografia}]
 
 \appendix
 \include{capitols/annexos}

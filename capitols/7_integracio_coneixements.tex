@@ -4,7 +4,7 @@
 La realització d'aquest Treball de Final de Grau ha permès consolidar i aplicar de forma transversal un ampli ventall de competències i coneixements adquirits durant els estudis d'Enginyeria Informàtica. A continuació, es detalla la relació entre les diferents àrees de coneixement i la seva aplicació pràctica en el projecte \textit{Web Core View}.
 
 \section{Enginyeria del Software (ES)}
-Aquesta àrea ha estat la base estructural del projecte. S'han aplicat els principis de disseny \textbf{SOLID} per garantir que el codi del \textit{frontend} sigui modular i fàcil de mantenir. Així mateix, l'ús de patrons arquitectònics (com el \textit{Proxy} o l'\textit{Observer} implícit en els Signals) i la definició del cicle de vida del software mitjançant metodologies àgils (\textbf{Kanban}) han estat fonamentals per gestionar la complexitat del sistema.
+Aquesta àrea ha estat la base estructural del projecte. S'han aplicat els principis de disseny \textbf{SOLID} \cite{solid_principles} per garantir que el codi del \textit{frontend} sigui modular i fàcil de mantenir. Així mateix, l'ús de patrons arquitectònics (com el \textit{Proxy} o l'\textit{Observer} implícit en els Signals) i la definició del cicle de vida del software mitjançant metodologies àgils (\textbf{Kanban}) han estat fonamentals per gestionar la complexitat del sistema.
 
 \section{Xarxes (X)}
 El coneixement de la pila de protocols d'internet ha estat crític per implementar el mòdul de vídeo. Entendre la diferència entre la transmissió fiable de \textbf{TCP} (utilitzada en HLS i REST) i la baixa latència de \textbf{UDP} (clau per a WebRTC) ha permès prendre decisions arquitectòniques encertades. També s'han aplicat coneixements sobre la negociació de protocols (\textbf{SDP}) i el trànsit a través de tallafocs.
@@ -15,9 +15,19 @@ Atès que l'aplicació interactua amb un dispositiu \textit{embedded}, ha estat 
 \section{Projecte de Programació (PROP)}
 La gestió d'estructures de dades complexes ha estat un repte constant. El motor \textit{schema-driven} requereix processar i validar objectes \textbf{JSON} altament anidats i dinàmics. Les competències adquirides en matèria d'algorísmia han estat clau per implementar una lògica de parseig prou eficient per no bloquejar el fil principal d'execució del navegador ni degradar l'experiència d'usuari (UX), mantenint la fluïdesa de la interfície fins i tot durant la càrrega de configuracions extenses.
 
+\section{Interacció Persona-Ordinador (IPO)}
+El disseny de la interfície d'usuari (UI) s'ha realitzat aplicant principis d'usabilitat i experiència d'usuari (UX) apresos a IPO. Donada la naturalesa crítica de la videovigilància, s'ha prioritzat una càrrega cognitiva baixa i una jerarquia visual clara. L'ús de \textit{Signals} ha permès implementar una interfície altament reactiva que informa l'usuari en temps real de qualsevol canvi en l'estat del sistema (alarmes, pèrdues de vídeo) sense necessitat de recàrregues.
+
+\section{Seguretat Informàtica (SI)}
+La protecció de dades i la integritat de les comunicacions són vitals. S'han aplicat coneixements de SI per implementar polítiques de \textit{Same-Origin} restrictives a NGINX, gestió de certificats \textbf{SSL/TLS} per a HTTPS/WSS i el xifratge de fluxos multimèdia mitjançant \textbf{DTLS} en WebRTC.
+
+\section{Arquitectura de Computadors (AC)}
+Treballar en un entorn \textit{embedded} requereix una consciència constant de l'ús de la CPU i la memòria. S'han aplicat coneixements d'AC per optimitzar l'execució del codi i minimitzar el sobrecost del \textit{runtime} d'Angular, assegurant que el maquinari pugui prioritzar el processament i la gravació de vídeo.
+
 \section{Aprenentatge autònom}
-Més enllà dels coneixements reglats, el projecte ha exigit una fase intensa d'autoformació en tecnologies d'última generació:
+Més enllà dels coneixements reglats, el projecte ha exigit una fase intensa d'autoformació:
 \begin{itemize}
-  \item \textbf{Angular 19 i Signals:} Estudi de la nova reactivitat nativa per substituir el model de zones clàssic.
-  \item \textbf{Seguretat i NGINX:} Configuració avançada de servidors web, gestió de polítiques \textbf{CORS} i implementació de certificats \textbf{SSL/TLS} per garantir comunicacions \textit{end-to-end} xifrades mitjançant HTTPS i WSS.
+  \item \textbf{Angular 19 i Signals:} Estudi de la nova reactivitat nativa per substituir el model de zones clàssic \cite{angular_signals}.
+  \item \textbf{Protocol gRPC:} Recerca sobre la comunicació binària d'alt rendiment per a microserveis \cite{grpc_io}.
+  \item \textbf{Configuració de NGINX:} Gestió avançada de proxys inversos i seguretat de capçaleres.
 \end{itemize}

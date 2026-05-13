@@ -13,26 +13,26 @@ Els requisits aquí exposats s'han obtingut mitjançant un procés iteratiu amb 
 S'han definit tres actors principals, classificant-los segons el seu nivell d'interacció i privilegis dins del sistema:
 
 \begin{description}
-    \item[Administrador de Sistema:] Actor amb privilegis totals sobre el videogravador. El seu objectiu és la posada en marxa de l'equip i el manteniment correctiu. Les seves responsabilitats inclouen:
-    \begin{itemize}
-        \item Configuració de paràmetres de xarxa (IP, DNS, Gateways).
-        \item Gestió del cicle de vida del hardware (Reinicis, actualització de firmware).
-        \item Administració de comptes d'usuari i permisos.
-    \end{itemize}
-    
-    \item[Operador de Seguretat:] Usuari final que utilitza la plataforma per a la monitorització. La seva interacció se centra en el consum de recursos multimèdia:
-    \begin{itemize}
-        \item Visualització de vídeo en temps real (\textit{Live}).
-        \item Navegació i exportació de gravacions històriques.
-        \item Supervisió i silenciament d'alarmes en temps real.
-    \end{itemize}
-    
-    \item[Videogravador (System Actor):] Malgrat ser un element de hardware, en aquesta arquitectura actua com un usuari actiu que:
-    \begin{itemize}
-        \item Dicta la estructura de la interfície mitjançant esquemes JSON.
-        \item Notifica esdeveniments de forma proactiva via WebSockets.
-        \item Gestiona el control de concurrència per evitar col·lisions de dades.
-    \end{itemize}
+  \item[Administrador de Sistema:] Actor amb privilegis totals sobre el videogravador. El seu objectiu és la posada en marxa de l'equip i el manteniment correctiu. Les seves responsabilitats inclouen:
+        \begin{itemize}
+          \item Configuració de paràmetres de xarxa (IP, DNS, Gateways).
+          \item Gestió del cicle de vida del hardware (Reinicis, actualització de firmware).
+          \item Administració de comptes d'usuari i permisos.
+        \end{itemize}
+
+  \item[Operador:] Usuari final que utilitza la plataforma per a la monitorització.
+        \begin{itemize}
+          \item Visualització de vídeo en temps real (\textit{Live}).
+          \item Navegació i exportació de gravacions històriques.
+          \item Supervisió i silenciament d'alarmes en temps real.
+        \end{itemize}
+
+  \item[Videogravador (System Actor):] Malgrat ser un element de hardware, en aquesta arquitectura actua com un usuari actiu que:
+        \begin{itemize}
+          \item Dicta la estructura de la interfície mitjançant esquemes JSON.
+          \item Notifica esdeveniments de forma proactiva via WebSockets.
+          \item Gestiona el control de concurrència per evitar col·lisions de dades.
+        \end{itemize}
 \end{description}
 
 \section{Històries d'Usuari (User Stories)}
@@ -40,24 +40,24 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
 
 \subsection{Mòdul de Visualització}
 \begin{description}
-    \item[\textbf{US-01: Streaming d'alta fidelitat}] \hfill \\
-    \textbf{Com a} Operador, \textbf{vull} veure el vídeo de qualsevol càmera connectada, \textbf{per tal de} vigilar l'espai protegit en temps real.
-    \begin{itemize}
-        \item \textit{Criteri 1:} La latència punta a punta (glass-to-glass) ha de ser inferior a 300ms.
-        \item \textit{Criteri 2:} El sistema ha de detectar automàticament si el navegador suporta WebRTC o ha de commutar a HLS.
-    \end{itemize}
+  \item[\textbf{US-01: Streaming d'alta fidelitat}] \hfill \\
+        \textbf{Com a} Operador, \textbf{vull} veure el vídeo de qualsevol càmera connectada, \textbf{per tal de} vigilar l'espai protegit en temps real.
+        \begin{itemize}
+          \item \textit{Criteri 1:} La latència punta a punta (glass-to-glass) ha de ser inferior a 300ms.
+          \item \textit{Criteri 2:} El sistema ha de detectar automàticament si el navegador suporta WebRTC o ha de commutar a HLS.
+        \end{itemize}
 
-    \item[\textbf{US-02: Gestió de Mosaic}] \hfill \\
-    \textbf{Com a} Operador, \textbf{vull} visualitzar fins a 4 càmeres simultàniament, \textbf{per tal de} tenir una visió global de la instal·lació.
+  \item[\textbf{US-02: Gestió de Mosaic}] \hfill \\
+        \textbf{Com a} Operador, \textbf{vull} visualitzar fins a 4 càmeres simultàniament, \textbf{per tal de} tenir una visió global de la instal·lació.
 \end{description}
 
 \subsection{Mòdul de Configuració (Schema-Driven)}
 \begin{description}
-    \item[\textbf{US-03: Configuració sense recàrrega de codi}] \hfill \\
-    \textbf{Com a} Administrador, \textbf{vull} que els nous paràmetres afegits al firmware apareguin a la web sense haver de reprogramar el frontend.
-    \begin{itemize}
-        \item \textit{Criteri 1:} El frontend ha d'interpretar l'esquema de metadades i renderitzar el component visual adequat (input, select, slider).
-    \end{itemize}
+  \item[\textbf{US-03: Configuració sense recàrrega de codi}] \hfill \\
+        \textbf{Com a} Administrador, \textbf{vull} que els nous paràmetres afegits al firmware apareguin a la web sense haver de reprogramar el frontend.
+        \begin{itemize}
+          \item \textit{Criteri 1:} El frontend ha d'interpretar l'esquema i renderitzar el component visual adequat (input, select, slider).
+        \end{itemize}
 \end{description}
 
 \section{Requisits Funcionals (RF)}
@@ -65,22 +65,22 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 
 \subsection{RF-1: Gestió de l'Accés i Seguretat}
 \begin{itemize}
-    \item \textbf{RF-1.1 Autenticació:} El sistema ha de validar les credencials contra el servei \textit{Core Legacy}.
-    \item \textbf{RF-1.2 Sessió Persistent:} S'ha de mantenir la sessió mitjançant un mecanisme de \textit{Keep-alive} que refresqui el token de seguretat cada 60 segons.
-    \item \textbf{RF-1.3 Control de Concurrència (Config Lock):} El sistema ha de demanar un bloqueig d'escriptura quan un administrador entri en mode edició. Si un altre usuari intenta editar, el sistema mostrarà un avís de "Només Lectura".
+  \item \textbf{RF-1.1 Autenticació:} El sistema ha de validar les credencials contra el servei \textit{Core Legacy}.
+  \item \textbf{RF-1.2 Sessió Persistent:} Mantenir la sessió mitjançant un mecanisme de \textit{Keep-alive} que refresqui el token cada 60 segons.
+  \item \textbf{RF-1.3 Control de Concurrència (Config Lock):} El sistema ha de demanar un bloqueig d'escriptura quan un administrador entri en mode edició. Si un altre usuari intenta editar, el sistema mostrarà un avís de "Només Lectura".
 \end{itemize}
 
 \subsection{RF-2: Visualització Multimèdia}
 \begin{itemize}
-    \item \textbf{RF-2.1 Protocol WebRTC:} Implementació de la negociació SDP (\textit{Session Description Protocol}) per a vídeo en directe.
-    \item \textbf{RF-2.2 Protocol HLS:} Generació de fragments de vídeo per a la reproducció de gravacions històriques i fallback de seguretat.
-    \item \textbf{RF-2.3 Control PTZ:} Interfície per al control de moviments de càmera (Pan, Tilt, Zoom) mitjançant peticions REST de baixa latència.
+  \item \textbf{RF-2.1 Protocol WebRTC:} Implementació de la negociació SDP (\textit{Session Description Protocol}) per a vídeo en directe.
+  \item \textbf{RF-2.2 Protocol HLS:} Generació de fragments de vídeo per a la reproducció de gravacions històriques i fallback de seguretat.
+  \item \textbf{RF-2.3 Control PTZ:} Interfície per al control de moviments de càmera (Pan, Tilt, Zoom) mitjançant peticions REST de baixa latència.
 \end{itemize}
 
 \subsection{RF-3: Motor de Configuració Dinàmica}
 Aquest és el requisit funcional més complex i innovador del sistema.
 \begin{itemize}
-    \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Un exemple d'aquest esquema es mostra en el següent fragment:
+  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Un exemple d'aquest esquema es mostra en el següent fragment:
 \end{itemize}
 
 \begin{lstlisting}[language=JavaScript, caption=Exemple d'esquema de metadades per a configuració de xarxa]
@@ -103,20 +103,20 @@ Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
 
 \subsection{RNF-1: Rendiment i Eficiència}
 \begin{itemize}
-    \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, el frontend no ha de fer més d'una petició de configuració per minut si no hi ha canvis de l'usuari.
-    \item \textbf{RNF-1.2 Angular Signals:} La reactivitat de la interfície s'ha de basar en \textit{Angular Signals} per minimitzar les operacions de \textit{Zone.js} i evitar el re-renderitzat innecessari del DOM, especialment crític amb vídeos actius.
+  \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, el frontend no ha de fer més d'una petició de configuració per minut si no hi ha canvis de l'usuari.
+  \item \textbf{RNF-1.2 Angular Signals:} La reactivitat de la interfície s'ha de basar en \textit{Angular Signals} per minimitzar les operacions de \textit{Zone.js} i evitar el re-renderitzat innecessari del DOM, especialment crític amb vídeos actius.
 \end{itemize}
 
 \subsection{RNF-2: Robustesa i Disponibilitat}
 \begin{itemize}
-    \item \textbf{RNF-2.1 Tolerància a talls de xarxa:} El WebSocket ha d'intentar una reconnexió exponencial (re-try) en cas de pèrdua de connectivitat.
-    \item \textbf{RNF-2.2 Fallback de Vídeo:} Si el port WebRTC (UDP 10000-20000) està bloquejat per firewall, el reproductor ha de commutar a TCP-HLS en menys de 5 segons.
+  \item \textbf{RNF-2.1 Tolerància a talls de xarxa:} El WebSocket ha d'intentar una reconnexió exponencial (re-try) en cas de pèrdua de connectivitat.
+  \item \textbf{RNF-2.2 Fallback de Vídeo:} Si el port WebRTC (UDP 10000-20000) està bloquejat per firewall, el reproductor ha de commutar a TCP-HLS en menys de 5 segons.
 \end{itemize}
 
 \subsection{RNF-3: Compatibilitat i Portabilitat}
 \begin{itemize}
-    \item \textbf{RNF-3.1 Multi-navegador:} Compatible amb les últimes dues versions de Google Chrome, Mozilla Firefox i Microsoft Edge.
-    \item \textbf{RNF-3.2 Responsive Design:} La interfície ha de ser plenament operativa en resolucions des de 1024px d'amplada (tablets de manteniment) fins a 4K (centres de control).
+  \item \textbf{RNF-3.1 Multi-navegador:} Compatible amb les últimes dues versions de Google Chrome, Mozilla Firefox i Microsoft Edge.
+  \item \textbf{RNF-3.2 Responsive Design:} La interfície ha de ser plenament operativa en resolucions des de 1024px d'amplada (tablets de manteniment) fins a 4K (centres de control).
 \end{itemize}
 
 \section{Casos d'Ús detalla'ts}
@@ -124,63 +124,63 @@ Per aprofundir en la funcionalitat del sistema, es presenta el diagrama de casos
 
 % Placeholder per a la teva imatge de Casos d'Ús
 \begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.9\textwidth]{figures/use_cases.png} % Assegura't de crear aquesta carpeta i fitxer
-    \caption{Diagrama UML de Casos d'Ús.}
-    \label{fig:diagrama_casos_us}
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/use_cases.png} % Assegura't de crear aquesta carpeta i fitxer
+  \caption{Diagrama UML de Casos d'Ús.}
+  \label{fig:diagrama_casos_us}
 \end{figure}
 
 \subsection{UC-01: Gestió de l'actualització de firmware}
 Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 
 \begin{table}[htbp]
-\centering
-\small
-\begin{tabular}{|l|p{10cm}|}
-\hline
-\rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-01: Actualització remota de firmware} \\ \hline
-\textbf{Actor} & Administrador \\ \hline
-\textbf{Descripció} & L'usuari carrega un binari de firmware per actualitzar les capacitats del dispositiu. \\ \hline
-\textbf{Precondicions} & Usuari autenticat com administrador. El gravador ha de tenir més d'un 10\% d'espai lliure a la partició de sistema. \\ \hline
-\textbf{Flux Principal} & 
-1. L'usuari accedeix al mòdul de Manteniment. \newline
-2. L'usuari selecciona un fitxer \textit{.bin} local. \newline
-3. El frontend valida l'extensió i mida del fitxer. \newline
-4. S'inicia la pujada via POST multipart. \newline
-5. El sistema mostra una barra de progrés real basada en els esdeveniments del backend. \newline
-6. Un cop finalitzat, el gravador inicia el procés de \textit{flashing} i es reinicia. \\ \hline
-\textbf{Flux Alternatiu} & 
-5a. Si la connexió es talla durant la pujada, el frontend informa de l'error i permet reintentar des del punt de fallada si el servidor ho suporta. \\ \hline
-\textbf{Postcondició} & L'equip es reinicia. La interfície web detecta el tall i mostra una pantalla d'espera fins que l'equip torna a estar en línia. \\ \hline
-\end{tabular}
-\caption{Especificació detallada del Cas d'Ús UC-01.}
-\label{tab:uc_firmware}
+  \centering
+  \small
+  \begin{tabular}{|l|p{10cm}|}
+    \hline
+    \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-01: Actualització remota de firmware}                                                                               \\ \hline
+    \textbf{Actor}                          & Administrador                                                                                                                  \\ \hline
+    \textbf{Descripció}                     & L'usuari carrega un binari de firmware per actualitzar les capacitats del dispositiu.                                          \\ \hline
+    \textbf{Precondicions}                  & Usuari autenticat com administrador. El gravador ha de tenir més d'un 10\% d'espai lliure a la partició de sistema.            \\ \hline
+    \textbf{Flux Principal}                 &
+    1. L'usuari accedeix al mòdul de Manteniment. \newline
+    2. L'usuari selecciona un fitxer \textit{.bin} local. \newline
+    3. El frontend valida l'extensió i mida del fitxer. \newline
+    4. S'inicia la pujada via POST multipart. \newline
+    5. El sistema mostra una barra de progrés real basada en els esdeveniments del backend. \newline
+    6. Un cop finalitzat, el gravador inicia el procés de \textit{flashing} i es reinicia.                                                                                   \\ \hline
+    \textbf{Flux Alternatiu}                &
+    5a. Si la connexió es talla durant la pujada, el frontend informa de l'error i permet reintentar des del punt de fallada si el servidor ho suporta.                      \\ \hline
+    \textbf{Postcondició}                   & L'equip es reinicia. La interfície web detecta el tall i mostra una pantalla d'espera fins que l'equip torna a estar en línia. \\ \hline
+  \end{tabular}
+  \caption{Especificació detallada del Cas d'Ús UC-01.}
+  \label{tab:uc_firmware}
 \end{table}
 
 \subsection{UC-02: Consulta de gravacions mitjançant Timeline}
 \begin{table}[htbp]
-\centering
-\small
-\begin{tabular}{|l|p{10cm}|}
-\hline
-\rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-02: Cerca de vídeo històric} \\ \hline
-\textbf{Actor} & Operador \\ \hline
-\textbf{Flux Principal} & 
-1. L'usuari activa el mode "Playback". \newline
-2. El frontend sol·licita l'índex de gravacions per a una data concreta. \newline
-3. El motor de renderitzat dibuixa una línia de temps amb colors diferents segons el tipus de gravació (contínua, per alarma). \newline
-4. L'usuari fa clic en un punt de la línia. \newline
-5. El reproductor HLS inicia la càrrega del fragment corresponent a aquell \textit{timestamp}. \\ \hline
-\end{tabular}
-\caption{Especificació detallada del Cas d'Ús UC-02.}
+  \centering
+  \small
+  \begin{tabular}{|l|p{10cm}|}
+    \hline
+    \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-02: Cerca de vídeo històric}              \\ \hline
+    \textbf{Actor}                          & Operador                                             \\ \hline
+    \textbf{Flux Principal}                 &
+    1. L'usuari activa el mode "Playback". \newline
+    2. El frontend sol·licita l'índex de gravacions per a una data concreta. \newline
+    3. El motor de renderitzat dibuixa una línia de temps amb colors diferents segons el tipus de gravació (contínua, per alarma). \newline
+    4. L'usuari fa clic en un punt de la línia. \newline
+    5. El reproductor HLS inicia la càrrega del fragment corresponent a aquell \textit{timestamp}. \\ \hline
+  \end{tabular}
+  \caption{Especificació detallada del Cas d'Ús UC-02.}
 \end{table}
 
 \section{Restriccions del sistema}
 El desenvolupament s'ha de cenyir a les següents limitacions:
 \begin{itemize}
-    \item \textbf{Seguretat:} No es permet l'ús de galetes (\textit{cookies}) per a l'emmagatzematge de dades de sessió per evitar atacs CSRF; s'ha d'usar \textit{LocalStorage} amb protecció de rutes.
-    \item \textbf{CORS:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
-    \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
+  \item \textbf{Seguretat:} No es permet l'ús de galetes (\textit{cookies}) per a l'emmagatzematge de dades de sessió per evitar atacs CSRF; s'ha d'usar \textit{LocalStorage} amb protecció de rutes.
+  \item \textbf{Same-Origin Policy:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
+  \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}
 \section{Marc normatiu i regulacions}
 Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real i dades de configuració de dispositius de seguretat, el sistema s'ha dissenyat per complir amb el següent marc legal:
@@ -188,22 +188,22 @@ Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real i 
 \subsection{Protecció de Dades (RGPD)}
 El sistema compleix amb el \textbf{Reglament General de Protecció de Dades (Reglament UE 2016/679)}. Tot i que l'aplicació gestiona imatges de persones en directe, \textit{Web Core View} s'ha dissenyat sota el principi de \textit{Privacy by Design}:
 \begin{itemize}
-    \item No s'emmagatzemen dades personals ni metadades d'usuari de forma persistent en el navegador, exceptuant el \textit{token} de sessió protegit en el \textit{LocalStorage}.
-    \item L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només el personal autoritzat pugui visualitzar el vídeo.
+  \item No s'emmagatzemen dades personals ni metadades d'usuari de forma persistent en el navegador, exceptuant el \textit{token} de sessió protegit en el \textit{LocalStorage}.
+  \item L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només el personal autoritzat pugui visualitzar el vídeo.
 \end{itemize}
 
 \subsection{Seguretat en la comunicació}
 Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de tipus \textit{Man-in-the-Middle} (MitM), s'obliga a l'ús de protocols xifrats:
 \begin{itemize}
-    \item Totes les peticions a l'API REST s'han de realitzar via \textbf{HTTPS}.
-    \item La comunicació d'alarmes i esdeveniments es realitza mitjançant \textbf{WebSockets Segurs (WSS)}.
-    \item El flux de vídeo WebRTC utilitza el protocol \textbf{DTLS} per al xifratge d'extrem a extrem.
+  \item Totes les peticions a l'API REST s'han de realitzar via \textbf{HTTPS}.
+  \item La comunicació d'alarmes i esdeveniments es realitza mitjançant \textbf{WebSockets Segurs (WSS)}.
+  \item El flux de vídeo WebRTC utilitza el protocol \textbf{DTLS} per al xifratge d'extrem a extrem.
 \end{itemize}
 
 \subsection{Normativa de seguretat privada}
 El software s'ha concebut com una eina per al compliment de la \textbf{Llei d'Ordenació de l'Edificació (LOE)} i, especialment, la \textbf{Llei 5/2014 de Seguretat Privada}. Atès que Lanaccess opera en sectors d'infraestructures crítiques i banca, \textit{Web Core View} integra funcionalitats que faciliten el compliment normatiu per part del client final:
 \begin{itemize}
-    \item \textbf{Gestió de la caducitat de gravacions:} El sistema permet configurar polítiques de sobreescriptura automàtica per assegurar que les imatges no s'emmagatzemen més enllà dels 30 dies prescrits per la llei, tret que hi hagi un requeriment judicial.
-    \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació facilita el registre exhaustiu de qui ha accedit a quina càmera i en quin moment, garantint la traçabilitat exigida per les autoritats en cas d'inspecció o incident de seguretat.
+  \item \textbf{Gestió de la caducitat de gravacions:} El sistema permet configurar polítiques de sobreescriptura automàtica per assegurar que les imatges no s'emmagatzemen més enllà dels 30 dies prescrits per la llei, tret que hi hagi un requeriment judicial.
+  \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació facilita el registre exhaustiu de qui ha accedit a quina càmera i en quin moment, garantint la traçabilitat exigida per les autoritats en cas d'inspecció o incident de seguretat.
 \end{itemize}
 Malgrat aquestes facilitats tècniques, el compliment final de la normativa depèn de la configuració i l'ús real que l'entitat de seguretat privada faci del sistema en la instal·lació del client.

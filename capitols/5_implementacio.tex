@@ -1,7 +1,7 @@
 \chapter{Implementació}
 \label{ch:implementacio}
 
-En aquest capítol es detalla el procés de construcció del sistema \textit{Web Core View}. S'explica la configuració de l'entorn de desenvolupament i es desglossa la implementació de cada mòdul funcional, posant èmfasi en la lògica reactiva d'Angular 19 i la integració amb els serveis de baix nivell del gravador.
+En aquest capítol es detalla el procés de construcció del sistema \textit{Web Core View}. Es descriu l'entorn de treball i la implementació de cada mòdul funcional, destacant la lògica reactiva i la integració amb el gravador.
 
 \section{Entorn de desenvolupament i tecnologies}
 Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte segueix un enfocament de components de tipus \textit{stand\-alone}, eliminant la dependència de mòduls clàssics per optimitzar el procés de \textit{tree-shaking} i la càrrega inicial.
@@ -24,7 +24,7 @@ S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de form
     \item \textbf{Config Lock Service:} S'ha implementat una lògica de bloqueig per evitar edicions simultànies per part de diferents administradors.
 \end{itemize}
 
-\section{Visualització de Vídeo en Temps Real (WebRTC)}
+\section{Visualització de Vídeo Real-Time (WebRTC)}
 El repte principal ha estat la negociació del flux de vídeo entre el \textit{backend} en C++ i el navegador del client.
 
 \subsection{Negociació SDP i intercanvi de candidats}

@@ -37,7 +37,7 @@ El projecte s'estructura en sis fases lògiques pactades amb l'empresa:
 \subsection{Recursos identificats}
 Per a l'execució del projecte es requereixen els següents recursos:
 \begin{itemize}
-  \item \textbf{Humans (Rols):} Cap de Projecte (planificació), Analista (disseny d'arquitectura), Programador (codificació) i Tester (validació).
+  \item \textbf{Humans (Rols):} Cap de Projecte, Analista (arquitectura), Programador (codificació) i Tester (validació).
   \item \textbf{Materials:} Ordinador portàtil (ASUS Expertbook), videogravador Lanaccess de proves i espai de despatx equipat.
   \item \textbf{Software:} VS Code, Git, Angular 19, RxJS i llibreries de vídeo (WebRTC, HLS.js).
 \end{itemize}
@@ -76,12 +76,24 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
 \end{figure}
 
 \subsection{Gestió del risc i desviacions reals}
-S'han previst plans de contingència per a retards en la formació o incompatibilitats en els protocols de vídeo (WebRTC). Actualment, s'han detectat desviacions significatives en el mòdul de reproducció de gravacions, ja que la integració del \textit{backend} ha presentat una complexitat superior a la prevista, especialment pel que fa a la precisió requerida pel còdec H.265. Així mateix, el disseny del motor de configuració dinàmica (definició d'esquemes i mapeig de camps) ha requerit una fase d'arquitectura més extensa de l'estimada inicialment.
+S'han previst plans de contingència per a retards en la formació o incompati\-bilitats en els protocols de vídeo (WebRTC). Actualment, s'han detectat desviacions significatives
+en el mòdul de reproducció de gravacions, ja que la integració del \textit{backend} ha presentat una complexitat superior a la prevista, especialment pel que fa a la precisió requerida pel còdec H.265. Així mateix, el disseny del motor de configuració dinàmica (definició d'esquemes i mapeig de camps) ha requerit una fase d'arquitectura més extensa de l'estimada inicialment.
 
 \subsection{Desviacions i impacte econòmic}
 Aquestes desviacions han tingut un impacte directe en el consum de recursos humans, especialment en els rols d'\textbf{Analista} i \textbf{Programador}. El temps addicional dedicat a la recerca i implementació del suport H.265 sense \textit{plugins} ha suposat un increment aproximat de \textbf{45 hores} sobre la planificació inicial.
 
 A nivell econòmic, aquest sobrecost teòric s'ha gestionat mitjançant el \textbf{marge de contingència del 10\%} definit en el pressupost inicial. Tot i que el cost real del personal ha augmentat, el pressupost final no s'ha vist compromès gràcies a aquesta reserva, evitant així la necessitat de finançament addicional o de retallar funcionalitats crítiques de l'abast del projecte.
+
+\subsection{Estat actual del projecte}
+A data de la fita de seguiment (maig de 2026), el projecte es troba en un estat de desenvolupament del \textbf{85 \%}. El desglossament per mòduls és el següent:
+\begin{itemize}
+  \item \textbf{Mòdul d'Autenticació i Core:} 100 \% (Completat).
+  \item \textbf{Motor d'Alarmes i Vídeo Directe (WebRTC):} 100 \% (Completat i validat).
+  \item \textbf{Motor de Configuració Schema-driven:} 90 \% (En fase de proves d'integració).
+  \item \textbf{Mòdul de Gravacions (HLS):} 60 \% (En fase d'optimització del buffer pel còdec H.265).
+  \item \textbf{Memòria i Documentació:} 50 \% (En procés).
+\end{itemize}
+Es preveu finalitzar el desenvolupament tècnic dins del termini previst, dedicant les últimes dues setmanes exclusivament al poliment de la UI i la redacció de l'annex tècnic.
 
 \section{Anàlisi econòmica}
 L'estimació econòmica s'ha realitzat assumint rols professionals i preus de mercat actuals, afegint un factor d'1,35 per cobrir la Seguretat Social.
@@ -93,7 +105,7 @@ L'estimació econòmica s'ha realitzat assumint rols professionals i preus de me
   \label{tab:costos_humans}
   \begin{tabular}{@{}lcccc@{}}
     \toprule
-    \textbf{Rol}       & \textbf{Sou Brut/h (€)} & \textbf{Cost Real/h (€)} & \textbf{Hores} & \textbf{Total (€)} \\ \midrule
+    \textbf{Rol}       & \textbf{Sou Brut/h (\euro{})} & \textbf{Cost Real/h (\euro{})} & \textbf{Hores} & \textbf{Total (\euro{})} \\ \midrule
     Project Manager    & 25,00                   & 33,75                    & 90             & 3.037,50           \\
     Analista           & 20,00                   & 27,00                    & 100            & 2.700,00           \\
     Programador        & 18,00                   & 24,30                    & 250            & 6.075,00           \\
@@ -103,7 +115,7 @@ L'estimació econòmica s'ha realitzat assumint rols professionals i preus de me
 \end{table}
 
 \subsection{Costos totals i control de gestió}
-Sumant l'amortització del hardware (210,00 €), els costos indirectes \- d'oficina (1.150,00 €) i un marge de contingència del 10 \%, el pressupost final estimat és de \textbf{16.810,40 €}.
+Sumant l'amortització del hardware (210,00~\euro{}), els costos indirectes \- d'oficina (1.150,00~\euro{}) i un marge de contingència del 10 \%, el pressupost final estimat és de \textbf{16.810,40~\euro{}}.
 
 El control de gestió es realitza mitjançant la fórmula de desviació de costos:
 \[ \text{Desviació} = (\text{Hores Planificades} - \text{Hores Reals}) \times \text{Cost/h} \]

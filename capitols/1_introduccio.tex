@@ -22,9 +22,9 @@ Històricament, la gestió operativa i tècnica dels gravadors de vídeo s'ha re
 \subsection{Estat de l'art}
 Actualment, el mercat de la videovigilància IP està dominat per grans fabricants com Hikvision o Dahua, que ofereixen interfícies web integrades. El principal inconvenient d'aquestes solucions és que sovint encara depenen de protocols propietaris o de la instal·lació de \textit{plugins} externs (com els antics ActiveX o extensions específiques) per poder visualitzar el vídeo, cosa que limita la seva compatibilitat a navegadors o sistemes operatius concrets.
 
-Aquesta dependència està desapareixent amb la tendència actual cap al \textbf{Plugin-less video}. L'aparició d'estàndards com \textbf{WebRTC} ha suposat un punt d'inflexió, permetent la transmissió de fluxos multimèdia d'alta fidelitat i baixa latència de forma nativa en el navegador, eliminant les barreres de seguretat i instal·lació que imposaven les tecnologies anteriors.
+Aquesta dependència està desapareixent amb la tendència actual cap al \textbf{Plugin-less video}. L'aparició d'estàndards com \textbf{WebRTC} \cite{rfc8825} ha suposat un punt d'inflexió, permetent la transmissió de fluxos multimèdia d'alta fidelitat i baixa latència de forma nativa en el navegador, eliminant les barreres de seguretat i instal·lació que imposaven les tecnologies anteriors.
 
-D'altra banda, els líders de programari VMS (\textit{Video Management System}) com Milestone o Genetec ofereixen solucions molt potents però amb arquitectures extremadament pesades i costos de llicenciament elevats, enfocades sovint a clients amb gran capacitat de còmput local.
+D'altra banda, els líders de programari VMS (\textit{Video Management System}) com Milestone o Genetec ofereixen solucions molt potents però amb arquitectures extremadament pesades i costos de llicenciament elevats, enfocades sovint a clients amb gran capacitat de còmput local. La proposta de \textit{Web Core View} es diferencia per ser una solució \textit{embedded-first}, on el servidor web corre directament en el hardware de gravació.
 
 \subsection{Taula comparativa}
 A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre la solució nativa anterior, els líders de mercat i la proposta de Web Core View.
@@ -33,14 +33,16 @@ A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre la soluc
   \centering
   \caption{Comparativa de solucions de mercat.}
   \label{tab:comparativa_mercat}
-  \begin{tabular}{@{}llll@{}}
-    \toprule
-    \textbf{Característica} & \textbf{App Windows} & \textbf{Market Leaders}    & \textbf{Web Core View}                     \\ \midrule
-    Accessibilitat          & Baixa (Windows)      & Mitjana (\textit{Plugins}) & \textbf{Alta (Navegador)}                  \\
-    Manteniment             & Difícil (Manual)     & Complex (Servidors)        & \textbf{Fàcil (Centralitzat)}              \\
-    Interfície (UX)         & Obsoleta             & Professional/Complexa      & \textbf{Moderna i Intuïtiva}               \\
-    Configuració            & Estàtica             & Propietària                & \textbf{Dinàmica (\textit{Schema-driven})} \\ \bottomrule
-  \end{tabular}
+  \resizebox{\textwidth}{!}{
+    \begin{tabular}{@{}llll@{}}
+      \toprule
+      \textbf{Característica} & \textbf{App Windows} & \textbf{Market Leaders}    & \textbf{Web Core View}                     \\ \midrule
+      Accessibilitat          & Baixa (Windows)      & Mitjana (\textit{Plugins}) & \textbf{Alta (Navegador)}                  \\
+      Manteniment             & Difícil (Manual)     & Complex (Servidors)        & \textbf{Fàcil (Centralitzat)}              \\
+      Interfície (UX)         & Obsoleta             & Professional/Complexa      & \textbf{Moderna i Intuïtiva}               \\
+      Configuració            & Estàtica             & Propietària                & \textbf{Dinàmica (\textit{Schema-driven})} \\ \bottomrule
+    \end{tabular}
+  }
   \par\smallskip
   \small Font: Elaboració pròpia.
 \end{table}
@@ -51,22 +53,22 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
 \subsection{Alternativa de vídeo: WebRTC vs. HLS}
 \begin{itemize}
   \item \textbf{HLS (HTTP Live Streaming):} Ideal per a retransmissions massives on la latència no és crítica (com Netflix o YouTube). En videovigilància, un retard de 2 a 5 segons és inacceptable per a l'operació tècnica.
-  \item \textbf{WebRTC (Web Real-Time Communication):} Permet una comunicació de baixa latència (<300ms) mitjançant UDP.
-  \item \textbf{Justificació:} S'ha escollit \textbf{WebRTC} com a protocol principal per a la visualització en directe per igualar l'experiència de les aplicacions natives, mantenint HLS només com a mecanisme de \textit{fallback} i per a la reproducció de gravacions.
+  \item \textbf{WebRTC (Web Real-Time Communication):} Permet una comunicació de baixa latència (<300ms) mitjançant UDP, seguint les especificacions del W3C i l'IETF \cite{webrtc_org}.
+  \item \textbf{Justificació:} S'ha escollit \textbf{WebRTC} com a protocol principal per a la visualització en directe per igualar l'experiència de les aplicacions natives, mantenint HLS \cite{hls_apple} només com a mecanisme de \textit{fallback} i per a la reproducció de gravacions.
 \end{itemize}
 
 \subsection{Alternativa de configuració: Estàtica vs. Schema-driven}
 \begin{itemize}
   \item \textbf{Formularis estàtics:} Programar una pantalla per a cada menú de configuració és més ràpid a curt termini però genera un deute tècnic insostenible, ja que cada canvi en el \textit{firmware} obligaria a actualitzar el \textit{frontend}.
   \item \textbf{Motor Schema-driven:} El \textit{frontend} actua com un intèrpret que renderitza la interfície basant-se en un esquema JSON rebut del servidor.
-  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compatibilitat futura amb nous models de gravador de Lanaccess sense necessitat de modificar el codi de l'aplicació web.
+  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compati\-bilitat futura amb els nous models de gravador de Lanaccess sense haver de modificar el codi de l'aplicació web.
 \end{itemize}
 
-\subsection{Alternativa de gestió d'estat: Redux (NgRx) vs. Angular Signals}
+\subsection{Alternativa de gestió d'estat: Redux vs. Angular Signals}
 \begin{itemize}
   \item \textbf{Redux/NgRx:} Solucions robustes per a aplicacions gegantines, però amb un \textit{boilerplate} elevat i un consum de recursos que pot penalitzar dispositius amb hardware limitat.
-  \item \textbf{Angular Signals:} La nova eina nativa d'Angular 19 per a la gestió de la reactivitat granular.
-  \item \textbf{Justificació:} S'ha seleccionat \textbf{Signals} per la seva lleugeresa i eficiència en el renderitzat. En un entorn \textit{embedded} on la CPU s'ha de prioritzar per al vídeo, la reactivitat nativa de Signals és l'opció més òptima.
+  \item \textbf{Angular Signals:} La nova eina nativa d'Angular 19 per a la gestió de la reactivitat granular \cite{angular_signals}.
+  \item \textbf{Justificació:} S'ha seleccionat \textbf{Signals} per la seva lleugeresa i eficiència en el renderitzat. En un entorn \textit{embedded} on la CPU s'ha de prioritzar per al vídeo, la reactivitat nativa de Signals permet prescindir de les comprovacions constants de \textit{Zone.js}, optimitzant el rendiment global del sistema.
 \end{itemize}
 
 \section{Solució proposada i valor afegit}
@@ -75,7 +77,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Arquitectura Schema-driven:} La interfície interpreta un esquema JSON enviat pel gravador i genera automàticament els controls de configuració, assegurant compatibilitat amb qualsevol versió de hardware.
   \item \textbf{Gestió d'estat amb Signals:} L'ús d'\textbf{Angular Signals} representa un canvi de paradigma en la reactivitat. Aquesta funcionalitat permet una gestió granular dels canvis, optimitzant el rendiment del \textit{frontend} i garantint una fluïdesa absoluta fins i tot amb múltiples fluxos de vídeo simultanis, evitant sobrecàrregues de CPU innecessàries al terminal del client.
   \item \textbf{Control de concurrència:} Implementació d'un servei de bloqueig en temps real per evitar conflictes d'edició entre administradors.
-  \item \textbf{Arquitectura d'esdeveniments:} Ús de \textit{WebSockets} (WSS) per rebre notificacions d'alarmes de forma instantània.
+  \item \textbf{Arquitectura d'esdeveniments:} Ús de \textit{WebSockets} (WSS) per rebre notificacions d'alarmes, notificacions del sistema i errors de forma immediata.
 \end{itemize}
 
 \section{Objectius del projecte}
@@ -86,8 +88,8 @@ Dissenyar i desenvolupar una plataforma web SPA modular, reactiva i d’alt rend
 \begin{itemize}
   \item Desenvolupar un motor de configuració dinàmic basat en esquemes metadada.
   \item Integrar un mòdul de visualització híbrid compatible amb WebRTC i HLS (H264/H265).
-  \item Implementar un sistema de gestió d'alarmes en temps real mitjançant comunicació bidireccional.
-  \item Facilitar el manteniment remot (firmware, llicències i logs) a través del navegador.
+  \item Implementar la gestió d'alarmes en temps real mitjançant comunicació bidireccional.
+  \item Facilitar el manteniment remot (\textit{firmware}, llicències i logs) via navegador.
 \end{itemize}
 
 \section{Abast i Obstacles}
@@ -99,7 +101,7 @@ S'han identificat reptes tècnics que afecten diferents actors:
 \begin{itemize}
   \item \textbf{Complexitat del vídeo natiu:} El repte de visualitzar H.265 sense \textit{plugins}. Afecta al \textbf{Projectista} (recerca de llibreries) i a l'\textbf{Usuari final} (potencial latència).
   \item \textbf{Sincronització en temps real:} Requereix una gestió d'estat robusta perquè l'\textbf{Operador} vegi alarmes sense retard.
-  \item \textbf{Seguretat i NGINX:} Configuració de CORS i certificats que afecta al desplegament de l'\textbf{Empresa}.
+  \item \textbf{Seguretat i NGINX:} Configuració del \textbf{Proxy Invers} per centralitzar els microserveis sota un mateix origen i garantir polítiques de \textit{Same-Origin}.
 \end{itemize}
 
 \section{Actors implicats (Stakeholders)}
@@ -107,6 +109,6 @@ S'han identificat reptes tècnics que afecten diferents actors:
   \item \textbf{Usuari final (Operador):} Monitoritza càmeres i gestiona incidents.
   \item \textbf{Administrador tècnic:} Configura el sistema i realitza manteniment.
   \item \textbf{Lanaccess Telecom:} Proporciona el \textit{hardware} i coneixement de negoci.
-  \item \textbf{Projectista (Estudiant):} Responsable únic de l'anàlisi, disseny i implementació.
+  \item \textbf{Projectista (Estudiant):} Responsable únic de l'anàlisi i la implementació.
   \item \textbf{Equip docent (Director i Ponent):} Supervisen el rigor acadèmic i tècnic.
 \end{enumerate}

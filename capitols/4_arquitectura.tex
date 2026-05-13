@@ -11,14 +11,14 @@ Com es va introduir a la Figura 1, la interacció entre la interfície i el hard
 
 \begin{itemize}
     \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
-    \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones, principalment a través del mòdul \textit{Core Legacy}. Aquest canal gestiona la consulta i l'enviament de paràmetres de configuració.
+    \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones via mòdul \textit{Core Legacy}. Gestiona la consulta i l'enviament de paràmetres de configuració.
     \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textit{Core Notifier} i \textit{Core Alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
 \end{itemize}
 
 Internament, els serveis es comuniquen mitjançant \textbf{gRPC} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu.
 
 \section{Disseny del Frontend (Angular 19)}
-L'elecció d'Angular 19 no és casual; el marc de treball proporciona una estructura opinada que facilita el manteniment a llarg termini d'una aplicació de gran envergadura.
+L'elecció d'Angular 19 no és casual; el \textit{framework} proporciona una estructura que facilita el manteniment a llarg termini de l'aplicació.
 
 \subsection{Arquitectura Modular i Standalone Components}
 S'ha eliminat l'ús de mòduls clàssics d'Angular en favor dels \textit{Standalone Components}. Això redueix el \textit{boilerplate} del codi i millora el temps de càrrega de l'aplicació (\textit{lazy loading}), ja que només es descarreguen al navegador els components necessaris per a la vista actual (per exemple, el mòdul de configuració avançada no es carrega si l'usuari només vol veure vídeo).
