@@ -38,7 +38,7 @@ S'han definit tres actors principals, classificant-los segons el seu nivell d'in
 \section{Històries d'Usuari (User Stories)}
 S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalitat aporta a l'usuari final. Cada història inclou els seus criteris d'acceptació.
 
-\subsection{Mòdul de Visualització i Control PTZ}
+\subsection{Mòdul de Visualització i Reproducció de Vídeo}
 \begin{description}
   \item[\textbf{US-01: Streaming d'alta fidelitat}] \hfill \\
         \textbf{Com a} Operador, \textbf{vull} veure el vídeo de qualsevol càmera connectada, \textbf{per tal de} vigilar l'espai protegit en temps real.
@@ -50,10 +50,11 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
   \item[\textbf{US-02: Gestió de Mosaic}] \hfill \\
         \textbf{Com a} Operador, \textbf{vull} visualitzar fins a 4 càmeres simultàniament, \textbf{per tal de} tenir una visió global de la instal·lació.
 
-  \item[\textbf{US-04: Control PTZ de càmeres}] \hfill \\
-        \textbf{Com a} Operador, \textbf{vull} controlar el moviment i el zoom (PTZ) de les càmeres de seguretat, \textbf{per tal de} seguir objectes o persones d'interès a la zona de vigilància.
+  \item[\textbf{US-04: Consulta de gravacions històriques}] \hfill \\
+        \textbf{Com a} Operador, \textbf{vull} consultar i reproduir el vídeo gravat del passat mitjançant una línia de temps (\textit{timeline}) gràfica, \textbf{per tal de} revisar incidents de seguretat que s'hagin produït prèviament.
         \begin{itemize}
-          \item \textit{Criteri 1:} Les ordres de moviment s'han d'enviar i executar amb un retard inferior a 150ms.
+          \item \textit{Criteri 1:} El reproductor ha de permetre saltar a qualsevol punt temporal passat amb una precisió de 1 segon a través del lliscador de la línia de temps.
+          \item \textit{Criteri 2:} La reproducció de vídeo històric s'ha de transmetre mitjançant fragments HLS generats a petició pel gravador.
         \end{itemize}
 \end{description}
 
@@ -155,6 +156,7 @@ Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
 \begin{itemize}
   \item \textbf{RNF-2.1 Tolerància a talls de xarxa:} El WebSocket ha d'intentar una reconnexió exponencial (re-try) en cas de pèrdua de connectivitat.
   \item \textbf{RNF-2.2 Fallback de Vídeo:} Si el port WebRTC (UDP 10000-20000) està bloquejat per firewall, el reproductor ha de commutar a TCP-HLS en menys de 5 segons.
+  \item \textbf{RNF-2.3 Concurrència i Integritat (Pessimistic Locking):} Per garantir la consistència de les dades del sistema i evitar escriptures concurrents conflictives entre diferents usuaris administradors, s'exigeix un mecanisme de bloqueig pessimista (\textit{Pessimistic Locking}) en l'adquisició dels formularis de configuració activa. Cap usuari podrà modificar paràmetres del sistema si un altre usuari posseeix el \textit{lock} exclusiu d'aquell mòdul.
 \end{itemize}
 
 \subsection{RNF-3: Compatibilitat i Portabilitat}
@@ -195,7 +197,7 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
     6. Un cop finalitzat, el gravador inicia el procés de \textit{flashing} i es reinicia.                                                                                   \\ \hline
     \textbf{Flux Alternatiu}                &
     5a. Si la connexió es talla durant la pujada, el frontend informa de l'error i permet reintentar des del punt de fallada si el servidor ho suporta.                      \\ \hline
-    \textbf{Postcondició}                   & L'equip es reinicia. La interfície web detecta el tall i mostra una pantalla d'espera fins que l'equip torna a estar en línia. \\ \hline
+    \textbf{Postcondició}                   & L'equip es reinicia. La interfície web detecta el tall i mostra una pantalla d'espera fins que l'equip torna a estar en línia. En cas d'actualització crítica amb fallida de verificació del checksum o corrupció del binari, el backend garanteix la recuperació automàtica commutant de forma transparent a la partició de firmware previ (\textit{dual-boot rollback}) per assegurar la integritat i operativitat del dispositiu. \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-01.}
   \label{tab:uc_firmware}

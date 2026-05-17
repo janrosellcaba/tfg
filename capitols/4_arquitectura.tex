@@ -25,7 +25,14 @@ Com es detalla a la Figura \ref{fig:deployment_diagram}, la interacció entre la
     \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textit{Core Notifier} i \textit{Core Alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
 \end{itemize}
 
-Internament, els serveis es comuniquen mitjançant \textbf{gRPC} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu.
+Internament, els serveis del backend embedded es comuniquen mitjançant \textbf{gRPC} \cite{grpc_up_running} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu. Aquesta naturalesa heterogènia de la pila de comunicació del gravador planteja un repte de disseny crític: el navegador del client web no pot consumir directament gRPC binari ni escoltar senyals del bus D-Bus de forma nativa.
+
+Per resoldre aquest desacoblament, s'ha dissenyat un mecanisme de **bridging de protocols (Protocol Bridging)** centralitzat en el servei de notificacions (\textit{Core Notifier}) del gravador. Aquest servei actua com a intermediari actiu (\textit{gateway}): es subscriu als esdeveniments de sistema (com pèrdues de vídeo o activació de relés) a través del bus de sistema D-Bus i de canals gRPC, tradueix aquestes estructures de baix nivell en missatges lleugers en format JSON, i finalment les transmet en temps real a través del canal de \textbf{WebSockets} (WSS) \cite{rfc6455} cap al client Angular. Aquest disseny de traducció bidireccional garanteix que el frontend pugui respondre immediatament a qualsevol esdeveniment de seguretat de forma asíncrona sense requerir costoses connexions binàries natives ni carregar la CPU del client.
+
+\subsection{Estratègia de Fallback i robustesa del canal de vídeo}
+La integració de WebRTC com a mètode de visualització de vídeo de baixa latència ($<300$~ms) requereix un mecanisme d'alta disponibilitat que respongui davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pels tallafocs de seguretat. Per a aquest propòsit, s'ha dissenyat un sistema de \textit{fallback} transparent a HLS \cite{hls_apple}.
+
+El client web inicia la negociació SDP mitjançant la referència del protocol WebRTC W3C \cite{webrtc_w3c}. Si el navegador detecta que l'estat de la connexió ICE (\textit{Interactive Connectivity Establishment}) transita cap a \texttt{failed} o \texttt{disconnected} després d'un \textit{timeout} de seguretat de 5 segons, s'activa automàticament la lògica de degradació de servei. En aquest instant, es tanquen de manera neta els descriptors de WebRTC i s'inicialitza la reproducció d'un flux de vídeo HLS a través del Proxy Invers NGINX (TCP, port 443 xifrat), assegurant que l'operador continuï visualitzant la càmera sense interrupció.
 
 \section{Disseny del Frontend (Angular 19)}
 L'elecció d'Angular 19 no és casual; el \textit{framework} proporciona una estructura que facilita el manteniment a llarg termini de l'aplicació.
@@ -52,11 +59,13 @@ L'organització d'aquests elements a nivell de dependències i estructura de mò
 \end{figure}
 
 \subsection{Gestió de l'Estat amb Angular Signals}
-Aquest és un punt d'inflexió respecte a les versions anteriors del programari. Mentre que RxJS és excel·lent per a fluxos de dades complexos, \textbf{Angular Signals} permet una reactivitat granular.
+Aquest és un punt d'inflexió respecte a les versions anteriors del programari. Mentre que RxJS és excel·lent per a fluxos de dades complexos, \textbf{Angular Signals} permet una reactivitat granular \cite{learning_angular}.
 \begin{itemize}
     \item \textbf{Eficiència:} En un sistema de vigilància on els estats de les càmeres canvien constantment, els \textit{Signals} asseguren que només es torni a renderitzar la part mínima de l'arbre del DOM afectada, reduint dràsticament l'ús de CPU al terminal del client.
     \item \textbf{Sincronització:} Els valors calculats (\textit{computed signals}) faciliten que la interfície s'adapti automàticament a canvis en el \textit{lock} de configuració o en l'estat de connectivitat informat pel \textit{Keep-alive}.
 \end{itemize}
+
+Dins d'aquest disseny de gestió d'estat reactiu, un dels reptes tècnics ha estat la modificació d'estructures de dades altament anidades zone-free sense trencar la detecció de canvis nativa. Angular Signals es basa en la comparació de valors per referència; per tant, mutar directament una propietat interna d'un objecte complex no dispararia la reactivitat del component. Per resoldre-ho, s'ha implementat un algorisme de manipulació profunda (\textit{deep copy} i \textit{deep access}) que clona l'objecte d'estat local completament, hi aplica la modificació en el camp editat dinàmicament (identificat pel camí de la propietat JSON de l'esquema), i finalment actualitzen el Signal amb la nova referència (\texttt{configSignal.set(newConfig)}). Aquest disseny garanteix la immutabilitat de l'estat i evita defectes de renderitzat col·laterals.
 
 \section{El Motor Schema-Driven}
 El component més innovador del sistema és el motor de configuració dinàmic. Aquest motor permet desacoblar totalment el desenvolupament del \textit{frontend} de l'evolució del \textit{firmware}.

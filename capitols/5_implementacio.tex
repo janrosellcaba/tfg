@@ -9,10 +9,31 @@ Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat e
 Pel que fa als estils, s'ha utilitzat \textbf{SCSS modular}. S'han definit variables globals per mantenir la consistència visual i s'ha aplicat l'estratègia de detecció de canvis \texttt{OnPush} per garantir que la interfície només es refresqui quan realment hi hagi canvis d'estat significatius.
 
 \section{Mòdul d'Autenticació i Core}
-La seguretat de l'aplicació es gestiona en la capa \textit{Core}. S'ha implementat un servei d'usuari (\texttt{user.service.ts}) que centralitza les crides a l'API de \textit{login} i manté l'estat de la sessió mitjançant \textit{tokens}.
+La seguretat de l'aplicació es gestiona de manera centralitzada en la capa \textit{Core} mitjançant la gestió de sessions amb JSON Web Tokens (JWT) \cite{rfc7519}. S'ha implementat un servei d'autenticació (\texttt{auth.service.ts}) que gestiona les crides a l'API de \textit{login}. Un cop el gravador valida les credencials del client, retorna un token signat digitalment. Aquest token s'emmagatzema en l'estat en memòria d'un Signal privatiu de l'aplicació per evitar atacs d'escriptura maliciosa de tipus \textit{Cross-Site Scripting} (XSS) associats a l'ús de \textit{localStorage}.
 
-\subsection{Protecció de rutes i Resolvers}
-S'ha programat un \textbf{AuthGuard} que verifica la validesa de la sessió. A més, s'ha implementat el resolver \texttt{Language\-Init\-Resolver} per carregar els fitxers de traducció abans de carregar la interfície principal i així evitar parpellejos en la \textit{inter\-nacionalització}.
+Per tal de garantir que totes les peticions enviades cap al gravador estan correctament autoritzades, s'ha definit un interceptor funcional d'Angular 19, anomenat \texttt{authInterceptor} (\texttt{HttpInterceptorFn}). Aquest interceptor s'encarrega d'examinar la petició, extreure el token actiu i, en cas de ser-hi present, clonar la petició per injectar la capçalera HTTP de seguretat corresponent:
+
+\begin{lstlisting}[language=JavaScript, caption={Implementació del HttpInterceptorFn en Angular 19.}]
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const token = authService.getTokenSignal()();
+  
+  if (token) {
+    const authReq = req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${token}`)
+    });
+    return next(authReq);
+  }
+  return next(req);
+};
+\end{lstlisting}
+
+\subsection{Protecció de rutes i Functional Guards}
+Per tal d'assegurar que l'accés a determinades seccions està degudament restringit segons el perfil de l'usuari (Operador o Administrador), s'han implementat **Functional Guards** basats en la nova especificació d'Angular 19, que simplifica el disseny evitant la declaració de classes clàssiques.
+
+La protecció de rutes de configuració es realitza mitjançant un guàrdia funcional de tipus \texttt{CanActivateFn}. Aquest guàrdia injecta el servei de seguretat, llegeix el rol descodificat en el token JWT del client i bloqueja l'accés al router web si l'usuari té un rol insuficient (per exemple, un operador intentant accedir al menú de configuració del sistema). En cas de bloqueig, el guard redirigeix l'usuari a la pàgina de visor de vídeo i emet un missatge de notificació emergent.
+
+A més, s'ha implementat el resolver \texttt{LanguageInitResolver} per carregar els fitxers de traducció abans de renderitzar la interfície principal i així evitar parpellejos en la internacionalització.
 
 El cicle complet de comunicació des del formulari de login fins al backend es descriu detalladament en el diagrama de seqüència de la Figura \ref{fig:seq_login}.
 
@@ -28,7 +49,17 @@ El cicle complet de comunicació des del formulari de login fins al backend es d
 Aquesta és la part més complexa de la implementació. El motor ha de ser capaç de transformar un esquema JSON abstracte en una interfície totalment funcional.
 
 \subsection{El component genèric de configuració}
-S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de forma recursiva segons l'estructura del JSON rebut. 
+S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de forma recursiva segons l'estructura del JSON rebut. La decisió de quin tipus d'element de formulari s'ha d'instanciar per a cada paràmetre es resol dinàmicament en temps d'execució analitzant la propietat \texttt{type} i les metadades de restricció de l'esquema JSON mitjançant un flux de selecció múltiple (\textit{switch-case}):
+
+\begin{description}
+    \item[\texttt{type: "boolean"}] $\rightarrow$ Es mapeja cap al component \texttt{ToggleComponent} (un botó de commutació gràfic actiu/inactiu).
+    \item[\texttt{type: "integer" o "float"}] $\rightarrow$ Si l'esquema inclou metadades de rang limitat (\texttt{min} i \texttt{max}), es renderitza el component \texttt{SliderComponent} per a un control tàctil precís. Si no es defineix un rang tancat, s'instancia el component \texttt{NumericInputComponent} amb filtrat actiu de caràcters de teclat.
+    \item[\texttt{type: "string"}] $\rightarrow$ Si el camp posseeix una propietat \texttt{enum} de valors tancats, es renderitza el component \texttt{SelectComponent} (un menú desplegable). Si conté una propietat de validació com \texttt{pattern} (expressió regular), es mapeja cap al component \texttt{TextInputComponent} amb validació activa de regex en temps real (per a formats d'adreça IP, DNS, etc.).
+    \item[\texttt{type: "object"}] $\rightarrow$ S'aplica la recursivitat cridant el component contenidor \texttt{ConfigGroupComponent}, que agrupa lògicament les subpropietats i genera una pestanya o secció col·lapsable a la interfície.
+    \item[\texttt{type: "array"}] $\rightarrow$ S'instancia el component \texttt{ListConfigComponent}, que gestiona de manera dinàmica l'escriptura, inserció i eliminació de conjunts de dades indexades (com llistes d'outputs de relés o presets de càmeres).
+\end{description}
+
+A més d'aquest motor d'instanciació, el component gestiona:
 \begin{itemize}
     \item \textbf{Validació en temps real:} S'utilitzen els valors de metadades per configurar les validacions de formulari automàticament.
     \item \textbf{Config Lock Service:} S'ha implementat una lògica de bloqueig per evitar edicions simultànies per part de diferents administradors.
