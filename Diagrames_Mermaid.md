@@ -9,9 +9,9 @@ Aquest fitxer conté el codi **Mermaid** per a tots els diagrames proposats a la
 ```mermaid
 flowchart TD
     %% Actors
-    Op["👤 Operador"]
-    Admin["🔐 Administrador"]
-    Sys["🖥️ Sistema Extern (NVR/Càmera)"]
+    Op["Operador"]
+    Admin["Administrador"]
+    Sys["Sistema Extern (NVR/Càmera)"]
 
     subgraph WebCoreView [Aplicació WebCoreView]
         UC1(["Login / Logout"])

@@ -14,6 +14,16 @@ La seguretat de l'aplicació es gestiona en la capa \textit{Core}. S'ha implemen
 \subsection{Protecció de rutes i Resolvers}
 S'ha programat un \textbf{AuthGuard} que verifica la validesa de la sessió. A més, s'ha implementat el resolver \texttt{Language\-Init\-Resolver} per carregar els fitxers de traducció abans de carregar la interfície principal i així evitar parpellejos en la \textit{inter\-nacionalització}.
 
+El cicle complet de comunicació des del formulari de login fins al backend es descriu detalladament en el diagrama de seqüència de la Figura \ref{fig:seq_login}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/seq_login.png}
+  \caption{Diagrama de seqüència del flux de control d'inici de sessió.}
+  \label{fig:seq_login}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
 \section{Implementació del Motor Schema-Driven}
 Aquesta és la part més complexa de la implementació. El motor ha de ser capaç de transformar un esquema JSON abstracte en una interfície totalment funcional.
 
@@ -24,13 +34,33 @@ S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de form
     \item \textbf{Config Lock Service:} S'ha implementat una lògica de bloqueig per evitar edicions simultànies per part de diferents administradors.
 \end{itemize}
 
+Aquest flux de bloqueig de configuració és vital per a entorns amb concurrència i està detallat en el diagrama de seqüència de la Figura \ref{fig:seq_config_lock}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/seq_config_lock.png}
+  \caption{Diagrama de seqüència del procés d'adquisició i alliberament de Lock de configuració.}
+  \label{fig:seq_config_lock}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
 \section{Visualització de Vídeo Real-Time (WebRTC)}
 El repte principal ha estat la negociació del flux de vídeo entre el \textit{backend} en C++ i el navegador del client.
+
+El reproductor de vídeo implementa un flux robust que s'encarrega d'inicialitzar els diferents mètodes de transmissió i gestionar reconexions automàtiques en cas de pèrdua de senyal, tal com es resumeix en el diagrama d'activitat de la Figura \ref{fig:activity_video_connection}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.65\textwidth]{figures/activity_video_connection.png}
+  \caption{Diagrama d'activitat de la lògica de connexió i reconexió de vídeo.}
+  \label{fig:activity_video_connection}
+  \small Font: Elaboració pròpia.
+\end{figure}
 
 \subsection{Negociació SDP i intercanvi de candidats}
 Per establir la connexió WebRTC, el frontend inicia una petició cap al servei de vídeo del gravador. El procés segueix la generació d'una \textit{Offer} SDP que s'envia via REST.
 
-\begin{lstlisting}[language=JavaScript, caption={Lògica simplificada de la PeerConnection en Angular.}]
+\begin{lstlisting}[language=JavaScript, caption={Lògica simplificada de la PeerConnection in Angular.}]
 async startStreaming(cameraId: string) {
   const pc = new RTCPeerConnection(this.config);
   const offer = await pc.createOffer();
@@ -43,8 +73,28 @@ async startStreaming(cameraId: string) {
 }
 \end{lstlisting}
 
+El cicle de vida d'establiment i inicialització del stream de vídeo des de la selecció de l'usuari fins al renderitzat s'especifica en la Figura \ref{fig:seq_video_streaming}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/seq_video_streaming.png}
+  \caption{Diagrama de seqüència de l'establiment de streaming de vídeo.}
+  \label{fig:seq_video_streaming}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
 \section{Sistema d'Alarmes i Comunicació asíncrona}
 S'ha implementat un servei de \textbf{WebSockets (WSS)} que es connecta al \textit{Core Notifier}. Quan arriba un missatge pel \textit{socket}, el servei el parseja i actualitza un \textit{Signal} global que refresca els components de la interfície de forma reactiva.
+
+A mesura que l'usuari interactua amb el WebSocket d'alarmes, cadascuna d'elles transita per un cicle de vida formal en el cicle d'estats del frontend, representat a la Figura \ref{fig:state_alarm}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/state_alarm.png}
+  \caption{Diagrama d'estats del cicle de vida de les alarmes.}
+  \label{fig:state_alarm}
+  \small Font: Elaboració pròpia.
+\end{figure}
 
 \section{Mòdul de Manteniment i Logs}
 Finalment, s'ha implementat la gestió de \textit{firmware}. Aquesta secció inclou una barra de progrés real que rep el \textit{feedback} de l'escriptura. També s'ha dissenyat un visualitzador de \textit{logs} amb \textit{scroll} infinit per gestionar milers de línies de registre sense saturar la memòria del navegador.

@@ -38,7 +38,7 @@ S'han definit tres actors principals, classificant-los segons el seu nivell d'in
 \section{Històries d'Usuari (User Stories)}
 S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalitat aporta a l'usuari final. Cada història inclou els seus criteris d'acceptació.
 
-\subsection{Mòdul de Visualització}
+\subsection{Mòdul de Visualització i Control PTZ}
 \begin{description}
   \item[\textbf{US-01: Streaming d'alta fidelitat}] \hfill \\
         \textbf{Com a} Operador, \textbf{vull} veure el vídeo de qualsevol càmera connectada, \textbf{per tal de} vigilar l'espai protegit en temps real.
@@ -49,16 +49,60 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
 
   \item[\textbf{US-02: Gestió de Mosaic}] \hfill \\
         \textbf{Com a} Operador, \textbf{vull} visualitzar fins a 4 càmeres simultàniament, \textbf{per tal de} tenir una visió global de la instal·lació.
+
+  \item[\textbf{US-04: Control PTZ de càmeres}] \hfill \\
+        \textbf{Com a} Operador, \textbf{vull} controlar el moviment i el zoom (PTZ) de les càmeres de seguretat, \textbf{per tal de} seguir objectes o persones d'interès a la zona de vigilància.
+        \begin{itemize}
+          \item \textit{Criteri 1:} Les ordres de moviment s'han d'enviar i executar amb un retard inferior a 150ms.
+        \end{itemize}
 \end{description}
 
-\subsection{Mòdul de Configuració (Schema-Driven)}
+\subsection{Mòdul de Gestió d'Alarmes}
+\begin{description}
+  \item[\textbf{US-05: Recepció d'alarmes en temps real}] \hfill \\
+        \textbf{Com a} Supervisor, \textbf{vull} rebre notificacions d'alarmes de forma immediata, \textbf{per tal d'}actuar ràpidament davant de qualsevol incidència de seguretat.
+        \begin{itemize}
+          \item \textit{Criteri 1:} L'alarma s'ha de mostrar a la interfície web en menys d'1 segon des de la seva detecció en el maquinari.
+        \end{itemize}
+
+  \item[\textbf{US-06: Configuració de regles d'alarma}] \hfill \\
+        \textbf{Com a} Administrador, \textbf{vull} configurar i programar regles de detecció d'alarmes per a cada càmera, \textbf{per tal d'}automatitzar la detecció d'esdeveniments.
+\end{description}
+
+\subsection{Mòdul de Configuració Dinàmica i Xarxa}
 \begin{description}
   \item[\textbf{US-03: Configuració sense recàrrega de codi}] \hfill \\
         \textbf{Com a} Administrador, \textbf{vull} que els nous paràmetres afegits al firmware apareguin a la web sense haver de reprogramar el frontend.
         \begin{itemize}
-          \item \textit{Criteri 1:} El frontend ha d'interpretar l'esquema i renderitzar el component visual adequat (input, select, slider).
+          \item \textit{Criteri 1:} El frontend ha d'interpretar l'esquema JSON i renderitzar el component visual adequat de forma dinàmica (input, select, slider).
         \end{itemize}
+
+  \item[\textbf{US-07: Configuració de xarxa i IP}] \hfill \\
+        \textbf{Com a} Administrador, \textbf{vull} configurar els paràmetres de xarxa del dispositiu (adreça IP, màscara, ports), \textbf{per tal de} garantir la connectivitat del sistema.
+
+  \item[\textbf{US-08: Gestió d'usuaris i permisos}] \hfill \\
+        \textbf{Com a} Administrador, \textbf{vull} gestionar els perfils d'usuari i els seus permisos d'accés (grants), \textbf{per tal de} controlar quines accions i vistes pot utilitzar cadascú.
 \end{description}
+
+\subsection{Mòdul de Manteniment}
+\begin{description}
+  \item[\textbf{US-09: Monitoratge dels discs durs}] \hfill \\
+        \textbf{Com a} Tècnic, \textbf{vull} supervisar l'estat i la capacitat dels discs durs de gravació, \textbf{per tal d'}assegurar-me que no es perden gravacions històriques.
+
+  \item[\textbf{US-10: Descàrrega i consulta de logs}] \hfill \\
+        \textbf{Com a} Tècnic, \textbf{vull} cercar i descarregar els registres d'esdeveniments del sistema, \textbf{per tal de} diagnosticar errors de funcionament o auditar l'ús de la plataforma.
+\end{description}
+
+\subsection{Flux d'Interacció (User Journey)}
+Per tal d'il·lustrar de quina manera els operadors de seguretat utilitzen aquest conjunt d'històries d'usuari per respondre de forma pràctica i integrada a un incident de seguretat real, es presenta el diagrama de User Journey (Figura \ref{fig:user_journey}).
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/user_journey.png}
+  \caption{Diagrama de flux d'interacció de l'usuari (User Journey) en la resolució d'una incidència de seguretat.}
+  \label{fig:user_journey}
+  \small Font: Elaboració pròpia.
+\end{figure}
 
 \section{Requisits Funcionals (RF)}
 A continuació es detallen els requisits tècnics dividits per blocs funcionals.

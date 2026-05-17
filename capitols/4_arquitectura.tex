@@ -6,8 +6,18 @@ L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de mo
 \section{Arquitectura Global del Sistema}
 El sistema es basa en un model de microserveis interns coordinats dins del sistema operatiu del gravador. La comunicació amb l'exterior es centralitza a través d'un punt d'entrada robust que gestiona el trànsit de dades i el flux de vídeo.
 
+A nivell de desplegament, el sistema segueix una distribució de components modular, detallada en el diagrama de desplegament de la Figura \ref{fig:deployment_diagram}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/deployment_diagram.png}
+  \caption{Diagrama de desplegament físic i lògic del sistema WebCoreView.}
+  \label{fig:deployment_diagram}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
 \subsection{Capa de comunicació i Microserveis}
-Com es va introduir a la Figura 1, la interacció entre la interfície i el hardware es divideix en tres canals principals:
+Com es detalla a la Figura \ref{fig:deployment_diagram}, la interacció entre la interfície i el hardware es divideix en tres canals principals:
 
 \begin{itemize}
     \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
@@ -20,8 +30,26 @@ Internament, els serveis es comuniquen mitjançant \textbf{gRPC} per a una trans
 \section{Disseny del Frontend (Angular 19)}
 L'elecció d'Angular 19 no és casual; el \textit{framework} proporciona una estructura que facilita el manteniment a llarg termini de l'aplicació.
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/angular_components.png}
+  \caption{Diagrama de components de l'arquitectura de l'aplicació Angular i la seva integració amb el backend.}
+  \label{fig:angular_components}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
 \subsection{Arquitectura Modular i Standalone Components}
 S'ha eliminat l'ús de mòduls clàssics d'Angular en favor dels \textit{Standalone Components}. Això redueix el \textit{boilerplate} del codi i millora el temps de càrrega de l'aplicació (\textit{lazy loading}), ja que només es descarreguen al navegador els components necessaris per a la vista actual (per exemple, el mòdul de configuració avançada no es carrega si l'usuari només vol veure vídeo).
+
+L'organització d'aquests elements a nivell de dependències i estructura de mòduls es presenta gràficament a la Figura \ref{fig:angular_modules}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/angular_modules.png}
+  \caption{Diagrama de mòduls de l'aplicació Angular i relació amb els components compartits i serveis de la capa Core.}
+  \label{fig:angular_modules}
+  \small Font: Elaboració pròpia.
+\end{figure}
 
 \subsection{Gestió de l'Estat amb Angular Signals}
 Aquest és un punt d'inflexió respecte a les versions anteriors del programari. Mentre que RxJS és excel·lent per a fluxos de dades complexos, \textbf{Angular Signals} permet una reactivitat granular.
@@ -47,3 +75,14 @@ Tot i que el sistema és principalment una interfície de gestió, l'arquitectur
     \item \textbf{SQLite3:} Utilitzada en el costat del servidor (\textit{backend embedded}) per a la gestió ràpida de l'historial d'alarmes i la configuració persistent dels usuaris.
     \item \textbf{Estratègia de Buffering:} El \textit{frontend} gestiona un estat local temporal per permetre a l'usuari realitzar múltiples canvis i validar-los abans d'adquirir el \textit{lock} i enviar la configuració final al hardware.
 \end{itemize}
+
+\subsection{Model de dades de l'aplicació}
+Per tal de representar la correspondència i relació entre les diferents estructures de dades que es reben de l'API (com ara Càmeres, Codecs, Presets o Alarmes), s'ha elaborat un model d'entitats representat en el diagrama de classes de la Figura \ref{fig:class_diagram}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/class_diagram.png}
+  \caption{Diagrama de classes de les entitats principals del sistema WebCoreView.}
+  \label{fig:class_diagram}
+  \small Font: Elaboració pròpia.
+\end{figure}
