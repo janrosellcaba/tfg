@@ -48,20 +48,51 @@ A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre la soluc
 \end{table}
 
 \section{Anàlisi d'alternatives i justificació de la solució}
-Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents camins tecnològics per als tres pilars fonamentals del sistema:
+Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents camins tecnològics per als pilars fonamentals de programari, vídeo, concurrència i emmagatzematge del sistema:
 
-\subsection{Alternativa de vídeo: WebRTC vs. HLS}
+\subsection{Alternativa de Framework Frontend: Angular 19 vs. React / Vue}
 \begin{itemize}
-  \item \textbf{HLS (HTTP Live Streaming):} Ideal per a retransmissions massives on la latència no és crítica (com Netflix o YouTube). En videovigilància, un retard de 2 a 5 segons és inacceptable per a l'operació tècnica.
-  \item \textbf{WebRTC (Web Real-Time Communication):} Permet una comunicació de baixa latència (<300ms) mitjançant UDP, seguint les especificacions del W3C i l'IETF \cite{webrtc_org}.
-  \item \textbf{Justificació:} S'ha escollit \textbf{WebRTC} com a protocol principal per a la visualització en directe per igualar l'experiència de les aplicacions natives, mantenint HLS \cite{hls_apple} només com a mecanisme de \textit{fallback} i per a la reproducció de gravacions.
+  \item \textbf{React / Vue:} Són llibreries extremadament populars i flexibles per a la creació d'interfícies. No obstant això, són arquitectures no opinades que requereixen la integració de múltiples llibreries de tercers per gestionar aspectes com el ruteig, formularis o seguretat. En un entorn de videovigilància professional embedded, això augmenta el risc de vulnerabilitats i encareix de manera crítica l'auditoria de seguretat.
+  \item \textbf{Angular 19:} És un framework empresarial complet (\textit{batteries-included}) que ofereix una estructura opinada, robusta i escrita nativament en TypeScript. Això garanteix que el codi s'organitzi de forma altament homogènia.
+  \item \textbf{Justificació:} S'ha escollit \textbf{Angular 19} per la seguretat de tipus de TypeScript, el seu motor de formularis reactius natius i, principalment, per la introducció de les **Signals** com a mecanisme natiu i eficient de gestió de l'estat reactiu, la qual cosa redueix de manera dràstica l'ús de CPU respecte a altres frameworks.
+\end{itemize}
+
+\subsection{Alternativa de vídeo: Arquitectura Híbrida WebRTC i HLS vs. RTSP / RTMP}
+\begin{itemize}
+  \item \textbf{RTSP (Real-Time Streaming Protocol):} És el protocol de facto utilitzat internament per les càmeres IP i sistemes VMS clàssics. No obstant això, és completament incompatible de forma nativa amb els navegadors web actuals, obligant a utilitzar transcodificadors molt costosos o \textit{plugins} externs propietaris en desús.
+  \item \textbf{RTMP (Real-Time Messaging Protocol):} Protocol clàssic molt lligat a la tecnologia ja obsoleta d'Adobe Flash, actualment completament desapareguda de l'ecosistema web estàndard.
+  \item \textbf{WebRTC i HLS:} Són els dos únics estàndards web moderns reconeguts pel W3C que permeten la reproducció de vídeo nativa (HTML5) de forma segura i sense cap mena d'extensió o control extern.
+  \item \textbf{Justificació:} S'ha optat per una **arquitectura híbrida complementària** que explota el millor de cada protocol en lloc de triar-ne només un:
+        \begin{enumerate}
+          \item \textbf{WebRTC:} S'utilitza de forma **principal per al vídeo en directe**, on la latència ultra-baixa ($<300$~ms) i el transport sobre UDP sota xifratge DTLS són indispensables per vigilar o respondre a amenaces immediates.
+          \item \textbf{HLS (HTTP Live Streaming) \cite{hls_apple}:} S'utilitza per a la **reproducció de gravacions històriques**, on la ultra-baixa latència no és prioritària però es requereix un control molt precís de descàrrega per blocs (segments), commutació dinàmica de qualitat i la capacitat de fer desplaçaments lliures (*seek*) sobre l'històric mitjançant TCP. També actua com a *fallback* per al vídeo en directe si els tallafocs bloquegen el trànsit WebRTC.
+        \end{enumerate}
+\end{itemize}
+
+\subsection{Alternativa de Base de Dades per a Alarmes: SQLite3 vs. PostgreSQL / MongoDB}
+\begin{itemize}
+  \item \textbf{PostgreSQL / MySQL:} Són bases de dades relacionals molt potents, però funcionen com a serveis de sistema independents. Requereixen un consum elevat i constant de memòria RAM i CPU per mantenir el dimoni actiu, sent una sobrecàrrega inacceptable en dispositius embedded limitats.
+  \item \textbf{MongoDB:} Base de dades documental NoSQL ideal per a grans volums de dades desestructurades, però amb una pila tecnològica pesada i requisits de recursos inassequibles per al maquinari de gravació local.
+  \item \textbf{SQLite3:} És un motor de base de dades relacional \textit{serverless}, transaccional (ACID) i auto-tingut que s'executa en el mateix procés del backend (in-process). Guarda tota la informació en un únic fitxer físic al disc.
+  \item \textbf{Justificació:} S'ha seleccionat \textbf{SQLite3} com el motor de base de dades per al registre d'alarmes i logs del dispositiu, atès que ofereix un rendiment excel·lent per a lectures i escriptures ràpides amb un consum residual de memòria ($<15$~MB), essent ideal per a sistemes embedded Linux.
+\end{itemize}
+
+\subsection{Alternativa de Còdec de Vídeo: H.264 i H.265 coexistents segons Maquinari i Càmera}
+\begin{itemize}
+  \item \textbf{H.264 (AVC):} És el còdec de compressió més universal i robust. És suportat pel 100\% de les targetes gràfiques, dispositivis mòbils i navegadors mitjançant descodificació accelerada per maquinari (GPU), garantint fluïdesa absoluta a costa d'un consum superior d'ample de banda.
+  \item \textbf{H.265 (HEVC):} Algorisme de compressió d'última generació que permet reduir a la meitat l'espai d'emmagatzematge a disc i l'ample de banda de transmissió de vídeo per a la mateixa qualitat d'imatge. No obstant això, el seu suport a la web està limitat per llicències de patents, requerint que el client disposi d'un processador modern amb descodificació nativa integrada.
+  \item \textbf{Justificació:} En lloc de descartar un dels dos còdecs, el sistema s'ha dissenyat amb una **estratègia dinàmica de coexistança**:
+        \begin{enumerate}
+          \item Es fa servir **H.265** com a còdec d'alta prioritat quan la càmera IP física ho suporta i el dispositiu del client disposa de descodificació nativa per maquinari compatible al navegador, maximitzant així l'estalvi d'espai de disc als discs durs del gravador (clau per a instal·lacions amb desenes de càmeres de gran resolució).
+          \item Es commuta de forma transparent cap a **H.264** si es detecta que la càmera és antiga o si el terminal de l'usuari és de gamma baixa i no disposa del motor de descodificació H.265 a la GPU, garantint així la portabilitat absoluta i la visualització sense retards ni sobrecàrrega de CPU.
+        \end{enumerate}
 \end{itemize}
 
 \subsection{Alternativa de configuració: Estàtica vs. Schema-driven}
 \begin{itemize}
   \item \textbf{Formularis estàtics:} Programar una pantalla per a cada menú de configuració és més ràpid a curt termini però genera un deute tècnic insostenible, ja que cada canvi en el \textit{firmware} obligaria a actualitzar el \textit{frontend}.
   \item \textbf{Motor Schema-driven:} El \textit{frontend} actua com un intèrpret que renderitza la interfície basant-se en un esquema JSON rebut del servidor.
-  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compati\-bilitat futura amb els nous models de gravador de Lanaccess sense haver de modificar el codi de l'aplicació web.
+  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compatibilitat futura amb els nous models de gravador de Lanaccess sense haver de modificar el codi de l'aplicació web.
 \end{itemize}
 
 \subsection{Alternativa de gestió d'estat: Redux vs. Angular Signals}

@@ -119,7 +119,7 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 \begin{itemize}
   \item \textbf{RF-2.1 Protocol WebRTC:} Implementació de la negociació SDP (\textit{Session Description Protocol}) per a vídeo en directe.
   \item \textbf{RF-2.2 Protocol HLS:} Generació de fragments de vídeo per a la reproducció de gravacions històriques i fallback de seguretat.
-  \item \textbf{RF-2.3 Control PTZ:} Interfície per al control de moviments de càmera (Pan, Tilt, Zoom) mitjançant peticions REST de baixa latència.
+  \item \textbf{RF-2.3 Línia de Temps Històrica (Timeline):} Interfície gràfica interactiva per a la cerca i consulta de gravacions passades amb selecció de franja horària.
 \end{itemize}
 
 \subsection{RF-3: Motor de Configuració Dinàmica}
@@ -229,27 +229,27 @@ El desenvolupament s'ha de cenyir a les següents limitacions:
   \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}
 \section{Marc normatiu i regulacions}
-Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real i dades de configuració de dispositius de seguretat, el sistema s'ha dissenyat per complir amb el següent marc legal:
+Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real, reproduccions d'imatges de persones físiques i dades de configuració de dispositius de seguretat crítics, el disseny i desenvolupament de \textit{Web Core View} s'ha cenyit als estàndards legals i regulacions tècniques nacionals i europees:
 
-\subsection{Protecció de Dades (RGPD)}
-El sistema compleix amb el \textbf{Reglament General de Protecció de Dades (Reglament UE 2016/679)}. Tot i que l'aplicació gestiona imatges de persones en directe, \textit{Web Core View} s'ha dissenyat sota el principi de \textit{Privacy by Design}:
+\subsection{Protecció de Dades de Caràcter Personal (RGPD i LOPDGDD)}
+El sistema s'adapta al \textbf{Reglament General de Protecció de Dades (RGPD - Reglament UE 2016/679)} \cite{gdpr_reg} i a la legislació de transposició espanyola, la \textbf{Llei Orgànica 3/2018 de Protecció de Dades Personals i Garantia dels Drets Digitals (LOPDGDD)} \cite{lopdgdd_spain}. Especialment, el disseny s'alinea amb l'\textbf{Article 22 de la LOPDGDD}, que regula específicament el tractament d'imatges amb finalitats de videovigilància, sota el principi fonamental de **Privadesa per Disseny (Privacy by Design)**:
 \begin{itemize}
-  \item No s'emmagatzemen dades personals ni metadades d'usuari de forma persistent en el navegador, exceptuant el \textit{token} de sessió protegit en el \textit{LocalStorage}.
-  \item L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només el personal autoritzat pugui visualitzar el vídeo.
+  \item \textbf{Minimització de dades:} No s'emmagatzemen imatges, captures ni dades personals de forma persistent en el navegador, exceptuant el \textit{token} de sessió protegit en el \textit{LocalStorage}.
+  \item \textbf{Seguretat d'accés:} L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només els operadors explícitament autoritzats puguin visualitzar el vídeo en directe i els històrics.
 \end{itemize}
 
-\subsection{Seguretat en la comunicació}
-Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de tipus \textit{Man-in-the-Middle} (MitM), s'obliga a l'ús de protocols xifrats:
+\subsection{Seguretat en la comunicació i Xifratge}
+Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de tipus interceptació de xarxa o \textit{Man-in-the-Middle} (MitM), s'obliga a l'ús de protocols criptogràfics segurs:
 \begin{itemize}
-  \item Totes les peticions a l'API REST s'han de realitzar via \textbf{HTTPS}.
-  \item La comunicació d'alarmes i esdeveniments es realitza mitjançant \textbf{WebSockets Segurs (WSS)}.
-  \item El flux de vídeo WebRTC utilitza el protocol \textbf{DTLS} per al xifratge d'extrem a extrem.
+  \item Totes les peticions a l'API REST es realitzen sota el protocol de transport xifrat \textbf{HTTPS}.
+  \item La comunicació asíncrona d'alarmes es realitza mitjançant canals de \textbf{WebSockets Segurs (WSS)}.
+  \item La transmissió de fluxos de vídeo WebRTC utilitza xifratge d'extrem a extrem mitjançant el protocol \textbf{DTLS} per al canal de control i \textbf{SRTP} per a la seguretat en els paquets multimèdia.
 \end{itemize}
 
-\subsection{Normativa de seguretat privada}
-El software s'ha concebut com una eina per al compliment de la \textbf{Llei d'Ordenació de l'Edificació (LOE)} i, especialment, la \textbf{Llei 5/2014 de Seguretat Privada}. Atès que Lanaccess opera en sectors d'infraestructures crítiques i banca, \textit{Web Core View} integra funcionalitats que faciliten el compliment normatiu per part del client final:
+\subsection{Llei de Seguretat Privada i Norma UNE-EN 62676}
+El disseny tècnic actua com un element facilitador perquè les entitats de seguretat compleixin amb la \textbf{Llei 5/2014 de Seguretat Privada} a Espanya, així com amb l'estàndard tècnic europeu \textbf{UNE-EN 62676} sobre sistemes de videovigilància per a aplicacions de seguretat:
 \begin{itemize}
-  \item \textbf{Gestió de la caducitat de gravacions:} El sistema permet configurar polítiques de sobreescriptura automàtica per assegurar que les imatges no s'emmagatzemen més enllà dels 30 dies prescrits per la llei, tret que hi hagi un requeriment judicial.
-  \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació facilita el registre exhaustiu de qui ha accedit a quina càmera i en quin moment, garantint la traçabilitat exigida per les autoritats en cas d'inspecció o incident de seguretat.
+  \item \textbf{Control de caducitat i esborrat automàtic:} El sistema permet configurar de manera dinàmica les polítiques d'emmagatzematge per garantir que les gravacions es sobreescriuen automàticament en un període màxim de \textbf{30 dies}, complint rigorosament amb el límit d'emmagatzematge fixat per la Llei de Seguretat Privada i l'Agència Espanyola de Protecció de Dades (AEPD), excepte en cas de requeriment judicial.
+  \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació compta amb un servei de registre d'activitat inalterable que monitoritza i audita les accions dels usuaris (qui ha visualitzat quina càmera, en quines dates i hores, i si s'han realitzat descàrregues de vídeo), assegurant la traçabilitat exigida per a la custòdia d'evidències gràfiques.
 \end{itemize}
 Malgrat aquestes facilitats tècniques, el compliment final de la normativa depèn de la configuració i l'ús real que l'entitat de seguretat privada faci del sistema en la instal·lació del client.
