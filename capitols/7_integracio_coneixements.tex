@@ -1,36 +1,98 @@
 \chapter{Integració de Coneixements}
 \label{ch:integracio}
 
-La realització d'aquest Treball de Final de Grau ha permès consolidar i aplicar de forma transversal un ampli ventall de competències i coneixements adquirits durant els estudis d'Enginyeria Informàtica. A continuació, es detalla la relació entre les diferents àrees de coneixement i la seva aplicació pràctica en el projecte \textit{Web Core View}.
+La realització d'aquest Treball de Final de Grau ha permès consolidar i aplicar de forma transversal un ampli ventall de competències, habilitats i coneixements adquirits durant els estudis del Grau en Enginyeria Informàtica (GEI). Aquest projecte s'emmarca de manera directa en la \textbf{Menció d'Enginyeria del Software} de la Facultat d'Informàtica de Barcelona (FIB) de la Universitat Politècnica de Catalunya (UPC). A continuació, es detalla la relació entre les diferents assignatures cursades en aquesta menció i el tronc comú, i la seva aplicació pràctica en el disseny i desenvolupament de la plataforma \textit{Web Core View}.
 
-\section{Enginyeria del Software (ES)}
-Aquesta àrea ha estat la base estructural del projecte. S'han aplicat els principis de disseny \textbf{SOLID} \cite{solid_principles} per garantir que el codi del \textit{frontend} sigui modular i fàcil de mantenir. Així mateix, l'ús de patrons arquitectònics (com el \textit{Proxy} o l'\textit{Observer} implícit en els Signals) i la definició del cicle de vida del software mitjançant metodologies àgils (\textbf{Kanban}) han estat fonamentals per gestionar la complexitat del sistema.
+\section{Especialitat en Enginyeria del Software}
+El fet d'haver cursat la Menció d'Enginyeria del Software ha estat el factor clau per afrontar un projecte d'aquesta envergadura. Les assignatures de l'especialitat han proporcionat tant la base metodològica com les competències de disseny de dades i de gestió necessàries per dur a terme el desenvolupament de forma sistemàtica i professional.
 
-\section{Xarxes (X)}
-El coneixement de la pila de protocols d'internet ha estat crític per implementar el mòdul de vídeo. Entendre la diferència entre la transmissió fiable de \textbf{TCP} (utilitzada en HLS i REST) i la baixa latència de \textbf{UDP} (clau per a WebRTC) ha permès prendre decisions arquitectòniques encertades. També s'han aplicat coneixements sobre la negociació de protocols (\textbf{SDP}) i el trànsit a través de tallafocs.
+\subsection{Projecte d'Enginyeria del Software (PES)}
+L'assignatura PES té com a objectiu simular l'activitat de desenvolupament de projectes en un entorn professional real. En el cas de \textit{Web Core View}, tot i tractar-se d'un projecte individual per a un TFG, el seu desenvolupament s'ha integrat plenament en la dinàmica de l'empresa Lanaccess. S'han aplicat els principis de PES col·laborant amb els enginyers del departament de \textit{backend} per coordinar les definicions de serveis, seguint pautes corporatives de documentació, realitzant integració contínua i gestionant els lliuraments en funció del cicle de vida de la versió de producció, simulant exactament la coordinació de rols pròpia d'un equip de desenvolupament professional.
 
-\section{Sistemes Operatius (SO)}
-Atès que l'aplicació interactua amb un dispositiu \textit{embedded}, ha estat necessari entendre la gestió de processos i la comunicació entre ells. El \textit{frontend} no és un element aïllat, sinó que es comunica amb microserveis interns del gravador que utilitzen \textbf{gRPC} i el bus de sistema \textbf{D-Bus}, requerint una comprensió profunda de com el sistema operatiu gestiona els recursos i la concurrència.
+\subsection{Gestió de Projectes de Software (GPS)}
+El desenvolupament del projecte s'ha regit pels ensenyaments de GPS en matèria de planificació, estimació d'esforços i mitigació de riscos. S'ha utilitzat una metodologia àgil basada en el framework \textbf{Kanban} per realitzar el seguiment de les tasques de forma dinàmica. Així mateix, l'aprenentatge en l'avaluació de riscos i scoping ha estat fonamental a l'hora de dissenyar una alternativa estratègica per a l'empresa: la viabilitat de disposar d'una versió simplificada per a petites empreses amb un únic gravador (\textit{single-NVR}) davant d'una aplicació altament centralitzada, permetent modularitzar i segmentar el projecte segons les necessitats de negoci reals.
 
-\section{Projecte de Programació (PROP)}
-La gestió d'estructures de dades complexes ha estat un repte constant. El motor \textit{schema-driven} requereix processar i validar objectes \textbf{JSON} altament anidats i dinàmics. Les competències adquirides en matèria d'algorísmia han estat clau per implementar una lògica de parseig prou eficient per no bloquejar el fil principal d'execució del navegador ni degradar l'experiència d'usuari (UX), mantenint la fluïdesa de la interfície fins i tot durant la càrrega de configuracions extenses.
+\subsection{Enginyeria de Requisits (ER)}
+La definició del sistema es va iniciar aplicant les tècniques d'elicitació, especificació i validació de requisits apreses a ER. El punt de partida va requerir una tasca intensiva d'enginyeria inversa sobre la plataforma web antiga de Lanaccess dels anys 90, identificant les funcionalitats que calia preservar i descartant les limitacions tecnològiques (com la dependència d'ActiveX). L'ús d'històries d'usuari i la modelització de casos d'ús (Capítol \ref{ch:requisits}) han servit per definir clarament els límits del sistema i formalitzar tant els requisits funcionals com els no funcionals (estabilitat del vídeo, latència subsegon i restriccions de maquinari).
 
-\section{Compiladors i Llenguatges de Programació (CL / LP)}
-El motor \textit{Schema-driven} dissenyat constitueix, en la seva essència, un intèrpret en temps real d'un llenguatge de descripció de configuracions expressat a través d'un esquema JSON. Les competències adquirides en les assignatures de Compiladors i Llenguatges de Programació han estat fonamentals per dissenyar aquesta arquitectura. S'han aplicat conceptes clàssics d'anàlisi sintàctica (\textit{parsing}) i recorregut recursiu d'arbres: el motor examina les regles semàntiques de l'esquema de metadades i "compila" (tradueix) dinàmicament cada definició de tipus en elements actius del DOM, gestionant el control de tipus i de validacions de rang de manera equivalent a com un intèrpret o compilador genera i valida codi executable a partir d'un arbre de sintaxi abstracta (\textit{AST}).
-
-\section{Interacció Persona-Ordinador (IPO)}
-El disseny de la interfície d'usuari (UI) s'ha realitzat aplicant principis d'usabilitat i experiència d'usuari (UX) apresos a IPO. Donada la naturalesa crítica de la videovigilància, s'ha prioritzat una càrrega cognitiva baixa i una jerarquia visual clara. L'ús de \textit{Signals} ha permès implementar una interfície altament reactiva que informa l'usuari en temps real de qualsevol canvi en l'estat del sistema (alarmes, pèrdues de vídeo) sense necessitat de recàrregues.
-
-\section{Seguretat Informàtica (SI)}
-La protecció de dades i la integritat de les comunicacions són vitals. S'han aplicat coneixements de SI per implementar polítiques de \textit{Same-Origin} restrictives a NGINX, gestió de certificats \textbf{SSL/TLS} per a HTTPS/WSS i el xifratge de fluxos multimèdia mitjançant \textbf{DTLS} en WebRTC.
-
-\section{Arquitectura de Computadors (AC)}
-Treballar en un entorn \textit{embedded} requereix una consciència constant de l'ús de la CPU i la memòria. S'han aplicat coneixements d'AC per optimitzar l'execució del codi i minimitzar el sobrecost del \textit{runtime} d'Angular, assegurant que el maquinari pugui prioritzar el processament i la gravació de vídeo.
-
-\section{Aprenentatge autònom}
-Més enllà dels coneixements reglats, el projecte ha exigit una fase intensa d'autoformació:
+\subsection{Disseny de Bases de Dades (DBD)}
+Com a assignatura especialitzada en l'administració i optimització de sistemes de dades, DBD ha estat crítica per decidir la persistència del dispositiu. S'ha hagut de resoldre un repte de disseny equilibrant dues necessitats contraposades:
 \begin{itemize}
-  \item \textbf{Angular 19 i Signals:} Estudi de la nova reactivitat nativa per substituir el model de zones clàssic \cite{angular_signals}.
-  \item \textbf{Protocol gRPC:} Recerca sobre la comunicació binària d'alt rendiment per a microserveis \cite{grpc_io}.
-  \item \textbf{Configuració de NGINX:} Gestió avançada de proxys inversos i seguretat de capçaleres.
+  \item \textbf{Estructura relacional robusta:} Mitjançant SQLite3 s'han emmagatzemat les entitats clàssiques de configuració física (llistes de càmeres, gravadors, usuaris i esdeveniments), dissenyant taules normalitzades i aplicant regles físiques per mitjà d'índexs d'accés per assegurar cerques de logs ultra ràpides sota recursos de maquinari limitats.
+  \item \textbf{Flexibilitat semiestructurada (NoSQL):} Per al motor \textit{schema-driven}, es va triar una arquitectura orientada a documents JSON que conté la definició dinàmica de formularis. DBD va permetre analitzar els avantatges i inconvenients de cada model i dissenyar els fluxos d'accés a disc per evitar colls d'ampolla.
+\end{itemize}
+
+\subsection{Arquitectura del Software (AS)}
+Aquesta assignatura de l'especialitat ha estat fonamental per al disseny estructural a gran escala de \textit{Web Core View}. S'ha definit un sistema organitzat en capes ben delimitades i independents: presentació (desenvolupada amb Angular), lògica de negoci (el motor d'interpretació dinàmica \textit{schema-driven}) i comunicacions (connectors per a API REST, WebSockets i WebRTC a través d'un proxy invers de NGINX). Addicionalment, s'ha aplicat el model reactiu \textbf{Observer} mitjançant el nou sistema de \textbf{Signals} d'Angular 19 per a la propagació d'estats sense introduir acoblaments de dades ni impactar negativament en el rendiment de renderitzat del navegador.
+
+\section{Bases de l'Enginyeria del Software}
+Aquesta àrea conté les bases estructurals i de qualitat per al desenvolupament de codi robust.
+
+\subsection{Introducció a l'Enginyeria del Software (IES)}
+IES ha aportat el marc conceptual fonamental per al disseny lògic i la modulació del codi del projecte. S'han aplicat els principis de disseny \textbf{SOLID} \cite{solid_principles} per assegurar que els serveis i components d'Angular estiguin altament desacoblats, siguin reutilitzables i fàcils de mantenir. Així mateix, el modelatge estructurat mitjançant diagrames UML (com els diagrames de seqüència, d'activitat i de classes utilitzats al llarg de la memòria) ha estat indispensable per analitzar les dependències lògiques abans de procedir a la fase d'implementació.
+
+\section{Core d'Enginyeria Informàtica (Troncals i Comuns)}
+Les assignatures troncals de la carrera han ofert el fonament tècnic que ha permès implementar els diferents protocols, algoritmes i interaccions de baix nivell del sistema.
+
+\subsection{Projecte de Programació (PROP)}
+La programació orientada a objectes de gran complexitat i l'aplicació d'estructures de dades robustes apreses a PROP s'han posat a prova en la creació del motor \textit{schema-driven}. Aquest motor actua analitzant recursivament una estructura de metadades altament niada expressada en JSON per construir, validar i renderitzar dinàmicament formularis HTML sencers en temps real. S'han dissenyat classes altament reutilitzables, una lògica eficient de tipatge dinàmic en TypeScript i mecanismes avançats de gestió d'excepcions per evitar que entrades mal formades bloquegessin el fil d'execució principal del navegador (\textit{UI thread}).
+
+\subsection{Bases de Dades (BD)}
+Els conceptes fonamentals del model relacional i de llenguatges de consulta s'han integrat per gestionar la base de dades local. El coneixement de les propietats \textbf{ACID} ha estat imprescindible per assegurar la integritat referencial de la informació en un entorn \textit{embedded} sensible, on fallades elèctriques sobtades en el gravador de vídeo podrien corrompre la configuració del sistema. Les consultes de creació, lectura, actualització i eliminació (CRUD) de dispositius s'han estructurat sota transaccions segures basades en SQL.
+
+\subsection{Xarxes de Computadors (XC)}
+Atès que \textit{Web Core View} és una aplicació de gestió remota de dispositius de seguretat en xarxa, XC ha estat crucial per dissenyar la infraestructura de comunicacions. S'ha hagut de gestionar amb precisió la pila de protocols d'internet, prenent decisions basades en la naturalesa del transport:
+\begin{itemize}
+  \item \textbf{TCP (Fiabilitat):} Emprat per al trànsit de configuracions via consultes REST (HTTP), el canal bidireccional en temps real per a senyalització i esdeveniments (WebSockets/WSS) i la reproducció de vídeo hereditària mitjançant HLS en navegadors antics.
+  \item \textbf{UDP (Baixa Latència):} Utilitzat a través del protocol de transport segur SRTP en \textbf{WebRTC}. XC va donar la base tècnica per comprendre la negociació de fluxos multimèdia (\textbf{SDP}) i la superació de restriccions de xarxa a través de tallafocs utilitzant protocols ICE, STUN i TURN.
+\end{itemize}
+
+\subsection{Sistemes Operatius (SO)}
+Com que l'aplicació web actua com a portal d'administració d'un gravador autònom (*embedded*), ha calgut entendre com el sistema operatiu hoste gestiona els recursos, la concurrència i la comunicació de baix nivell. El client web no es comunica directament amb el maquinari físic, sinó amb microserveis i servidors interns del gravador Linux. S'han aprofitat els conceptes d'IPC (Comunicació entre Processos) per interactuar amb APIs binàries d'alt rendiment basades en \textbf{gRPC} i s'ha comprès el comportament concurrent del bus de sistema \textbf{D-Bus} amb el qual es comuniquen els dimonis interns del gravador.
+
+\section{Interacció i Disseny d'Interfícies (IDI)}
+El disseny de la interfície d'usuari (UI) i la definició de l'experiència d'usuari (UX) s'han recolzat directament en les teories d'usabilitat i disseny cognitiu d'IDI. Sent la videovigilància un entorn crític on els operadors de seguretat prenen decisions immediates, s'ha prioritzat la disminució de la càrrega cognitiva. S'ha dissenyat un disseny visual net, amb alts contrastos adaptats per a visualitzacions prolongades i una jerarquia d'elements extremadament clara. Addicionalment, s'ha aconseguit que la interfície sigui altament reactiva en temps real mitjançant microanimacions i canvis d'estat immediats (com pèrdues de vídeo o alarmes actives) recolzant-se en la reactivitat nativa dels Signals d'Angular 19.
+
+\section{Assoliment de les competències de l'especialitat}
+En aquesta secció es descriu de forma sistemàtica com s'han assolit les nou competències de la Menció d'Enginyeria del Software del Grau en Enginyeria Informàtica (GEI) definides pel pla d'estudis de la FIB per a aquest Treball de Final de Grau, especificant-ne el nivell de profunditat triat.
+
+\subsection{Competències assolides en profunditat}
+
+\noindent \textbf{CES1.1: Desenvolupar, mantenir i avaluar sistemes i serveis software complexos i/o crítics.}\\
+La plataforma \textit{Web Core View} té com a finalitat gestionar la configuració i la visualització de sistemes de seguretat físics (videogravadors corporatius de Lanaccess). Atesa la naturalesa crítica dels entorns de videovigilància, on qualsevol pèrdua de paquets de vídeo, retard en la senyalització d'alarmes o bloqueig del sistema és inacceptable, s'ha hagut de dissenyar una aplicació altament robusta. S'ha aplicat de forma estricta el patró reactiu de Signals d'Angular 19, aconseguint minimitzar l'ús de CPU al client web, aïllant completament els mòduls de renderitzat i assegurant una disponibilitat del servei de forma contínua i sense degradacions durant sessions de visualització prolongades.
+
+\noindent \textbf{CES1.2: Donar solució a problemes d'integració en funció de les estratègies, dels estàndards i de les tecnologies disponibles.}\\
+El projecte resol un repte d'integració de múltiples tecnologies heterogènies. El frontend actua connectant un navegador web estàndard amb serveis de baix nivell incrustats en un maquinari dedicat. S'ha dissenyat una topologia d'integració robusta que unifica capes dispars: serveis REST HTTP de configuració base, canals full-duplex de comunicació d'alarmes per WebSockets, i comunicació binària de molt baix sobrecost gRPC sobre HTTP/2 connectada al bus intern D-Bus del gravador Linux, tot sota la seguretat d'un proxy invers controlat per NGINX.
+
+\noindent \textbf{CES1.4: Desenvolupar, mantenir i avaluar serveis i aplicacions distribuïdes com suport de xarxa.}\\
+Web Core View és una aplicació clarament distribuïda on el navegador executa la lògica de presentació i dades dinàmiques que interaccionen amb servidors de gravació remots. S'han aplicat i avaluat protocols de xarxa distribuïts com WebSockets asíncrons (WSS) per mantenir la sincronització en temps real d'esdeveniments d'alarmes, i el protocol WebRTC basat en l'encapsulació SRTP sobre UDP per resoldre l'enviament distribuït de fluxos de vídeo. A més, s'han gestionat de forma rigorosa les capçaleres de seguretat distribuïda CORS i polítiques de Same-Origin a NGINX.
+
+\noindent \textbf{CES3.1: Desenvolupar serveis i aplicacions multimèdia.}\\
+El nucli del valor operatiu del projecte és la gestió multimèdia. S'ha desenvolupat i avaluat un motor de reproducció integrat al navegador capaç de commutar entre dos fluxos: vídeo en directe de molt baixa latència (WebRTC) mitjançant negociació SDP asíncrona i navegació de tallafocs per canals ICE (STUN/TURN), i vídeo històric sota la tecnologia HLS (HTTP Live Streaming) emprant la llibreria HLS.js. S'ha treballat en l'optimització de còdecs H.264 i la integració del buffer d'Angular per suportar de forma eficient el processament del format H.265 sense requerir endolls (\textit{plugins}) de navegadors antics.
+
+\subsection{Competències assolides en un nivell notable (Bastant)}
+
+\noindent \textbf{CES1.5: Especificar, dissenyar, implementar i avaluar bases de dades.}\\
+El projecte s'ha integrat amb el motor de dades SQLite3 allotjat en el videogravador de proves real. S'ha col·laborat en la definició lògica i física del model de persistència, dissenyant taules relacionals normalitzades per emmagatzemar esdeveniments, historials de logs i llistes estructurades de càmeres. S'ha garantit el correcte comportament de les regles d'integritat referencial i s'han dissenyat índexs d'accés per assegurar consultes SQL d'esdeveniments altament eficients sense comprometre el maquinari embedded limitat.
+
+\noindent \textbf{CES1.7: Controlar la qualitat i dissenyar proves en la producció de software.}\\
+S'ha dissenyat un pla complet de control de qualitat i de validació (Capítol \ref{ch:validacio}). Les proves d'integració han estat especialment intensives en el motor \textit{schema-driven}, validant de forma sistemàtica la resposta a diferents esquemes de definició de formularis. Es van dissenyar proves funcionals per comprovar el comportament de l'streaming davant talls de xarxa sobtats, assegurant la recuperació automàtica del buffer, i es van aplicar eines de perfilat al navegador per verificar que les renderitzacions d'Angular no presentaven fugues de memòria ni sobrecostos.
+
+\noindent \textbf{CES2.1: Definir i gestionar els requisits d'un sistema software.}\\
+S'ha aplicat el cicle complet de l'enginyeria de requisits (Capítol \ref{ch:requisits}). A través de reunions de treball i un exhaustiu estudi d'enginyeria inversa sobre la web obsoleta d'ActiveX de Lanaccess, s'han definit de forma precisa els requisits funcionals i no funcionals del sistema. S'ha realitzat un modelatge conceptual robust i un disseny formal d'històries d'usuari i casos d'ús, permetent avaluar i acotar l'abast lògic i econòmic del projecte.
+
+\subsection{Competències assolides en un nivell introductori (Una mica)}
+
+\noindent \textbf{CES1.3: Identificar, avaluar i gestionar els riscos potencials associats a la construcció de software que es poguessin presentar.}\\
+Durant la planificació i execució de GEP s'han gestionat activament els riscos tècnics i de calendari. S'han dissenyat solucions preventives com sandboxes breus de proves per a Angular 19 i la creació d'un entorn mock-up local mitjançant fitxers simulats en JSON per evitar el risc de dependència de maquinari de gravadors reals indisponibles, permetent continuar el desenvolupament de forma aïllada.
+
+\noindent \textbf{CES2.2: Dissenyar solucions apropiades en un o més dominis d'aplicació, utilitzant mètodes d'enginyeria del software que integrin aspectes ètics, socials, legals i econòmics.}\\
+La solució dissenyada ha considerat el seu entorn operacional en diferents dimensions (Capítol \ref{ch:gestio}): l'àmbit econòmic (amb el control del pressupost de rols i la proposta comercial simplificada single-NVR de baix cost), la sostenibilitat social (reducció d'estrès operatiu i càrrega cognitiva de l'usuari) i ambiental (evitant desplaçaments tècnics). Addicionalment, s'ha assegurat el rigor legal de privacitat del flux de vídeo i informació de logs corporatius encriptant tot el trànsit de xarxa per canals HTTPS/WSS i protocols de seguretat multimèdia (SRTP/DTLS) a WebRTC.
+
+\section{Aprenentatge Autònom}
+Més enllà dels coneixements reglats del pla d'estudis de la FIB, el projecte ha exigit una fase molt intensa d'autoformació en tecnologies i estàndards d'avantguarda dins el sector professional:
+\begin{itemize}
+  \item \textbf{Angular 19 i Signals:} Estudi de la nova reactivitat nativa per substituir el model de zones clàssic, aconseguint un augment molt significatiu del rendiment en la renderització del client \cite{angular_signals}.
+  \item \textbf{Protocol gRPC:} Recerca sobre la comunicació binària d'alt rendiment basada en HTTP/2 per establir connexions eficients i de molt baix sobrecost amb els microserveis de backend \cite{grpc_io}.
+  \item \textbf{Configuració Avançada de NGINX:} Autoformació en la implementació de proxys inversos locals, gestió robusta de capçaleres de seguretat (CORS, CSP) i redirecció de trànsit WebSocket/HTTP de manera unificada.
 \end{itemize}

@@ -42,13 +42,13 @@ Com es pot observar a la Taula \ref{tab:latencies}, el protocol WebRTC ofereix u
 \textbf{Protocol} & \textbf{Latència mitjana (ms)} & \textbf{Estabilitat observada} \\ \midrule
 WebRTC (Directe)  & 150 -- 300                     & Alta (Xarxa LAN)     \\
 HLS (Fallback)    & 2.000 -- 5.000                 & Molt Alta            \\
-RTSP (App Nativa) & 200 -- 400                     & Alta                 \\ \bottomrule
+RTSP (Web Legacy)  & 200 -- 400                     & Alta                 \\ \bottomrule
 \end{tabular}
 \par\smallskip
 \small Font: Elaboració pròpia mitjançant proves en entorn de laboratori.
 \end{table}
 
-Aquests resultats validen que la solució web és capaç d'igualar o millorar la latència de l'antiga aplicació nativa Windows, eliminant un dels principals arguments en contra de les solucions basades en navegador.
+Aquests resultats validen que la solució web moderna és capaç d'igualar o millorar la latència de l'antiga plataforma web basada en ActiveX, eliminant un dels principals arguments en contra de les solucions basades en navegadors actuals.
 
 \subsection{Consum de CPU, Memòria i Absència de Fugues (Memory Leaks)}
 En un entorn \textit{embedded} on l'aplicació web corre directament en el hardware de gravació i els clients la visualitzen des de navegadors de terminals de control, l'optimització de recursos és crítica. 

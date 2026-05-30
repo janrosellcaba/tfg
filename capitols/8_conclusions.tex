@@ -7,18 +7,19 @@ Aquest capítol recull les conclusions finals derivades del disseny i la impleme
 Després de completar el cicle de desenvolupament i validació, es pot afirmar que s'han assolit els objectius plantejats en el Capítol 1:
 
 \begin{itemize}
-    \item \textbf{Modernització de la plataforma:} S'ha substituït amb èxit la dependència de l'aplicació nativa de Windows per una \textit{Single Page Application} (SPA) basada en Angular 19. La nova interfície és responsiva, ubiqüitària i accessible des de qualsevol navegador modern.
+    \item \textbf{Modernització de la plataforma:} S'ha substituït amb èxit l'aplicació web \textit{legacy} dels anys 90, basada en ActiveX i tecnologies desfasades, per una interfície de gestió web moderna basada en Angular 19. La nova interfície és responsiva, ubiqüitària i accessible des de qualsevol navegador modern, sense dependència de \textit{plugins} propietaris.
     \item \textbf{Motor dinàmic (Schema-driven):} Sistema de configuració que s'adapta automàtica\-ment al hardware Lanaccess mitjançant JSON, eliminant la necessitat de reprogramar el \textit{frontend} per a cada \textit{firmware}.
     \item \textbf{Visualització d'alt rendiment:} Mitjançant la integració de WebRTC, s'han assolit latències inferiors als 300ms en la visualització de vídeo en directe, complint els requeriments operatius de seguretat.
     \item \textbf{Gestió reactiva d'alarmes:} L'ús de WebSockets (WSS) i \textit{Angular Signals} ha permès crear una interfície que reacciona en temps real als esdeveniments del gravador sense penalitzar el rendiment del terminal de l'usuari.
+    \item \textbf{Solució autònoma per a empreses petites (single-NVR):} S'ha aconseguit que l'aplicació funcioni de manera completament autònoma dins del propi videogravador, permetent a empreses petites amb un únic dispositiu gestionar-lo integralment des del navegador sense necessitat d'infraestructura centralitzada. Aquesta capacitat obre un nou segment de mercat per a Lanaccess que la plataforma anterior no cobria.
 \end{itemize}
 
 \section{Treball futur}
-Tot i que el sistema és totalment funcional, la naturalesa modular del projecte permet plantejar diverses línies d'evolució per a la versió 2.0:
+Tot i que el sistema és totalment funcional en el seu mode autònom \textit{single-NVR}, la naturalesa modular del projecte permet plantejar diverses línies d'evolució per a la versió 2.0:
 
 \begin{itemize}
     \item \textbf{Analítica de vídeo amb IA:} Integrar metadades d'intel·ligència artificial directament sobre el reproductor de vídeo per dibuixar quadres de detecció d'objectes o mapes de calor en temps real.
-    \item \textbf{Multi-dispositiu centralitzat:} Desenvolupar un mòdul de gestió "Multi-NVR" que permeti visualitzar i configurar diversos gravadors Lanaccess des d'una única instància de l'aplicació web.
+    \item \textbf{Multi-dispositiu centralitzat (Multi-NVR):} L'evolució natural de la solució \textit{single-NVR} actual consistiria a desenvolupar un mòdul de gestió centralitzada que permeti visualitzar i configurar diversos gravadors Lanaccess des d'una única instància de l'aplicació web. Mentre que la versió actual cobreix el segment d'empreses petites amb un únic dispositiu, aquesta ampliació permetria atendre grans instal·lacions corporatives amb desenes de gravadors distribuïts geogràficament.
     \item \textbf{Suport d'enregistrament avançat:} Ampliar les eines d'edició i exportació de vídeo directament des del navegador, permetent l'aplicació de marques d'aigua digitals o signatures legals en les descàrregues.
     \item \textbf{Aplicació Mòbil Nativa:} Utilitzar tecnologies com \textit{Ionic} o \textit{Capacitor} per reutilitzar el codi d'Angular 19 i oferir una versió nativa a les botigues d'aplicacions (App Store / Play Store).
 \end{itemize}

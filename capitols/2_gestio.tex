@@ -43,32 +43,51 @@ El projecte s'estructura en sis fases lògiques pactades amb l'empresa:
 \end{enumerate}
 
 \subsection{Recursos identificats}
-Per a l'execució del projecte es requereixen els següents recursos:
+Per a l'execució del projecte s'han identificat i classificat els següents recursos:
+
+\subsubsection{Recursos humans (Rols)}
+Es defineixen els següents rols assumits pel desenvolupador al llarg del projecte:
 \begin{itemize}
-  \item \textbf{Humans (Rols):} Cap de Projecte, Analista (arquitectura), Programador (codificació) i Tester (validació).
-  \item \textbf{Materials:} Ordinador portàtil (ASUS Expertbook), videogravador Lanaccess de proves i espai de despatx equipat.
-  \item \textbf{Software:} VS Code, Git, Angular 19, RxJS i llibreries de vídeo (WebRTC, HLS.js).
+  \item \textbf{Cap de Projecte (PM):} Responsable de la planificació temporal, coordinació amb Lanaccess i control econòmic.
+  \item \textbf{Analista:} Dissenyador de l'arquitectura de capes, diagrames UML i definició de requisits.
+  \item \textbf{Programador:} Codificador del frontend en Angular 19, configuració de NGINX i integració gRPC.
+  \item \textbf{Tester / Validació:} Responsable del disseny de casos de prova, test de càrrega de vídeo i validació de seguretat.
+\end{itemize}
+
+\subsubsection{Recursos materials}
+Comprèn exclusivament els elements físics no informàtics i d'infraestructura:
+\begin{itemize}
+  \item \textbf{Espai físic:} Oficina de proves i laboratori de xarxes proveït per Lanaccess a les seves instal·lacions.
+  \item \textbf{Mobiliari:} Escriptori d'oficina, cadira ergonòmica de treball i elements de papereria.
+\end{itemize}
+
+\subsubsection{Recursos informàtics}
+Grup que agrupa tot el programari i el maquinari digital utilitzats pel projecte, evitant catalogar el software com a recurs material:
+\begin{itemize}
+  \item \textbf{Maquinari (Hardware):} Ordinador portàtil (ASUS Expertbook Intel Core i7, 16GB RAM, anomenat PC) i videogravador de proves real (NVR Lanaccess, anomenat NVR) per a proves d'streaming WebRTC/HLS.
+  \item \textbf{Programari de desenvolupament (Software):} IDE Visual Studio Code, entorn de versions Git, intèrpret de terminal Bash i compilador de LaTeX.
+  \item \textbf{Tecnologies d'execució:} Framework Angular 19, reactivitat mitjançant Signals, protocol gRPC, connexions WebSockets (WSS) i llibreria multimèdia WebRTC natiu.
 \end{itemize}
 
 \subsection{Estimació d'hores i Diagrama de Gantt}
-S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{tab:estimacio_hores} resumeix el repartiment temporal segons el planning oficial.
+S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{tab:estimacio_hores} resumeix el repartiment de tasques, les dependències de cicle de vida i els recursos associats.
 
 \begin{table}[htbp]
   \centering
-  \caption{Estimació d'hores i dependències de les tasques.}
+  \caption{Estimació d'hores i recursos utilitzats a cada tasca.}
   \label{tab:estimacio_hores}
   \small
   \begin{tabular}{@{}llllc@{}}
     \toprule
-    \textbf{ID}    & \textbf{Tasca}        & \textbf{Mes/Setmana} & \textbf{Dependència} & \textbf{Hores} \\ \midrule
-    GF1            & Formació Angular 19   & Desembre             & -                    & 40             \\
-    AC1            & Login                 & Gener S1             & GF1                  & 20             \\
-    AC2            & Home Page             & Gener S2             & AC1                  & 20             \\
-    AV1            & Core Alarm (WSS)      & Feb S4 - Mar S1      & AC3                  & 50             \\
-    AV3            & Càmeres Directe       & Març S3 - S4         & AC2                  & 50             \\
-    GV2            & System Config Avançat & Abr S3 - Maig S1     & MC2                  & 60             \\
-    FM2            & Memòria TFG           & Transversal          & -                    & 80             \\ \midrule
-    \textbf{TOTAL} &                       &                      &                      & \textbf{540}   \\ \bottomrule
+    \textbf{ID}    & \textbf{Tasca}        & \textbf{Dependència} & \textbf{Recursos}                     & \textbf{Hores} \\ \midrule
+    GF1            & Formació Angular 19   & -                    & Programador, PC                       & 40             \\
+    AC1            & Login                 & GF1                  & Programador, Analista, PC             & 20             \\
+    AC2            & Home Page             & AC1                  & Programador, Analista, PC             & 20             \\
+    AV1            & Core Alarm (WSS)      & AC3                  & Programador, Analista, PM, PC         & 50             \\
+    AV3            & Càmeres Directe       & AC2                  & Programador, Analista, PM, PC, NVR    & 50             \\
+    GV2            & System Config Avançat & MC2                  & Programador, Analista, PM, PC         & 60             \\
+    FM2            & Memòria TFG           & -                    & PM, Analista, Programador, Tester, PC & 80             \\ \midrule
+    \textbf{TOTAL} &                       &                      &                                       & \textbf{540}   \\ \bottomrule
   \end{tabular}
   \par\smallskip
   \small Font: Elaboració pròpia.
@@ -84,8 +103,32 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
 \end{figure}
 
 \subsection{Gestió del risc i desviacions reals}
-S'han previst plans de contingència per a retards en la formació o incompati\-bilitats en els protocols de vídeo (WebRTC). Actualment, s'han detectat desviacions significatives
-en el mòdul de reproducció de gravacions, ja que la integració del \textit{backend} ha presentat una complexitat superior a la prevista, especialment pel que fa a la precisió requerida pel còdec H.265. Així mateix, el disseny del motor de configuració dinàmica (definició d'esquemes i mapeig de camps) ha requerit una fase d'arquitectura més extensa de l'estimada inicialment.
+Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns de videovigilància corporativa comporta un conjunt de riscos que cal monitorar de manera constant. Per respondre de forma preventiva i correctiva, s'ha definit una matriu de gestió de riscos on es classifiquen segons la seva tipologia, la probabilitat d'ocurrència (Alta, Mitjana, Baixa) i l'impacte potencial en el cicle de vida del projecte (Alt, Mitjà, Baix), tal com es recull a la Taula \ref{tab:matriu_riscos}.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Matriu de gestió de riscos i plans de contingència.}
+  \label{tab:matriu_riscos}
+  \small
+  \begin{tabular}{@{}lp{3.2cm}ccp{5.2cm}@{}}
+    \toprule
+    \textbf{Tipus} & \textbf{Risc Identificat} & \textbf{Prob.} & \textbf{Imp.} & \textbf{Pla de Contingència / Acció Correctiva} \\ \midrule
+    Tecnològic & Incompatibilitat de descompressió de vídeo H.265 & Mitjana & Alt & Optimització de bufereig a la capa de frontend. Sol·licitar ajustaments del format d'emissió H.265 directament a l'equip de firmware corporatiu. \\ \midrule
+    Planificació & Corba d'aprenentatge d'Angular 19 i Signals & Baixa & Mitjà & Ús de sandboxes de prova reduïts, guies oficials de desenvolupament Angular i aprofitament d'arquitectures MVC heretades. \\ \midrule
+    Tecnològic & Degradació del rendiment per configuracions anidades & Mitjana & Mitjà & Implementació d'algorísmia de recorregut asíncron de dades al motor \textit{schema-driven} per evitar bloquejar el thread del DOM. \\ \midrule
+    Materials & Manca de disponibilitat de gravadors NVR de prova & Baixa & Alt & Creació d'un entorn de mock-up local mitjançant respostes JSON simulades que repliquin la interfície gRPC i D-Bus. \\ \midrule
+    Humans & Descoordinació amb el departament de backend & Baixa & Mitjà & Establiment de contractes de dades rígids mitjançant definicions formalitzades de fitxers de missatges .proto a gRPC. \\ \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \small Font: Elaboració pròpia.
+\end{table}
+
+A nivell de desviacions reals experimentades, durant l'execució del projecte s'han confirmat dos dels riscos recollits en la planificació:
+\begin{enumerate}
+  \item \textbf{Complexitat en la integració del còdec H.265:} El comportament de la descodificació nativa en diferents navegadors ha requerit un buffer d'Angular molt més complex per garantir la fluïdesa.
+  \item \textbf{Disseny arquitectònic del motor Schema-driven:} La complexitat teòrica del parseig de metadades JSON per garantir validacions complexes ha consumit més hores de l'estimat inicialment.
+\end{enumerate}
+Aquestes desviacions i la seva gestió d'impacte es detallen en els següents apartats de rendiment i planificació econòmica.
 
 \subsection{Desviacions i impacte econòmic}
 Aquestes desviacions han tingut un impacte directe en el consum de recursos humans, especialment en els rols d'\textbf{Analista} i \textbf{Programador}. El temps addicional dedicat a la recerca i implementació del suport H.265 sense \textit{plugins} ha suposat un increment aproximat de \textbf{45 hores} sobre la planificació inicial.
@@ -122,11 +165,108 @@ L'estimació econòmica s'ha realitzat assumint rols professionals i preus de me
   \end{tabular}
 \end{table}
 
-\subsection{Costos totals i control de gestió}
-Sumant l'amortització del hardware (210,00~\euro{}), els costos indirectes \- d'oficina (1.150,00~\euro{}) i un marge de contingència del 10 \%, el pressupost final estimat és de \textbf{16.810,40~\euro{}}.
+\subsection{Costos totals i resum econòmic}
+Considerant tots els conceptes analitzats en la planificació econòmica, el pressupost global del projecte es pot resumir de la següent manera:
+\begin{itemize}
+  \item \textbf{Cost de Recursos Humans (CPA):} 13.567,50~\euro{}.
+  \item \textbf{Amortització del maquinari:} 210,00~\euro{}.
+  \item \textbf{Costos indirectes (despeses generals d'oficina):} 1.150,00~\euro{}.
+  \item \textbf{Marge de contingència (10 \%):} 1.492,75~\euro{} (reserva preventiva calculada sobre la suma total de despeses).
+\end{itemize}
+D'aquesta manera, el pressupost final estimat del projecte ascendeix a \textbf{16.810,40~\euro{}}.
 
-El control de gestió es realitza mitjançant la fórmula de desviació de costos:
-\[ \text{Desviació} = (\text{Hores Planificades} - \text{Hores Reals}) \times \text{Cost/h} \]
+\subsection{Control de gestió i seguiment de desviacions}
+Per garantir que el projecte no pateixi sobrecostos inassumibles o retards estructurals crítics en la fita final, s'ha dissenyat un sistema de control de gestió basat en mètriques de rendiment. El seguiment es realitza de forma setmanal pel Cap de Projecte, mesurant l'evolució del treball mitjançant el càlcul d'indicadors de desviació acumulats.
+
+Els indicadors aplicats són els següents:
+\begin{itemize}
+  \item \textbf{Desviació de Terminis (DT):} Mesura el retard o avanç de calendari en hores reals d'execució:
+  \[ DT = \text{Hores Planificades} - \text{Hores Reals} \]
+  Un valor negatiu de $DT$ indica que s'està consumint més temps del planificat a causa de problemes de desenvolupament (com els descrits al buffer H.265).
+  \item \textbf{Desviació del Pressupost (DP):} Avalua l'impacte financer sobre el cost del personal brut:
+  \[ DP = \text{Cost Planificat} - \text{Cost Real} \]
+  i es calcula de forma desglossada de la següent manera:
+  \[ DP = (H_{\text{plan}} - H_{\text{reals}}) \times \text{Cost/h} \]
+  \item \textbf{Indicadors de Rendiment (EVM):} S'apliquen el CPI (\textit{Cost Performance Index}) i l'SPI (\textit{Schedule Performance Index}) per comparar l'evolució del valor obtingut enfront del cost real i planificat. Un valor inferior a 1,0 en ambdós indicadors marca alertes d'ineficiència temporal o sobrecost.
+\end{itemize}
+
+Per respondre ràpidament a aquests indicadors, s'estabilitza un protocol de llindars de tolerància i d'accions correctives immediates:
+\begin{itemize}
+  \item \textbf{Llindar Verd (Desviació < 5 \%):} Situació controlada. Qualsevol lleugera desviació d'hores es compensa en les tasques posteriors més flexibles, especialment en les de documentació i proves transversals.
+  \item \textbf{Llindar Groc (Desviació 5 \% - 10 \%):} Alerta moderada. Requereix l'optimització de codi existent per evitar desbordaments temporals de rols d'Analista o Programador. Si hi ha desviació financera s'inicia el consum parcial del marge de contingència previst del 10 \%.
+  \item \textbf{Llindar Vermell (Desviació > 10 \%):} Alerta crítica de projecte. Aquest cas s'ha activat realment davant de la complexitat acumulada en H.265 i el motor \textit{schema-driven}. Seguint el protocol definit, es reavalua immediatament l'abast del projecte i s'apliquen mesures correctives dràstiques. En aquest cas real, la mesura correctora clau ha estat la decisió de dissenyar una versió simplificada dirigida a petites instal·lacions (\textit{single-NVR}). Això permet aïllar els retards del desplegament centralitzat massiu, concentrant les hores i els recursos de personal en un lliurament funcional de qualitat que assegura complir el pressupost global del projecte sense necessitat de refinançament.
+\end{itemize}
+
+\section{Tancament del projecte i desviacions finals}
+\label{sec:tancament_projecte}
+
+Un cop completat el cicle de desenvolupament i la redacció de la present memòria, es procedeix a realitzar el tancament del projecte. Aquest tancament té com a objectiu analitzar de forma retrospectiva les desviacions ocorregudes tant en la planificació temporal com en la gestió del pressupost, justificant les mesures correctores aplicades.
+
+\subsection{Tancament temporal: Planificació prevista vs. real}
+Tot i que la càrrega de treball total s'ha mantingut en l'ordre de les \textbf{540 hores} globals definides durant la fase d'iniciativa GEP (corresponents a 18 crèdits ECTS), la distribució interna de les tasques ha patit desviacions significatives a causa de la complexitat tècnica del sistema.
+
+La Taula~\ref{tab:desviacions_temporal} recull la comparativa de les hores previstes en la planificació inicial enfront de les hores realment consumides per cada una de les fases principals del projecte.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Comparativa de la planificació temporal prevista enfront del temps real d'execució.}
+  \label{tab:desviacions_temporal}
+  \small
+  \begin{tabular}{@{}llccc@{}}
+    \toprule
+    \textbf{Fase} & \textbf{Descripció} & \textbf{Hores Previstes} & \textbf{Hores Reals} & \textbf{Desviació (h)} \\ \midrule
+    GF            & Gestió i Formació                     & 40                       & 35                   & -5                     \\
+    AC            & Mòdul d'Autenticació i Core          & 60                       & 50                   & -10                    \\
+    MC            & Manteniment i Configuració Base      & 70                       & 65                   & -5                     \\
+    AV            & Alarmes i Vídeo Directe (WebRTC)     & 120                      & 145                  & +25                    \\
+    GV            & Gravacions i Configuració Avançada   & 170                      & 190                  & +20                    \\
+    FM            & Finalització i Memòria               & 80                       & 55                   & -25                    \\ \midrule
+    \textbf{TOT.} &                                     & \textbf{540}             & \textbf{540}         & \textbf{0}             \\ \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \small Font: Elaboració pròpia.
+\end{table}
+
+Com s'observa en els indicadors, les fases de desenvolupament tècnic pur (\textbf{AV} i \textbf{GV}) han patit una desviació a l'alça acumulada de \textbf{+45 hores}. Aquesta desviació es justifica per dos motius principals:
+\begin{enumerate}
+    \item \textbf{El buffer i reproducció H.265 (fase AV):} La implementació i proves de descompressió de vídeo en temps real natiu sense dependència de \textit{plugins} sota diferents navegadors moderns va presentar problemes insospitats de desbordament del buffer HTML5, forçant un desenvolupament asíncron addicional.
+    \item \textbf{El motor de parseig del Schema-driven (fase GV):} El recorregut recursiu i validació recursiva de JSONs amb validacions complexes sobre camps anidats va resultar arquitectònicament més complex de l'estimat.
+\end{enumerate}
+
+Per mantenir la data de lliurament immutable i respectar les 540 hores màximes establertes, es van aplicar les següents accions correctores en les fases de finalització:
+\begin{itemize}
+    \item \textbf{Optimització de la redacció (FM):} L'elaboració de la memòria es va realitzar de forma altament paral·lela i simplificada aprofitant els diagrames de Mermaid de la documentació tècnica de l'empresa, estalviant \textbf{25 hores} d'escriptura repetitiva.
+    \item \textbf{Retall d'abast no essencial:} Es van automatitzar les proves unitàries amb perfilador natiu en lloc de desplegar tests e2e extremadament densos que haguessin sobrecarregat les fases finals.
+\end{itemize}
+
+\subsection{Tancament econòmic: Pressupost estimat vs. final}
+La variació de les hores a nivell de tasques de desenvolupament ha repercutit directament sobre els costos associats als rols de personal corporatiu brut (\textbf{CPA}). No obstant això, el pressupost global del projecte no s'ha vist alterat.
+
+La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per cada un dels rols humans definits.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Comparativa del cost de recursos humans estimat enfront de l'executat real.}
+  \label{tab:desviacions_pressupost}
+  \small
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    \textbf{Rol} & \textbf{Cost Estimat (\euro{})} & \textbf{Hores Reals} & \textbf{Cost Real (\euro{})} & \textbf{Desviació (\euro{})} \\ \midrule
+    Project Manager & 3.037,50 & 70 & 2.362,50 & -675,00 \\
+    Analista & 2.700,00 & 120 & 3.240,00 & +540,00 \\
+    Programador & 6.075,00 & 285 & 6.925,50 & +850,50 \\
+    Tester & 1.755,00 & 65 & 1.140,75 & -614,25 \\ \midrule
+    \textbf{CPA} & \textbf{13.567,50} & \textbf{540} & \textbf{13.668,75} & \textbf{+101,25} \\ \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \small Font: Elaboració pròpia.
+\end{table}
+
+A causa de les desviacions de desenvolupament indicades anteriorment, s'ha hagut de destinar més temps d'enginyeria als rols d'\textbf{Analista} ($+20\text{ h}$) i \textbf{Programador} ($+35\text{ h}$), el que ha provocat un lleuger desviament brut del personal de \textbf{+101,25~\euro{}}. 
+
+Aquest sobrecost s'ha aconseguit absorbir de forma directa mitjançant l'ús de la partida preventiva del \textbf{Marge de Contingència (10 \%)}, que estava pressupostada inicialment en \textbf{1.492,75~\euro{}}. Un cop alliberats els fons restants d'aquesta partida i consolidada la resta de costos immutables (amortitzacions de maquinari a \textbf{210,00~\euro{}} i costos indirectes d'oficina mantinguts en \textbf{1.150,00~\euro{}}), el pressupost total final executat s'ha tancat en \textbf{15.128,75~\euro{}} (enfront dels 16.810,40~\euro{} inicialment estimats incloent el total del marge sense consumir).
+
+D'aquesta manera, el projecte es tanca amb un estalvi net de \textbf{1.681,65~\euro{}} respecte a l'estimació de despesa màxima prevista pel negoci, demostrant una eficiència econòmica òptima.
 
 \section{Informe de sostenibilitat}
 \begin{itemize}

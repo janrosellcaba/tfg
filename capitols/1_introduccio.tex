@@ -1,21 +1,23 @@
 \chapter{Introducció i Context}
 \label{ch:introduccio}
 
-En aquest primer capítol es defineix el marc en el qual es desenvolupa el projecte, s'analitza la problemàtica actual de l'empresa Lanaccess i es justifica la necessitat d'una nova plataforma web. Així mateix, es detallen els objectius, l'abast i els actors implicats en el cicle de vida del software.
+En aquest primer capítol es defineix el marc en el qual es desenvolupa el projecte, s'analitza la problemàtica de la plataforma web \textit{legacy} de l'empresa Lanaccess i es justifica la necessitat de substituir-la per una solució moderna. Així mateix, es detallen els objectius, l'abast i els actors implicats en el cicle de vida del software.
 
 \section{Context del projecte}
-El present Treball de Final de Grau (TFG) consisteix en el disseny i desenvolupament de \textbf{Web Core View}, una aplicació web d'última generació destinada a la gestió centralitzada dels videogravadors de l'empresa Lanaccess Telecom, SA. El projecte es realitza en col·laboració amb aquesta empresa tecnològica, especialitzada en el desenvolupament de solucions professionals de videovigilància i seguretat electrònica.
+El present Treball de Final de Grau (TFG) consisteix en el disseny i desenvolupament de \textbf{Web Core View}, una aplicació web moderna destinada a la gestió centralitzada dels videogravadors de l'empresa Lanaccess Telecom, SA. El projecte es realitza en col·laboració amb aquesta empresa tecnològica, especialitzada en el desenvolupament de solucions professionals de videovigilància i seguretat electrònica.
 
-El treball s'emmarca dins de la \textbf{Modalitat B} del TFG i dins de l'especialitat d'Enginyeria de Software, posant èmfasi en arquitectures frontend modernes, seguretat en la comunicació i integració de protocols de \textit{streaming} en temps real. L'objectiu principal és liderar la transició digital de l'empresa, substituint el programari de gestió basat en aplicacions natives per a Windows per una solució \textit{Single Page Application} (SPA) basada en l'ecosistema Angular.
+El treball s'emmarca dins de la \textbf{Modalitat B} del TFG i dins de l'especialitat d'Enginyeria de Software, posant èmfasi en arquitectures frontend modernes, seguretat en la comunicació i integració de protocols de \textit{streaming} en temps real. L'objectiu principal és liderar la modernització tecnològica de l'empresa, substituint l'aplicació web \textit{legacy} de gestió --- construïda als anys 90 amb tecnologies avui obsoletes com \textbf{ActiveX} --- per una interfície web de control i administració embedded basada en l'ecosistema Angular amb arquitectura i protocols moderns.
 
 \section{Identificació del problema i motivació}
-Històricament, la gestió operativa i tècnica dels gravadors de vídeo s'ha realitzat mitjançant aplicacions d'escriptori pesades. Aquest model presenta avui dia una obsolescència tecnològica que es tradueix en els següents problemes:
+Històricament, la gestió operativa i tècnica dels gravadors de vídeo de Lanaccess s'ha realitzat mitjançant una aplicació web desenvolupada als anys 90 que depenia de tecnologies avui completament obsoletes, com els controls \textbf{ActiveX} de Microsoft, entre d'altres. Aquesta plataforma \textit{legacy} presenta una obsolescència tecnològica severa que es tradueix en els següents problemes:
 
 \begin{itemize}
-  \item \textbf{Costos de manteniment elevats:} Les aplicacions natives obliguen a realitzar desplegaments manuals en cada terminal de client per a cada actualització, dificultant l'escalabilitat en grans infraestructures.
-  \item \textbf{Rigidesa davant hardware heterogeni:} Els gravadors moderns posseeixen capacitats i \textit{firmwares} molt diversos. Les interfícies estàtiques actuals no poden adaptar-se eficientment a la disparitat de paràmetres (IP, ports, lògiques d'alarma) de cada equip.
-  \item \textbf{Obsolescència d'experiència d'usuari (UX):} Les eines actuals requereixen una corba d'aprenentatge elevada i no compleixen els estàndards de reactivitat i claredat que exigeixen els operadors de seguretat.
+  \item \textbf{Dependència de tecnologies obsoletes:} L'ús de controls ActiveX restringeix el funcionament de l'aplicació a navegadors antics (Internet Explorer), incompatible amb els navegadors web moderns (Chrome, Firefox, Edge), que han eliminat completament el suport per a \textit{plugins} propietaris per raons de seguretat.
+  \item \textbf{Rigidesa davant hardware heterogeni:} Els gravadors moderns posseeixen capacitats i \textit{firmwares} molt diversos. La interfície estàtica de la plataforma \textit{legacy} no pot adaptar-se eficientment a la disparitat de paràmetres (IP, ports, lògiques d'alarma) de cada equip.
+  \item \textbf{Obsolescència d'experiència d'usuari (UX):} La interfície actual, dissenyada fa més de dues dècades, requereix una corba d'aprenentatge elevada i no compleix els estàndards de reactivitat i claredat que exigeixen els operadors de seguretat actuals.
 \end{itemize}
+
+Paral·lelament a l'obsolescència de la plataforma existent, Lanaccess ha identificat una \textbf{necessitat de mercat addicional}: oferir una versió simplificada i autònoma del programari de gestió, orientada a \textbf{empreses petites} que disposen d'un únic videogravador. El model anterior estava concebut exclusivament per a grans instal·lacions centralitzades, on una única aplicació es connecta simultàniament a tot el parc de dispositius. Aquesta arquitectura resulta sobredimensionada i innecessàriament complexa per a clients amb una sola unitat de gravació. Així, el projecte \textit{Web Core View} neix amb una doble finalitat: modernitzar la plataforma tecnològica obsoleta i, alhora, proporcionar una solució \textit{embedded} lleugera que s'executi directament en el propi gravador, permetent la gestió autònoma de l'equip des de qualsevol navegador web sense requerir infraestructura addicional.
 
 \section{Estat de l'art i alternatives existents}
 
@@ -27,7 +29,7 @@ Aquesta dependència està desapareixent amb la tendència actual cap al \textbf
 D'altra banda, els líders de programari VMS (\textit{Video Management System}) com Milestone o Genetec ofereixen solucions molt potents però amb arquitectures extremadament pesades i costos de llicenciament elevats, enfocades sovint a clients amb gran capacitat de còmput local. La proposta de \textit{Web Core View} es diferencia per ser una solució \textit{embedded-first}, on el servidor web corre directament en el hardware de gravació.
 
 \subsection{Taula comparativa}
-A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre la solució nativa anterior, els líders de mercat i la proposta de Web Core View.
+A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre l'aplicació web \textit{legacy} anterior, els líders de mercat i la proposta de Web Core View.
 
 \begin{table}[h!]
   \centering
@@ -36,11 +38,11 @@ A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre la soluc
   \resizebox{\textwidth}{!}{
     \begin{tabular}{@{}llll@{}}
       \toprule
-      \textbf{Característica} & \textbf{App Windows} & \textbf{Market Leaders}    & \textbf{Web Core View}                     \\ \midrule
-      Accessibilitat          & Baixa (Windows)      & Mitjana (\textit{Plugins}) & \textbf{Alta (Navegador)}                  \\
-      Manteniment             & Difícil (Manual)     & Complex (Servidors)        & \textbf{Fàcil (Centralitzat)}              \\
-      Interfície (UX)         & Obsoleta             & Professional/Complexa      & \textbf{Moderna i Intuïtiva}               \\
-      Configuració            & Estàtica             & Propietària                & \textbf{Dinàmica (\textit{Schema-driven})} \\ \bottomrule
+      \textbf{Característica} & \textbf{Web Legacy (ActiveX)} & \textbf{Market Leaders}    & \textbf{Web Core View}                     \\ \midrule
+      Accessibilitat          & Baixa (IE / ActiveX)          & Mitjana (\textit{Plugins}) & \textbf{Alta (Navegador)}                  \\
+      Manteniment             & Difícil (Obsoleta)            & Complex (Servidors)        & \textbf{Fàcil (Centralitzat)}              \\
+      Interfície (UX)         & Obsoleta (anys 90)            & Professional/Complexa      & \textbf{Moderna i Intuïtiva}               \\
+      Configuració            & Estàtica                      & Propietària                & \textbf{Dinàmica (\textit{Schema-driven})} \\ \bottomrule
     \end{tabular}
   }
   \par\smallskip
@@ -103,17 +105,18 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
 \end{itemize}
 
 \section{Solució proposada i valor afegit}
-\textbf{Web Core View} es proposa com una solució integral que aprofita el màxim potencial d'\textbf{Angular 19}. L'elecció d'aquesta versió, altament recent, respon a la voluntat d'utilitzar tecnologies que defineixen el futur del desenvolupament web. El seu valor diferencial resideix en:
+\textbf{Web Core View} es proposa com una solució integral que aprofita les noves funcionalitats de rendiment d'\textbf{Angular 19}. L'elecció d'aquesta versió respon a la voluntat d'utilitzar tecnologies actualitzades i de llarg suport. Les aportacions clau de la solució proposada són:
 \begin{itemize}
   \item \textbf{Arquitectura Schema-driven:} La interfície interpreta un esquema JSON enviat pel gravador i genera automàticament els controls de configuració, assegurant compatibilitat amb qualsevol versió de hardware.
   \item \textbf{Gestió d'estat amb Signals:} L'ús d'\textbf{Angular Signals} representa un canvi de paradigma en la reactivitat. Aquesta funcionalitat permet una gestió granular dels canvis, optimitzant el rendiment del \textit{frontend} i garantint una fluïdesa absoluta fins i tot amb múltiples fluxos de vídeo simultanis, evitant sobrecàrregues de CPU innecessàries al terminal del client.
   \item \textbf{Control de concurrència:} Implementació d'un servei de bloqueig en temps real per evitar conflictes d'edició entre administradors.
   \item \textbf{Arquitectura d'esdeveniments:} Ús de \textit{WebSockets} (WSS) per rebre notificacions d'alarmes, notificacions del sistema i errors de forma immediata.
+  \item \textbf{Desplegament autònom (single-NVR):} L'aplicació s'executa directament dins del propi videogravador com a servidor web \textit{embedded}. Això permet que empreses petites amb un únic dispositiu puguin gestionar-lo de forma completa i autònoma des de qualsevol navegador, sense necessitat d'infraestructura centralitzada addicional ni de programari extern. Aquesta capacitat obre un nou segment de mercat per a Lanaccess que la plataforma \textit{legacy} anterior no podia cobrir.
 \end{itemize}
 
 \section{Objectius del projecte}
 \subsection{Objectiu general}
-Dissenyar i desenvolupar una plataforma web SPA modular, reactiva i d’alt rendiment que centralitzi la gestió tècnica i operativa dels dispositius Lanaccess, eliminant la dependència de programari natiu.
+Dissenyar i desenvolupar una consola de gestió web modular, reactiva i d'alt rendiment que centralitzi la gestió tècnica i operativa dels dispositius Lanaccess, substituint la plataforma web \textit{legacy} dels anys 90 i les seves tecnologies obsoletes (ActiveX) per una arquitectura i interfície completament modernes.
 
 \subsection{Objectius específics}
 \begin{itemize}
@@ -121,11 +124,12 @@ Dissenyar i desenvolupar una plataforma web SPA modular, reactiva i d’alt rend
   \item Integrar un mòdul de visualització híbrid compatible amb WebRTC i HLS (H264/H265).
   \item Implementar la gestió d'alarmes en temps real mitjançant comunicació bidireccional.
   \item Facilitar el manteniment remot (\textit{firmware}, llicències i logs) via navegador.
+  \item Dissenyar l'aplicació com una solució autònoma \textit{embedded} capaç de funcionar directament en un únic gravador (\textit{single-NVR}), sense dependència de servidors centralitzats, per cobrir el segment d'empreses petites.
 \end{itemize}
 
 \section{Abast i Obstacles}
 \subsection{Abast funcional}
-L'aplicació ha d'oferir un cicle complet de gestió: des de l'autenticació segura de l'usuari fins a la monitorització de càmeres en directe, la cerca de gravacions històriques i la configuració avançada de xarxa i paràmetres de sistema.
+L'aplicació ha d'oferir un cicle complet de gestió: des de l'autenticació segura de l'usuari fins a la monitorització de càmeres en directe, la cerca de gravacions històriques i la configuració avançada de xarxa i paràmetres de sistema. El disseny ha de contemplar el desplegament autònom en un únic gravador (mode \textit{single-NVR}) com a cas d'ús principal, garantint que tota la funcionalitat sigui operable sense infraestructura externa.
 
 \subsection{Obstacles detectats}
 S'han identificat reptes tècnics que afecten diferents actors:
