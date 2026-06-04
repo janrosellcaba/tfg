@@ -89,9 +89,9 @@ S'ha eliminat l'ús de mòduls clàssics d'Angular en favor dels \textit{Standal
 
 L'organització d'aquests elements a nivell de dependències i estructura de mòduls es presenta gràficament a la Figura \ref{fig:angular_modules}.
 
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
   \centering
-  \includegraphics[width=0.9\textwidth]{figures/angular_modules.png}
+  \includegraphics[width=0.75\textwidth, height=0.45\textheight, keepaspectratio]{figures/angular_modules.png}
   \caption{Diagrama de mòduls de l'aplicació Angular i relació amb els components compartits i serveis de la capa Core.}
   \label{fig:angular_modules}
   \small Font: Elaboració pròpia.
@@ -127,9 +127,9 @@ Tot i que el sistema és principalment una interfície de gestió, l'arquitectur
 \subsection{Model de dades de l'aplicació}
 Per tal de representar la correspondència i relació entre les diferents estructures de dades que es reben de l'API (com ara Càmeres, Codecs, Presets o Alarmes), s'ha elaborat un model d'entitats representat en el diagrama de classes de la Figura \ref{fig:class_diagram}. Cal destacar que el model de la classe \texttt{Camera} està dissenyat per reflectir exactament l'estructura tipada del \textit{frontend} en TypeScript, incloent l'objecte imbricat \texttt{ipConfig}, el qual conté camps clau com \texttt{manufacturer} i \texttt{model}. Aquests camps són essencials per a la renderització correcta de les taules de manteniment i la generació d'informes tècnics d'estat de l'equip.
 
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
   \centering
-  \includegraphics[width=0.9\textwidth]{figures/class_diagram.png}
+  \includegraphics[width=0.75\textwidth, height=0.45\textheight, keepaspectratio]{figures/class_diagram.png}
   \caption{Diagrama de classes de les entitats principals del sistema WebCoreView.}
   \label{fig:class_diagram}
   \small Font: Elaboració pròpia.
