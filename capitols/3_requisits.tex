@@ -125,20 +125,30 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 \subsection{RF-3: Motor de Configuració Dinàmica}
 Aquest és el requisit funcional més complex i innovador del sistema.
 \begin{itemize}
-  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Un exemple d'aquest esquema es mostra en el següent fragment:
+  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Per tal d'il·lustrar la capacitat del motor dinàmic (\textit{schema-driven}) de desacoblar la interfície del frontend respecte de la lògica de baix nivell del gravador, es presenta a continuació un fragment d'esquema JSON de configuració avançada real enviat pel servei de vídeo. Aquest esquema defineix els tipus de transport tolerats pel maquinari de visualització d'una càmera IP física (utilitzant estructures d'enumeracions) i la restricció d'adreçaments de multidifusió (multicast) utilitzant expressions regulars complexes (\textit{regex}) que el motor del frontend compilarà i validarà dinàmicament.
 \end{itemize}
 
-\begin{lstlisting}[language=JavaScript, caption=Exemple d'esquema de metadades per a configuració de xarxa]
+\begin{lstlisting}[language=JavaScript, caption={Exemple d'esquema avançat JSON de metadades per a IP Video amb restriccions regex.}]
 {
-  "network.ip": {
-    "type": "string",
-    "regex": "^[0-9]{1,3}(\\.[0-9]{1,3}){3}$",
-    "description": "Adreça IP de la LAN 1",
-    "default": "192.168.1.10"
+  "media.video.{streamId}.receiver.transport": {
+    "_type": "list",
+    "_allowedValues": ["unicast", "multicast", "tcp"],
+    "_description": "Tipus de transport de xarxa per a la recepció de vídeo RTSP",
+    "_default": "unicast"
   },
-  "network.dhcp": {
-    "type": "boolean",
-    "description": "Habilitar DHCP"
+  "media.video.{streamId}.multicast.address": {
+    "_type": "string",
+    "_description": "Adreça IP de multidifusió assignada al perfil de streaming",
+    "_maxLength": 15,
+    "_regex": "^(22[4-9]|23[0-9])\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+    "_default": "0.0.0.0"
+  },
+  "media.video.{streamId}.multicast.port": {
+    "_type": "integer",
+    "_min": 1024,
+    "_max": 65535,
+    "_description": "Puerto de destinació per a la transmissió Multicast de dades de vídeo",
+    "_default": 30010
   }
 }
 \end{lstlisting}
@@ -165,7 +175,7 @@ Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
   \item \textbf{RNF-3.2 Responsive Design:} La interfície ha de ser plenament operativa en resolucions des de 1024px d'amplada (tablets de manteniment) fins a 4K (centres de control).
 \end{itemize}
 
-\section{Casos d'Ús detalla'ts}
+\section{Casos d'Ús detallats}
 Per aprofundir en la funcionalitat del sistema, es presenta el diagrama de casos d'ús general (Figura \ref{fig:diagrama_casos_us}) i l'especificació detallada dels fluxos crítics.
 
 % Placeholder per a la teva imatge de Casos d'Ús

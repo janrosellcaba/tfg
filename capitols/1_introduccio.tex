@@ -81,9 +81,9 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
 
 \subsection{Alternativa de Còdec de Vídeo: H.264 i H.265 coexistents segons Maquinari i Càmera}
 \begin{itemize}
-  \item \textbf{H.264 (AVC):} És el còdec de compressió més universal i robust. És suportat pel 100\% de les targetes gràfiques, dispositivis mòbils i navegadors mitjançant descodificació accelerada per maquinari (GPU), garantint fluïdesa absoluta a costa d'un consum superior d'ample de banda.
+  \item \textbf{H.264 (AVC):} És el còdec de compressió més universal i robust. És suportat pel 100\% de les targetes gràfiques, dispositius mòbils i navegadors mitjançant descodificació accelerada per maquinari (GPU), garantint fluïdesa absoluta a costa d'un consum superior d'ample de banda.
   \item \textbf{H.265 (HEVC):} Algorisme de compressió d'última generació que permet reduir a la meitat l'espai d'emmagatzematge a disc i l'ample de banda de transmissió de vídeo per a la mateixa qualitat d'imatge. No obstant això, el seu suport a la web està limitat per llicències de patents, requerint que el client disposi d'un processador modern amb descodificació nativa integrada.
-  \item \textbf{Justificació:} En lloc de descartar un dels dos còdecs, el sistema s'ha dissenyat amb una **estratègia dinàmica de coexistança**:
+  \item \textbf{Justificació:} En lloc de descartar un dels dos còdecs, el sistema s'ha dissenyat amb una \textbf{estratègia dinàmica de coexistència}:
         \begin{enumerate}
           \item Es fa servir **H.265** com a còdec d'alta prioritat quan la càmera IP física ho suporta i el dispositiu del client disposa de descodificació nativa per maquinari compatible al navegador, maximitzant així l'estalvi d'espai de disc als discs durs del gravador (clau per a instal·lacions amb desenes de càmeres de gran resolució).
           \item Es commuta de forma transparent cap a **H.264** si es detecta que la càmera és antiga o si el terminal de l'usuari és de gamma baixa i no disposa del motor de descodificació H.265 a la GPU, garantint així la portabilitat absoluta i la visualització sense retards ni sobrecàrrega de CPU.

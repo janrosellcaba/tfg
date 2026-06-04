@@ -1,3 +1,14 @@
+
+captures:
+
+ui_login.png (Pantalla inicial)
+ui_schema_config.png (Un formulari avançat amb els toggles i sliders)
+ui_video_mosaic.png (La vista de vídeo amb el mosaic de càmeres)
+ui_alarm_notification.png (L'aplicació mostrant una alarma)
+ui_logs_maintenance.png (La taula de logs o l'actualització de firmware)
+ui_timeline_playback.png (La línia de temps interactiva de gravacions)
+
+
 #
 # DONE
 #

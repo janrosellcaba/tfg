@@ -45,6 +45,13 @@ El cicle complet de comunicació des del formulari de login fins al backend es d
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.85\textwidth]{figures/ui_login.png}
+  \caption{Captura de la pantalla d'inici de sessió (Login) de l'aplicació.}
+  \label{fig:ui_login}
+\end{figure}
+
 \section{Implementació del Motor Schema-Driven}
 Aquesta és la part més complexa de la implementació. El motor ha de ser capaç de transformar un esquema JSON abstracte en una interfície totalment funcional.
 
@@ -52,17 +59,24 @@ Aquesta és la part més complexa de la implementació. El motor ha de ser capa�
 S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de forma recursiva segons l'estructura del JSON rebut. La decisió de quin tipus d'element de formulari s'ha d'instanciar per a cada paràmetre es resol dinàmicament en temps d'execució analitzant la propietat \texttt{type} i les metadades de restricció de l'esquema JSON mitjançant un flux de selecció múltiple (\textit{switch-case}):
 
 \begin{description}
-    \item[\texttt{type: "boolean"}] $\rightarrow$ Es mapeja cap al component \texttt{ToggleComponent} (un botó de commutació gràfic actiu/inactiu).
-    \item[\texttt{type: "integer" o "float"}] $\rightarrow$ Si l'esquema inclou metadades de rang limitat (\texttt{min} i \texttt{max}), es renderitza el component \texttt{SliderComponent} per a un control tàctil precís. Si no es defineix un rang tancat, s'instancia el component \texttt{NumericInputComponent} amb filtrat actiu de caràcters de teclat.
-    \item[\texttt{type: "string"}] $\rightarrow$ Si el camp posseeix una propietat \texttt{enum} de valors tancats, es renderitza el component \texttt{SelectComponent} (un menú desplegable). Si conté una propietat de validació com \texttt{pattern} (expressió regular), es mapeja cap al component \texttt{TextInputComponent} amb validació activa de regex en temps real (per a formats d'adreça IP, DNS, etc.).
-    \item[\texttt{type: "object"}] $\rightarrow$ S'aplica la recursivitat cridant el component contenidor \texttt{ConfigGroupComponent}, que agrupa lògicament les subpropietats i genera una pestanya o secció col·lapsable a la interfície.
-    \item[\texttt{type: "array"}] $\rightarrow$ S'instancia el component \texttt{ListConfigComponent}, que gestiona de manera dinàmica l'escriptura, inserció i eliminació de conjunts de dades indexades (com llistes d'outputs de relés o presets de càmeres).
+  \item[\texttt{type: "boolean"}] $\rightarrow$ Es mapeja cap al component \texttt{ToggleComponent} (un botó de commutació gràfic actiu/inactiu).
+  \item[\texttt{type: "integer" o "float"}] $\rightarrow$ Si l'esquema inclou metadades de rang limitat (\texttt{min} i \texttt{max}), es renderitza el component \texttt{SliderComponent} per a un control tàctil precís. Si no es defineix un rang tancat, s'instancia el component \texttt{NumericInputComponent} amb filtrat actiu de caràcters de teclat.
+  \item[\texttt{type: "string"}] $\rightarrow$ Si el camp posseeix una propietat \texttt{enum} de valors tancats, es renderitza el component \texttt{SelectComponent} (un menú desplegable). Si conté una propietat de validació com \texttt{pattern} (expressió regular), es mapeja cap al component \texttt{TextInputComponent} amb validació activa de regex en temps real (per a formats d'adreça IP, DNS, etc.).
+  \item[\texttt{type: "object"}] $\rightarrow$ S'aplica la recursivitat cridant el component contenidor \texttt{ConfigGroupComponent}, que agrupa lògicament les subpropietats i genera una pestanya o secció col·lapsable a la interfície.
+  \item[\texttt{type: "array"}] $\rightarrow$ S'instancia el component \texttt{ListConfigComponent}, que gestiona de manera dinàmica l'escriptura, inserció i eliminació de conjunts de dades indexades (com llistes d'outputs de relés o presets de càmeres).
 \end{description}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_schema_config.png}
+  \caption{Captura de pantalla d'un formulari de configuració avançat generat dinàmicament pel motor Schema-Driven (amb \textit{toggles}, \textit{sliders} i \textit{selects}).}
+  \label{fig:ui_schema_config}
+\end{figure}
 
 A més d'aquest motor d'instanciació, el component gestiona:
 \begin{itemize}
-    \item \textbf{Validació en temps real:} S'utilitzen els valors de metadades per configurar les validacions de formulari automàticament.
-    \item \textbf{Config Lock Service:} S'ha implementat una lògica de bloqueig per evitar edicions simultànies per part de diferents administradors.
+  \item \textbf{Validació en temps real:} S'utilitzen els valors de metadades per configurar les validacions de formulari automàticament.
+  \item \textbf{Config Lock Service:} S'ha implementat una lògica de bloqueig per evitar edicions simultànies per part de diferents administradors. Qualsevol canvi en l'estat d'aquest bloqueig es propaga instantàniament a tots els components de formulari mitjançant \textit{Signals}, aplicant la propietat \texttt{[readonly]="isReadOnly()"} per deshabilitar l'entrada de dades si l'usuari no posseeix el \textit{lock}.
 \end{itemize}
 
 Aquest flux de bloqueig de configuració és vital per a entorns amb concurrència i està detallat en el diagrama de seqüència de la Figura \ref{fig:seq_config_lock}.
@@ -75,15 +89,101 @@ Aquest flux de bloqueig de configuració és vital per a entorns amb concurrènc
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\subsection{Optimització del payload mitjançant deltes de canvis}
+A causa de les limitacions de maquinari del videogravador embedded, enviar l'esquema sencer de configuració de càmeres o usuaris en cada petició de desat (\textit{save}) suposaria una sobrecàrrega inacceptable en el processament XML/JSON del backend i una transferència innecessària d'ample de banda. Per solucionar-ho, s'ha dissenyat un algorisme recursiu de detecció de diferències (\textit{deep delta detection}) que compara l'estat actual editat per l'usuari amb l'estat original obtingut de l'NVR. L'algorisme genera un objecte de canvis mínims (\textit{delta payload}) que només s'envia si s'han detectat modificacions reals, permetent a més ignorar els camps interns (que comencen amb guió baix \texttt{\_}) utilitzats només per a la renderització visual del frontend.
+
+\begin{lstlisting}[language=JavaScript, caption={Algorisme recursiu de detecció de diferències (Delta) per a l'optimització de payloads.}]
+export function getObjectDelta(
+  current: any,
+  original: any,
+  forceFullKeys: string[] = [],
+  path: string = ''
+): any {
+  if (current === original) return undefined;
+
+  if (typeof current !== 'object' || current === null) {
+    return current;
+  }
+
+  const delta: any = {};
+  let hasChanges = false;
+
+  for (const key in current) {
+    // S'ignoren camps interns de gestió visual de l'esquema
+    if (key.startsWith('_')) continue;
+
+    const currentVal = current[key];
+    const originalVal = original ? original[key] : undefined;
+    const currentPath = path ? `${path}.${key}` : key;
+
+    // Comprovació de si la propietat requereix transmissió completa forçada
+    const isProtected = forceFullKeys.some((pattern) => {
+      if (pattern === key || pattern === currentPath) return true;
+      const regexStr = pattern.replace(/\./g, '\\.').replace(/\{[^}]*\}/g, '[^.]+');
+      const regex = new RegExp(`(^|\\.)${regexStr}$`);
+      return regex.test(currentPath);
+    });
+
+    if (JSON.stringify(currentVal) !== JSON.stringify(originalVal)) {
+      if (isProtected) {
+        delta[key] = currentVal;
+        hasChanges = true;
+      } else {
+        const diff = getObjectDelta(currentVal, originalVal, forceFullKeys, currentPath);
+        if (diff !== undefined) {
+          delta[key] = diff;
+          hasChanges = true;
+        }
+      }
+    }
+  }
+
+  return hasChanges ? delta : undefined;
+}
+\end{lstlisting}
+
+\subsection{Optimització de Cicle de Vida i Fil d'Execució}
+El servei de bloqueig de configuració (\texttt{ConfigLockService}) requereix un mecanisme de batec de cor (\textit{heartbeat}) que renovi periòdicament el token de bloqueig al backend abans que expiri. Executar temporitzadors ordinaris de JavaScript (\texttt{setInterval}) dins de la zona d'Angular (Zone.js) provocaria que el framework disparés el cicle de detecció de canvis global a tota l'aplicació en cada renovació, degradant dràsticament el rendiment del processament de vídeo en directe. Per evitar-ho, s'ha dissenyat un algorisme de renovació asíncrona que s'executa fora de la zona d'Angular mitjançant \texttt{NgZone.runOutsideAngular}, reentrant a la zona de detecció de canvis de forma explícita només quan es rep la confirmació d'èxit de renovació.
+
+\begin{lstlisting}[language=JavaScript, caption={Optimització del cicle de vida de \textit{Zone.js} per renovació de \textit{tokens}.}]
+import { Injectable, NgZone, inject } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class ConfigLockService {
+  private zone = inject(NgZone);
+  private renewalTimer: any;
+
+  // Planifica la renovació de forma eficient fora de la detecció de canvis global
+  private scheduleRenewal(ms: number) {
+    this.stopRenewal();
+    
+    // S'executa fora d'Angular per evitar disparar Zone.js innecessàriament
+    this.zone.runOutsideAngular(() => {
+      this.renewalTimer = setTimeout(() => {
+        // Només reentrem a la zona quan cal actualitzar l'estat reactiu de l'aplicació
+        this.zone.run(() => this.acquireLock());
+      }, ms);
+    });
+  }
+
+  public stopRenewal() {
+    if (this.renewalTimer) {
+      clearTimeout(this.renewalTimer);
+      this.renewalTimer = null;
+    }
+  }
+}
+\end{lstlisting}
+
 \section{Visualització de Vídeo Real-Time (WebRTC)}
 El repte principal ha estat la negociació del flux de vídeo entre el \textit{backend} en C++ i el navegador del client.
 
-El reproductor de vídeo implementa un flux robust que s'encarrega d'inicialitzar els diferents mètodes de transmissió i gestionar reconexions automàtiques en cas de pèrdua de senyal, tal com es resumeix en el diagrama d'activitat de la Figura \ref{fig:activity_video_connection}.
+El reproductor de vídeo implementa un flux robust que s'encarrega d'inicialitzar els diferents mètodes de transmissió i gestionar reconnexions automàtiques en cas de pèrdua de senyal, tal com es resumeix en el diagrama d'activitat de la Figura \ref{fig:activity_video_connection}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.65\textwidth]{figures/activity_video_connection.png}
-  \caption{Diagrama d'activitat de la lògica de connexió i reconexió de vídeo.}
+  \caption{Diagrama d'activitat de la lògica de connexió i reconnexió de vídeo.}
   \label{fig:activity_video_connection}
   \small Font: Elaboració pròpia.
 \end{figure}
@@ -114,6 +214,51 @@ El cicle de vida d'establiment i inicialització del stream de vídeo des de la 
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_video_mosaic.png}
+  \caption{Vista principal de l'operador mostrant el mosaic de visualització de vídeo en directe.}
+  \label{fig:ui_video_mosaic}
+\end{figure}
+
+\subsection{Orquestració Reactiva amb Signals i Effects}
+La visualització de vídeo requereix una sincronització perfecta entre l'estat de la càmera (com ara la pèrdua de senyal), el canal de streaming seleccionat (codec, resolució) i l'element HTML \texttt{<video>} del DOM. En lloc d'utilitzar mètodes tradicionals basats en temporitzadors (\textit{polling}) o subscripcions complexes que poden provocar fugues de memòria, s'ha utilitzat el mecanisme reactiu de les \textbf{Angular Signals} combinat amb un \texttt{effect}. Aquest efecte d'orquestració s'executa automàticament de forma asíncrona cada vegada que canvia algun dels valors reactius dels quals depèn (\texttt{cameraSignal}, \texttt{selectedCodecId}, \texttt{hasSignal}), gestionant de forma neta l'obertura i tancament d'instàncies dels serveis de WebRTC o HLS.
+
+\begin{lstlisting}[language=JavaScript, caption={Orquestració reactiva de vídeo mitjançant Angular Effects.}]
+// Constructor de l'orquestrador de vídeo basat en Angular Signals
+constructor() {
+  effect(() => {
+    const streamName = this.cameraStreamName();
+    const signalAvailable = this.hasSignal();
+    const player = this.videoPlayer();
+
+    // S'alliberen i es tanquen nítidament les connexions i sockets anteriors
+    this.webrtcService.closeStream();
+    this.hlsService.closeStream();
+
+    if (!signalAvailable) {
+      console.warn('Stream bloquejat: Pèrdua de senyal detectada (NO SIGNAL).');
+      return;
+    }
+    if (!streamName) {
+      console.warn('Stream bloquejat: Nom de flux invàlid per a la càmera.');
+      return;
+    }
+    if (!player) {
+      console.warn('Stream bloquejat: Element de reproducció de vídeo no renderitzat.');
+      return;
+    }
+
+    // Inicialització dinàmica del protocol seleccionat segons configuració de l'aplicació
+    if (getStreamingMethod() === 'hls') {
+      this.hlsService.startStream(player.nativeElement, streamName);
+    } else {
+      this.webrtcService.startStream(streamName);
+    }
+  });
+}
+\end{lstlisting}
+
 \section{Sistema d'Alarmes i Comunicació asíncrona}
 S'ha implementat un servei de \textbf{WebSockets (WSS)} que es connecta al \textit{Core Notifier}. Quan arriba un missatge pel \textit{socket}, el servei el parseja i actualitza un \textit{Signal} global que refresca els components de la interfície de forma reactiva.
 
@@ -127,5 +272,70 @@ A mesura que l'usuari interactua amb el WebSocket d'alarmes, cadascuna d'elles t
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_alarm_notification.png}
+  \caption{Captura del panell mostrant una alerta o notificació d'alarma en temps real mitjançant WebSockets.}
+  \label{fig:ui_alarm_notification}
+\end{figure}
+
+\subsection{Estratègia de reconnexió amb Backoff exponencial}
+La gestió d'esdeveniments i alarmes de videovigilància és un servei de caràcter crític. Per garantir que l'operador rebi les notificacions en temps real fins i tot després d'una caiguda de xarxa transitòria o un reinici del videogravador, s'ha programat una estratègia de connexió altament resilient utilitzant la reactivitat de RxJS. El servei de connexió encapsula el cicle de vida del WebSocket de manera que, en cas de desconnexió o pèrdua de pols, utilitza l'operador \texttt{retry} amb una estratègia de temporització intel·ligent (\textit{backoff exponencial}) per evitar saturar la CPU del videogravador i s'assegura que no es reintenti la connexió si l'usuari s'ha desautenticat de manera voluntària.
+
+\begin{lstlisting}[language=JavaScript, caption={Connexió WebSocket resilient amb backoff exponencial en RxJS.}]
+this.socket$ = webSocket<ServerSentMessage>(config);
+this.socket$
+  .pipe(
+    tap({
+      error: (error) => console.error('Error crític detectat al canal WebSocket:', error),
+    }),
+    retry({
+      delay: (error, retryCount) => {
+        // Atura immediatament els intents si l'usuari ha tancat la sessió
+        if (!this.userService.isAuthenticated()) {
+          return throwError(() => new Error('Connexió tancada per pèrdua de credencials.'));
+        }
+
+        // Si el gravador està reiniciant-se de forma controlada, es difereix l'intent
+        if (this.maintenanceService.isSystemRebooting()) {
+          console.log(`Reintent de connexió deferred per reinici. Intent: #${retryCount}`);
+          return timer(RECONNECT_INTERVAL_MS);
+        }
+
+        console.warn(`Pèrdua de connectivitat. Reintentant connexió en ${RECONNECT_INTERVAL_MS}ms (Intent #${retryCount})`);
+        return timer(RECONNECT_INTERVAL_MS);
+      },
+    }),
+    catchError((error) => {
+      console.error('WebSocket tancat definitivament després dels intents màxims.');
+      this.connectionStatus$.next(false);
+      this.detailedConnectionState$.next('DISCONNECTED');
+      return EMPTY;
+    })
+  )
+  .subscribe({
+    next: (message: ServerSentMessage) => {
+      this.messagesSubject$.next(message);
+    }
+  });
+\end{lstlisting}
+
 \section{Mòdul de Manteniment i Logs}
 Finalment, s'ha implementat la gestió de \textit{firmware}. Aquesta secció inclou una barra de progrés real que rep el \textit{feedback} de l'escriptura. També s'ha dissenyat un visualitzador de \textit{logs} amb \textit{scroll} infinit per gestionar milers de línies de registre sense saturar la memòria del navegador.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_logs_maintenance.png}
+  \caption{Captura del visor de registres (Logs) o la barra de progrés d'actualització de firmware.}
+  \label{fig:ui_logs_maintenance}
+\end{figure}
+
+\section{Reproducció de Gravacions i Timeline Històrica}
+El mòdul de reproducció permet als operadors consultar els esdeveniments passats sota el protocol HLS. S'ha dissenyat un component interactiu de línia de temps (\textit{Timeline}) que carrega els blocs de gravació i indica visualment (per codi de colors) els períodes on s'han produït alarmes, permetent navegar de forma precisa per l'històric del dispositiu.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_timeline_playback.png}
+  \caption{Vista del reproductor de vídeo històric amb el component interactiu de la línia de temps (\textit{Timeline}).}
+  \label{fig:ui_timeline_playback}
+\end{figure}

@@ -113,7 +113,7 @@ Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns 
   \begin{tabular}{@{}lp{3.2cm}ccp{5.2cm}@{}}
     \toprule
     \textbf{Tipus} & \textbf{Risc Identificat} & \textbf{Prob.} & \textbf{Imp.} & \textbf{Pla de Contingència / Acció Correctiva} \\ \midrule
-    Tecnològic & Incompatibilitat de descompressió de vídeo H.265 & Mitjana & Alt & Optimització de bufereig a la capa de frontend. Sol·licitar ajustaments del format d'emissió H.265 directament a l'equip de firmware corporatiu. \\ \midrule
+    Tecnològic & Incompatibilitat de descompressió de vídeo H.265 & Mitjana & Alt & Optimització de la memòria intermèdia (\textit{buffering}) a la capa de frontend. Sol·licitar ajustaments del format d'emissió H.265 directament a l'equip de firmware corporatiu. \\ \midrule
     Planificació & Corba d'aprenentatge d'Angular 19 i Signals & Baixa & Mitjà & Ús de sandboxes de prova reduïts, guies oficials de desenvolupament Angular i aprofitament d'arquitectures MVC heretades. \\ \midrule
     Tecnològic & Degradació del rendiment per configuracions anidades & Mitjana & Mitjà & Implementació d'algorísmia de recorregut asíncron de dades al motor \textit{schema-driven} per evitar bloquejar el thread del DOM. \\ \midrule
     Materials & Manca de disponibilitat de gravadors NVR de prova & Baixa & Alt & Creació d'un entorn de mock-up local mitjançant respostes JSON simulades que repliquin la interfície gRPC i D-Bus. \\ \midrule
@@ -268,9 +268,12 @@ Aquest sobrecost s'ha aconseguit absorbir de forma directa mitjançant l'ús de 
 
 D'aquesta manera, el projecte es tanca amb un estalvi net de \textbf{1.681,65~\euro{}} respecte a l'estimació de despesa màxima prevista pel negoci, demostrant una eficiència econòmica òptima.
 
-\section{Informe de sostenibilitat}
+\section{Anàlisi de sostenibilitat i implicacions ètiques}
+L'avaluació global del projecte requereix analitzar-ne l'impacte des de quatre dimensions fonamentals:
+
 \begin{itemize}
-  \item \textbf{Dimensió Econòmica:} La solució \textit{Schema-driven} permet adaptar el software a nous models de gravadors sense cost addicional, allargant la vida útil del producte.
-  \item \textbf{Dimensió Ambiental:} L'ús de la plataforma web redueix els desplaçaments físics de tècnics a les instal·lacions del client, minimitzant la petjada de carboni.
-  \item \textbf{Dimensió Social:} Millora la interfície de treball dels operadors de seguretat, reduint l'estrès operatiu en situacions d'incident crític.
+  \item \textbf{Dimensió Econòmica:} La solució \textit{Schema-driven} permet adaptar el software a nous models de gravadors sense cost addicional d'enginyeria frontend, allargant la vida útil del producte i reduint el deute tècnic de l'empresa. El model \textit{single-NVR} democratitza l'accés a sistemes professionals per a petites empreses.
+  \item \textbf{Dimensió Ambiental:} L'ús d'una plataforma web remota accessible des de qualsevol navegador redueix dràsticament els desplaçaments físics de tècnics de manteniment a les instal·lacions del client, minimitzant directament la petjada de carboni associada a la flota de vehicles.
+  \item \textbf{Dimensió Social:} Millora significativament la interfície de treball dels operadors de seguretat. S'ha reduït la càrrega cognitiva gràcies a un disseny clar i reactiu, fet que disminueix l'estrès operatiu i la fatiga visual en situacions d'incident crític o torns de monitorització perllongats.
+  \item \textbf{Implicacions Ètiques:} Tractant-se d'un sistema de videovigilància, el projecte ha integrat el principi de \textit{Privadesa per Disseny}. L'arquitectura assegura que només els usuaris amb privilegis explícits puguin visualitzar el vídeo. El compliment de les directives RGPD s'aborda tècnicament garantint l'esborrat de dades passats 30 dies i la no persistència d'imatges o dades biomètriques al terminal de l'operador. A més, s'evita la inclusió de perfilats automatitzats opacs, garantint que les decisions de seguretat recaiguin sempre sobre el judici humà sota una estricta traçabilitat auditable (\textit{Audit Log}).
 \end{itemize}
