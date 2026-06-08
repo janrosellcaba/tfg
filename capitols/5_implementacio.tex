@@ -68,9 +68,9 @@ S'ha creat el component \texttt{Config\-Input\-Component}, el qual actua de form
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_schema_config.png}
+  \includegraphics[width=0.95\textwidth]{figures/ui_configuration.png}
   \caption{Captura de pantalla d'un formulari de configuració avançat generat dinàmicament pel motor Schema-Driven (amb \textit{toggles}, \textit{sliders} i \textit{selects}).}
-  \label{fig:ui_schema_config}
+  \label{fig:ui_configuration}
 \end{figure}
 
 A més d'aquest motor d'instanciació, el component gestiona:
@@ -216,9 +216,9 @@ El cicle de vida d'establiment i inicialització del stream de vídeo des de la 
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_video_mosaic.png}
+  \includegraphics[width=0.95\textwidth]{figures/ui_cameras.png}
   \caption{Vista principal de l'operador mostrant el mosaic de visualització de vídeo en directe.}
-  \label{fig:ui_video_mosaic}
+  \label{fig:ui_cameras}
 \end{figure}
 
 \subsection{Orquestració Reactiva amb Signals i Effects}
@@ -274,9 +274,9 @@ A mesura que l'usuari interactua amb el WebSocket d'alarmes, cadascuna d'elles t
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_alarm_notification.png}
+  \includegraphics[width=0.95\textwidth]{figures/ui_alarms.png}
   \caption{Captura del panell mostrant una alerta o notificació d'alarma en temps real mitjançant WebSockets.}
-  \label{fig:ui_alarm_notification}
+  \label{fig:ui_alarms}
 \end{figure}
 
 \subsection{Estratègia de reconnexió amb Backoff exponencial}
@@ -325,9 +325,16 @@ Finalment, s'ha implementat la gestió de \textit{firmware}. Aquesta secció inc
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_logs_maintenance.png}
-  \caption{Captura del visor de registres (Logs) o la barra de progrés d'actualització de firmware.}
-  \label{fig:ui_logs_maintenance}
+  \includegraphics[width=0.95\textwidth]{figures/ui_log.png}
+  \caption{Captura del visor de registres (Logs).}
+  \label{fig:ui_log}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_updating1.png}
+  \caption{Captura de la barra de progrés d'actualització de firmware.}
+  \label{fig:ui_updating1}
 \end{figure}
 
 \section{Reproducció de Gravacions i Timeline Històrica}
@@ -335,7 +342,7 @@ El mòdul de reproducció permet als operadors consultar els esdeveniments passa
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_timeline_playback.png}
+  \includegraphics[width=0.95\textwidth]{figures/ui_recordings.png}
   \caption{Vista del reproductor de vídeo històric amb el component interactiu de la línia de temps (\textit{Timeline}).}
-  \label{fig:ui_timeline_playback}
+  \label{fig:ui_recordings}
 \end{figure}
