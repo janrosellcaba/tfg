@@ -56,7 +56,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
 \begin{itemize}
   \item \textbf{React / Vue:} Són llibreries extremadament populars i flexibles per a la creació d'interfícies. No obstant això, són arquitectures no opinades que requereixen la integració de múltiples llibreries de tercers per gestionar aspectes com el ruteig, formularis o seguretat. En un entorn de videovigilància professional embedded, això augmenta el risc de vulnerabilitats i encareix de manera crítica l'auditoria de seguretat.
   \item \textbf{Angular 19:} És un framework empresarial complet (\textit{batteries-included}) que ofereix una estructura opinada, robusta i escrita nativament en TypeScript. Això garanteix que el codi s'organitzi de forma altament homogènia.
-  \item \textbf{Justificació:} S'ha escollit \textbf{Angular 19} per la seguretat de tipus de TypeScript, el seu motor de formularis reactius natius i, principalment, per la introducció de les **Signals** com a mecanisme natiu i eficient de gestió de l'estat reactiu, la qual cosa redueix de manera dràstica l'ús de CPU respecte a altres frameworks.
+  \item \textbf{Justificació:} S'ha escollit \textbf{Angular 19} per la seguretat de tipus de TypeScript, el seu motor de formularis reactius natius i, principalment, per la introducció de les \textbf{Signals} com a mecanisme natiu i eficient de gestió de l'estat reactiu, la qual cosa redueix de manera dràstica l'ús de CPU respecte a altres frameworks.
 \end{itemize}
 
 \subsection{Alternativa de vídeo: Arquitectura Híbrida WebRTC i HLS vs. RTSP / RTMP}
@@ -67,7 +67,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Justificació:} S'ha optat per una **arquitectura híbrida complementària** que explota el millor de cada protocol en lloc de triar-ne només un:
         \begin{enumerate}
           \item \textbf{WebRTC:} S'utilitza de forma **principal per al vídeo en directe**, on la latència ultra-baixa ($<300$~ms) i el transport sobre UDP sota xifratge DTLS són indispensables per vigilar o respondre a amenaces immediates.
-          \item \textbf{HLS (HTTP Live Streaming) \cite{hls_apple}:} S'utilitza per a la **reproducció de gravacions històriques**, on la ultra-baixa latència no és prioritària però es requereix un control molt precís de descàrrega per blocs (segments), commutació dinàmica de qualitat i la capacitat de fer desplaçaments lliures (*seek*) sobre l'històric mitjançant TCP. També actua com a *fallback* per al vídeo en directe si els tallafocs bloquegen el trànsit WebRTC.
+          \item \textbf{HLS (HTTP Live Streaming) \cite{hls_apple}:} S'utilitza per a la \textbf{reproducció de gravacions històriques}, on la ultra-baixa latència no és prioritària però es requereix un control molt precís de descàrrega per blocs (segments), commutació dinàmica de qualitat i la capacitat de fer desplaçaments lliures (\textit{seek}) sobre l'històric mitjançant TCP. També actua com a \textit{fallback} per al vídeo en directe si els tallafocs bloquegen el trànsit WebRTC.
         \end{enumerate}
 \end{itemize}
 

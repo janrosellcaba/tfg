@@ -1,18 +1,22 @@
 
-captures:
+live streaming -> WebRTC guanyador, HLS backup
+gravacions -> la-video-engine, HLS playlist, H264 V, H265 X, web server
+alarmes -> la-core-alarm, la-db-engine, persistent storage SQLite3, DBUS, gRPC, threads architecutre
 
-ui_login.png (Pantalla inicial)
-ui_schema_config.png (Un formulari avançat amb els toggles i sliders)
-ui_video_mosaic.png (La vista de vídeo amb el mosaic de càmeres)
-ui_alarm_notification.png (L'aplicació mostrant una alarma)
-ui_logs_maintenance.png (La taula de logs o l'actualització de firmware)
-ui_timeline_playback.png (La línia de temps interactiva de gravacions)
+resum i abstract tornar a fer!
 
+treure diagrama 3.1
+
+l'arquitectura global del sistema no està bé. figura 4.1
+revisar tema 4.
+
+averiguar com va el login en el corelegacy
 
 #
 # DONE
 #
 
+captures
 treure floritures
 treure llenguatge massa tècnic
 treure lo de spa (o posarho diferent)
