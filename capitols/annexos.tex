@@ -2,3 +2,54 @@
 \label{ch:annexos}
 
 En aquest apartat s'inclouen materials addicionals que complementen la memòria del projecte.
+
+\section{Exemple d'esquema de configuració (Schema-driven JSON)}
+\label{annex:schema_json}
+A continuació es mostra un exemple simplificat de l'estructura JSON que el \textit{backend} (\textbf{la-core-legacy}) envia al \textit{frontend} per construir dinàmicament la vista de configuració d'una càmera. S'observa com es defineix l'estructura, el tipus de dada, els rangs de valors i la persistència que s'ha d'aplicar.
+
+\begin{lstlisting}[language=JavaScript, caption={Exemple d'esquema JSON per a la configuració d'una càmera IP.}, label={lst:schema_json}]
+{
+  "properties": {
+    "camera": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Nom assignat a la càmera"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "stream": {
+          "type": "object",
+          "properties": {
+            "codec": {
+              "type": "string",
+              "enum": ["H264", "H265"],
+              "default": "H264"
+            },
+            "resolution": {
+              "type": "string",
+              "enum": ["1080p", "720p", "4K"]
+            },
+            "fps": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 60,
+              "default": 25
+            }
+          }
+        }
+      }
+    }
+  }
+}
+\end{lstlisting}
+
+Aquest esquema permet que el backend defineixi regles de validació (com el regex d'IP) que el frontend aplica automàticament sense conèixer prèviament el camp.

@@ -21,7 +21,13 @@ El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de
 L'autenticació la gestiona directament el \textit{backend} (\texttt{la-core-legacy}), el qual avalua les credencials introduïdes a la Figura \ref{fig:ui_login} i retorna un JSON amb l'estatus de l'operació. Un cop validat pel sistema, l'usuari aterra a la pàgina d'inici principal (\textit{Home page}).
 
 \subsection{Seguretat (JWT)}
-La seguretat es basa en JSON Web Tokens (JWT) \cite{rfc7519}. S'ha implementat un servei (\texttt{auth.service.ts}) que gestiona les crides a l'API. Un cop el gravador valida les credencials, retorna un token que s'emmagatzema exclusivament en l'estat en memòria d'un Signal privatiu (evitant atacs d'escriptura maliciosa associats al \textit{localStorage}).
+La seguretat es basa en JSON Web Tokens (JWT) \cite{rfc7519}. El flux d'autenticació comença amb una petició POST al servei \textbf{la-core-legacy}. Aquest servei no només valida l'usuari, sinó que interacciona amb \textbf{la-db-engine} per obtenir el perfil de permisos (\textit{grants}) associat. El token JWT resultant conté aquesta metadada xifrada, la qual cosa permet al \textit{frontend} (mitjançant \textit{guards} d'Angular) habilitar o deshabilitar botons de la interfície sense haver de fer consultes addicionals per cada acció de l'usuari.
+
+S'ha implementat un servei (\texttt{auth.service.ts}) que gestiona les crides a l'API. Un cop el gravador valida les credencials, retorna aquest token que s'emmagatzema exclusivament en l'estat en memòria d'un Signal privatiu.
+
+La gestió de la sessió s'ha dissenyat sota un esquema de \textbf{zero-persistence} per maximitzar la seguretat. A diferència de les aplicacions web convencionals que emmagatzemen el JWT a \texttt{localStorage} (vulnerable a atacs \textit{Cross-Site Scripting} o XSS), Web Core View manté el token exclusivament en l'estat d'un \textbf{Signal privat} dins del servei d'autenticació.
+
+Aquesta decisió implica que, si un atacant aconseguís injectar un script maliciós, aquest no tindria una API de navegador on anar a buscar les credencials. El cost d'aquest disseny és que un refresc manual de la pàgina (\texttt{F5}) tanca la sessió, una penalització d'experiència d'usuari (UX) que es considera acceptable i desitjable en una aplicació de seguretat industrial.
 
 \begin{figure}[htbp]
   \centering
@@ -50,7 +56,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 Addicionalment, s'han implementat \textbf{Functional Guards} (\texttt{CanActivateFn}) que injecten el servei de seguretat, llegeixen el rol descodificat i bloquegen l'accés a rutes prohibides (per exemple, un operador intentant entrar a configuració). També s'utilitza el \texttt{LanguageInitResolver} per carregar les traduccions abans de renderitzar la vista.
 
-D'altra banda, per tal de mantenir la sessió activa de forma contínua mentre l'operador utilitza la plataforma, s'ha introduït un servei \textbf{KeepAlive}. Aquest mecanisme s'encarrega d'enviar periòdicament un \textit{ping} o renovació al \textit{backend} (\texttt{la-core-legacy}). Si el gravador no rep aquest \textit{keepalive} en un interval determinat, invalida el token i tanca la sessió per motius de seguretat, obligant l'usuari a tornar a autenticar-se.
+El mecanisme de \textbf{Keep-Alive} actua com un batec de cor (\textit{heartbeat}) coordinat entre el \textit{frontend} i el servei \textbf{la-core-legacy}. S'ha configurat un interval de 60 segons per realitzar peticions síncrones que estenguin la validesa de la sessió al backend. 
+
+Si el servei de backend detecta l'absència de dos pings consecutius, invalida automàticament el token a la base de dades \textbf{la-db-engine}, garantint que les sessions abandonades per talls de connectivitat o tancaments inesperats del navegador no quedin obertes. Al \textit{frontend}, si la petició de Keep-Alive retorna un error 401, l'interceptor funcional (Lògica 5.1) redirigeix l'usuari a la pantalla de \textit{login} de forma immediata, protegint la integritat del sistema.
 
 \section{Tauler Principal i Panells d'Informació}
 La pàgina d'inici (\textit{Home page}) és el punt central de l'aplicació on l'usuari aterra un cop validat pel sistema.
@@ -119,7 +127,7 @@ Com s'aprecia a les vistes de configuració (Figures \ref{fig:ui_system1}, \ref{
 \end{itemize}
 
 \subsection{Bloqueig de Configuració (Pessimistic Locking)}
-Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura. Si un altre usuari el té, la pantalla es bloqueja com a "Només lectura" via \textit{Signals}.
+Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy}. Si un altre usuari el té, la pantalla es bloqueja com a "Només lectura" via \textit{Signals}.
 
 \begin{figure}[htbp]
   \centering
@@ -263,6 +271,9 @@ Per consultar esdeveniments passats sota el protocol de \textit{fallback} HLS, s
 A la interfície (Figura \ref{fig:ui_recordings}), l'operador pot triar la data mitjançant un calendari esquerre. L'element clau és la línia de temps (\textit{Timeline}) inferior, que descarrega l'índex de gravacions del backend i representa gràficament amb diferents colors si hi ha gravació contínua o d'alarma. En moure el lliscador, el reproductor de vídeo sol·licita dinàmicament el fragment HLS (fitxer `.ts`) de l'instant seleccionat de forma transparent a l'usuari, emulant un reproductor clàssic amb botons de velocitat variable.
 
 \section{Sistema d'Alarmes i Comunicació asíncrona}
+Per a la gestió de les notificacions, s'ha evitat l'obertura de múltiples connexions per cada component que necessiti dades. S'ha implementat un \textbf{servei de missatgeria centralitzat} que manté un únic canal WSS obert amb el mòdul \textit{Core Notifier}. 
+
+Aquest servei utilitza un flux de dades basat en el patró \textit{Observable Shared}, on els diferents components de la interfície (el mosaic de vídeo, la taula d'alarmes i la barra d'estat) se subscriuen a la mateixa connexió. Aquesta arquitectura redueix dràsticament la càrrega de treball del Proxy Invers \textbf{NGINX} i el consum de sockets al sistema operatiu del gravador, permetent una escalabilitat del sistema sense degradació del rendiment.
 Per alertar d'intrusions o problemes detectats pels relés, el sistema implementa un canal de \textbf{WebSockets (WSS)} basat en un patró observador asíncron.
 
 \begin{figure}[htbp]
@@ -297,6 +308,14 @@ this.socket$.pipe(
   next: (message) => this.messagesSubject$.next(message)
 });
 \end{lstlisting}
+
+El flux de dades asíncron segueix un camí crític des del maquinari fins a la interfície:
+\begin{enumerate}
+    \item El servei \textbf{la-core-alarm} detecta un canvi d'estat en els relés o una intrusió i publica un esdeveniment al bus D-Bus intern.
+    \item El mòdul de \textit{Protocol Bridging} (Core Notifier) captura aquest missatge, el transforma a format JSON i l'injecta al túnel de \textbf{WebSockets} gestionat per NGINX.
+    \item Al \textit{frontend}, el servei \texttt{WebSocketService} rep el paquet i actualitza un \texttt{Signal} d'Angular. 
+    \item Gràcies a la reactivitat granular de la versió 19, la fila corresponent de la taula d'alarmes es renderitza de nou instantàniament sense afectar la reproducció de vídeo activa, garantint que l'operador rebi la alerta en un temps mitjà de 200ms.
+\end{enumerate}
 
 \section{Manteniment i Gestió del Maquinari}
 El darrer bloc engloba les funcionalitats essencials per allargar la vida útil i la traçabilitat de les accions al videogravador.
@@ -348,6 +367,8 @@ El panell de configuració global (Figura \ref{fig:ui_configuration_actions}) pe
 \end{figure}
 
 Tota acció (des d'autenticacions fallides fins a pèrdues de càmeres) queda registrada en aquest panell (Figura \ref{fig:ui_log}). S'ha implementat amb una taula reactiva de \textit{scroll} infinit, capaç de suportar el desplaçament per milers de files extraient-les de mica en mica, per no saturar la memòria RAM del navegador de l'usuari. Inclou filtres de data i botons per descarregar l'informe generat.
+
+La consulta de logs a gran escala s'ha optimitzat mitjançant una comunicació directa amb el servei \textbf{la-db-engine}. Atès que el videogravador pot emmagatzemar milions d'entrades de registre, el \textit{frontend} realitza peticions paginades mitjançant l'API REST. El servei de backend executa consultes SQL indexades sobre SQLite3 per retornar només els segments temporals visibles, evitant el col·lapse de la xarxa i permetent una navegació fluida per l'historial del sistema fins i tot en condicions de baixa amplada de banda.
 
 \subsection{Documentació Integrada}
 \begin{figure}[htbp]

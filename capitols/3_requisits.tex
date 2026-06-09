@@ -158,7 +158,7 @@ Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
 
 \subsection{RNF-1: Rendiment i Eficiència}
 \begin{itemize}
-  \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, el frontend no ha de fer més d'una petició de configuració per minut si no hi ha canvis de l'usuari.
+  \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, s'ha optimitzat el trànsit per evitar el \textit{polling} innecessari, substituint-lo per una arquitectura basada en esdeveniments mitjançant el servei \textbf{la-core-alarm} i WebSockets.
   \item \textbf{RNF-1.2 Angular Signals:} La reactivitat de la interfície s'ha de basar en \textit{Angular Signals} per minimitzar les operacions de \textit{Zone.js} i evitar el re-renderitzat innecessari del DOM, especialment crític amb vídeos actius.
 \end{itemize}
 

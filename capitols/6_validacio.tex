@@ -62,6 +62,9 @@ S'han dut a terme anàlisis de rendiment utilitzant el perfilador de memòria de
 \section{Proves de Robustesa i Comunicació asíncrona}
 S'ha validat la persistència de la sessió i la recepció d'alarmes mitjançant el sistema \textit{Keep-alive} i la reconnexió automàtica de \textit{WebSockets}.
 
+En les proves de connectivitat, s'ha validat l'eficiència de l'algorisme de \textbf{backoff exponencial} implementat amb RxJS (Lògica 5.6). Davant d'una caiguda de xarxa, el sistema no intenta reconnectar de forma agressiva, la qual cosa podria provocar un atac de denegació de servei (DoS) involuntari sobre el gravador quan la xarxa es recuperi. 
+
+L'estratègia triada dobla el temps d'espera entre intents (1s, 2s, 4s, 8s...), protegint la CPU del dispositiu \textit{embedded}. Durant aquest període de desconnexió, la interfície utilitza un \texttt{Signal} global de \texttt{connectivityStatus} per posar l'aplicació en mode segur, desactivant les accions d'escriptura per evitar inconsistències en la configuració.
 \subsection{Escenari de tall de connectivitat}
 S'ha simulat una pèrdua de xarxa d'un minut durant una sessió activa de configuració. Els resultats han estat satisfactoris:
 \begin{itemize}

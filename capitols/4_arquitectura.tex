@@ -19,20 +19,57 @@ A nivell de desplegament, el sistema segueix una distribució de components modu
 \subsection{Capa de comunicació i Microserveis}
 Com es detalla a la Figura \ref{fig:deployment_diagram}, la interacció entre la interfície i el hardware es divideix en tres canals principals:
 
+Per tal de garantir l'operativa del sistema, la plataforma interactua amb quatre serveis crítics executant-se en l'entorn \textit{embedded}:
 \begin{itemize}
-    \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
-    \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones via mòdul \textit{Core Legacy}. Gestiona la consulta i l'enviament de paràmetres de configuració.
-    \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textit{Core Notifier} i \textit{Core Alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
+    \item \textbf{la-core-legacy:} És el servei encarregat de la lògica de negoci heretada i la gestió de la configuració base del sistema. La interfície web hi comunica mitjançant peticions REST per validar credencials i obtenir els esquemes de configuració.
+    \item \textbf{la-video-engine:} Actua com el node central de processament multimèdia. Gestiona la negociació de les sessions WebRTC i la fragmentació de vídeo per a HLS. La web hi interacciona per establir els canals de visualització de baixa latència.
+    \item \textbf{la-core-alarm:} Servei especialitzat en la monitorització de sensors i lògiques de seguretat. Publica esdeveniments en temps real al bus de dades intern, que posteriorment són transmesos al \textit{frontend} mitjançant WebSockets.
+    \item \textbf{la-db-engine:} Gestiona la capa de persistència mitjançant SQLite. S'encarrega de l'emmagatzematge indexat de logs i l'historial d'alarmes, garantint que la web pugui realitzar cerques ràpides sobre milers de registres.
 \end{itemize}
 
-Internament, els serveis del backend embedded es comuniquen mitjançant \textbf{gRPC} \cite{grpc_up_running} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu. Aquesta naturalesa heterogènia de la pila de comunicació del gravador planteja un repte de disseny crític: el navegador del client web no pot consumir directament gRPC binari ni escoltar senyals del bus D-Bus de forma nativa.
+\begin{itemize}
+    \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
+    \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones via mòdul \textbf{la-core-legacy}. Gestiona la consulta i l'enviament de paràmetres de configuració.
+    \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textbf{la-core-legacy} i \textbf{la-core-alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
+\end{itemize}
 
-Per resoldre aquest desacoblament, s'ha dissenyat un mecanisme de **bridging de protocols (Protocol Bridging)** centralitzat en el servei de notificacions (\textit{Core Notifier}) del gravador. Aquest servei actua com a intermediari actiu (\textit{gateway}): es subscriu als esdeveniments de sistema (com pèrdues de vídeo o activació de relés) a través del bus de sistema D-Bus i de canals gRPC, tradueix aquestes estructures de baix nivell en missatges lleugers en format JSON, i finalment les transmet en temps real a través del canal de \textbf{WebSockets} (WSS) \cite{rfc6455} cap al client Angular. Aquest disseny de traducció bidireccional garanteix que el frontend pugui respondre immediatament a qualsevol esdeveniment de seguretat de forma asíncrona sense requerir costoses connexions binàries natives ni carregar la CPU del client.
+Internament, els serveis del backend embedded es comuniquen mitjançant \textbf{gRPC} \cite{grpc_up_running} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu. El repte de disseny rau en el fet que el navegador no pot parlar directament amb els dimonis de backend (que utilitzen gRPC o D-Bus). S'ha implementat una capa de \textbf{Gateway} utilitzant \textbf{NGINX} com a \textit{Proxy} invers, que redirigeix el trànsit segons el path:
+
+\begin{itemize}
+    \item Les peticions \texttt{/api/v1/config/*} es deriven a \textbf{la-core-legacy}.
+    \item El flux de senyalització WebRTC es negocia directament amb \textbf{la-video-engine}.
+    \item Les consultes de dades històriques es canalitzen cap a \textbf{la-db-engine}.
+\end{itemize}
+
+Aquest desacoblament permet que, si en un futur es canvia el motor de base de dades o el motor de vídeo, el \textit{frontend} només hagi de canviar el \textit{contracte} de dades, no la seva arquitectura base.
+
+Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:matriu_comunicacio} es detallen els protocols i la naturalesa del trànsit entre el navegador i el gravador:
+
+\begin{table}[htbp]
+  \centering
+  \caption{Matriu de comunicació de la plataforma.}
+  \label{tab:matriu_comunicacio}
+  \resizebox{\textwidth}{!}{
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+    \textbf{Origen} & \textbf{Destinació} & \textbf{Protocol} & \textbf{Finalitat} \\ \midrule
+    Frontend (Navegador) & NGINX & HTTPS & Peticions REST i descàrrega de l'App \\
+    Frontend (Navegador) & NGINX & WSS & Notificacions d'alarmes en temps real \\
+    Frontend (Navegador) & \textbf{la-video-engine} & WebRTC (UDP) & Streaming de vídeo de baixa latència \\
+    NGINX (Proxy) & \textbf{la-core-legacy} & HTTP (Intern) & Gestió de configuració i usuaris \\
+    NGINX (Proxy) & \textbf{la-db-engine} & HTTP (Intern) & Consultes a la base de dades SQLite \\ \bottomrule
+  \end{tabular}
+  }
+\end{table}
+
+Per resoldre aquest desacoblament a l'hora d'enviar esdeveniments, s'ha dissenyat un mecanisme de \textbf{bridging de protocols (Protocol Bridging)} centralitzat en el servei de notificacions (\textit{Core Notifier}) del gravador. Aquest servei actua com a intermediari actiu (\textit{gateway}): es subscriu als esdeveniments de sistema (com pèrdues de vídeo o activació de relés) a través del bus de sistema D-Bus i de canals gRPC, tradueix aquestes estructures de baix nivell en missatges lleugers en format JSON, i finalment les transmet en temps real a través del canal de \textbf{WebSockets} (WSS) \cite{rfc6455} cap al client Angular. Aquest disseny de traducció bidireccional garanteix que el frontend pugui respondre immediatament a qualsevol esdeveniment de seguretat de forma asíncrona sense requerir costoses connexions binàries natives ni carregar la CPU del client.
 
 \subsection{Seguretat Defensiva contra vectors d'atac OWASP}
 Com a requisit no funcional de seguretat crítica, el frontend s'ha dissenyat per mitigar de forma activa les principals vulnerabilitats del catàleg OWASP Top 10. S'ha eliminat l'ús de cookies per a la persistència de sessió, utilitzant en el seu lloc capçaleres portadores (Bearer tokens) injectades dinàmicament a la memòria de l'aplicació per evitar atacs de tipus Cross-Site Request Forgery (CSRF). 
 
 Addicionalment, a la capa de NGINX, s'ha unificat l'origen de l'aplicació i l'API REST sota un mateix servidor de recursos, el que permet aplicar polítiques de Same-Origin estrictes i capçaleres de seguretat Content Security Policy (CSP) per immunitzar el sistema contra injeccions Cross-Site Scripting (XSS) i intents de Clickjacking.
+
+L'ús de NGINX com a \textit{entry point} és indispensable per a la seguretat del sistema. En centralitzar les peticions, NGINX actua de tallafoc per als serveis \textbf{la-video-engine} i \textbf{la-core-legacy}, impedint l'accés directe als ports interns. A més, permet que el token JWT generat per l'autenticació sigui vàlid per a tots els microserveis sota un mateix domini de seguretat, simplificant la gestió de capçaleres \textit{Authorization} i evitant problemes de CORS (Cross-Origin Resource Sharing) que podrien bloquejar l'streaming de vídeo.
 
 \begin{lstlisting}[language=bash, caption={Configuració de seguretat NGINX per a l'entorn embedded de Web Core View.}]
 # Configuració de seguretat NGINX per a l'entorn embedded de Web Core View
@@ -106,6 +143,8 @@ Aquest és un punt d'inflexió respecte a les versions anteriors del programari.
 
 Dins d'aquest disseny de gestió d'estat reactiu, un dels reptes tècnics ha estat la modificació d'estructures de dades altament anidades zone-free sense trencar la detecció de canvis nativa. Angular Signals es basa en la comparació de valors per referència; per tant, mutar directament una propietat interna d'un objecte complex no dispararia la reactivitat del component. Per resoldre-ho, s'ha implementat un algorisme de manipulació profunda (\textit{deep copy} i \textit{deep access}) que clona l'objecte d'estat local completament, hi aplica la modificació en el camp editat dinàmicament (identificat pel camí de la propietat JSON de l'esquema), i finalment actualitza el Signal amb la nova referència (\texttt{configSignal.set(newConfig)}). Aquest disseny garanteix la immutabilitat de l'estat i evita defectes de renderitzat col·laterals.
 
+A diferència de les arquitectures anteriors basades en \texttt{Zone.js}, que havien de revisar tot l'arbre de components davant qualsevol esdeveniment, l'ús de \textbf{Signals} permet que l'aplicació s'apropi a un model \textit{Zone-less}. Això és especialment crític en la visualització de vídeo: el fet que arribin metadades cada 100ms sobre el bitrate no provoca que es torni a avaluar tota la interfície, sinó només l'etiqueta de text específica, alliberant cicles de CPU del terminal per dedicar-los exclusivament a la descodificació de vídeo H.265.
+
 \section{El Motor Schema-Driven}
 El component més innovador del sistema és el motor de configuració dinàmic. Aquest motor permet desacoblar totalment el desenvolupament del \textit{frontend} de l'evolució del \textit{firmware}.
 
@@ -116,6 +155,12 @@ En lloc de programar pantalles de configuració estàtiques, s'ha creat un intè
     \item \textbf{Parseig:} El servei \texttt{ConfigInputComponent} processa la metadada i mapeja cada propietat a un component visual (un \textit{toggle} per a booleans, un \textit{slider} per a sensibilitat, etc.).
     \item \textbf{Manipulació de camins:} S'utilitzen utilitats de \textit{Deep Access} per llegir i escriure en estructures d'objectes anidats (ex: \texttt{config.io.outputs[0].task}), garantint que l'enviament de tornada al servidor sigui un node vàlid.
 \end{enumerate}
+
+Aquest enfocament és especialment valuós quan s'introdueixen noves funcionalitats a \textbf{la-video-engine} o \textbf{la-core-alarm}. En lloc de programar una nova vista a Angular, el servei de backend simplement actualitza el seu esquema de dades i el \textit{frontend} el renderitza automàticament, reduint el temps de \textit{time-to-market} de noves versions del firmware.
+
+És important destacar que el servei \textbf{la-core-legacy} és el responsable de generar aquest esquema dinàmic. El servei inspecciona les capacitats del hardware (nombre de canals de vídeo, tipus de ports instal·lats) i construeix el diccionari de metadades JSON en temps real. Això permet que una mateixa versió de la interfície web sigui capaç de gestionar tant un gravador compacte de 4 càmeres com una unitat de rack de 64 càmeres, ja que el \textit{frontend} no té hardcoded el nombre d'interfícies, sinó que es limita a renderitzar el que \textbf{la-core-legacy} li indica.
+
+Un dels reptes d'aquest disseny és la \textbf{tolerància a errors en l'esquema}. S'ha implementat una lògica de \textit{fail-safe} al frontend: si \textbf{la-core-legacy} envia un node de configuració amb un tipus no reconegut o amb paràmetres fora de rang, el motor no bloqueja el renderitzat de la resta de la pàgina. En lloc d'això, substitueix el component defectuós per un avís visual de 'Paràmetre no compatible', permetent que l'operador continuï treballant amb la resta del sistema sense patir un tancament inesperat de l'aplicació.
 
 \section{Disseny de la Persistència i dades}
 Tot i que el sistema és principalment una interfície de gestió, l'arquitectura preveu la persistència en dos nivells:
