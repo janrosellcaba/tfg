@@ -18,7 +18,7 @@ El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de
   \label{fig:ui_login}
 \end{figure}
 
-L'autenticació la gestiona directament el \textit{backend} (\texttt{la-core-legacy}), el qual avalua les credencials introduïdes a la Figura \ref{fig:ui_login} i retorna un JSON amb l'estatus de l'operació. Un cop validat pel sistema, l'usuari aterra a la pàgina d'inici principal (\textit{Home page}).
+L'autenticació la gestiona directament el \textit{backend} (\texttt{la-core-legacy}), el qual avalua les credencials introduïdes a la Figura \ref{fig:ui_login}. Les credencials s'envien per HTTPS en text pla per tal que el servei comprovi la seva validesa. Si són correctes, el servidor retorna un JSON amb l'estatus d'\textit{èxit}, dades addicionals de l'usuari i els seus permisos (\textit{grants}); en cas contrari, es retorna un \textit{error}. Aquest servei també implementa mesures de seguretat com el bloqueig després d'un màxim de 5 intents fallits. Un cop validat pel sistema, l'usuari aterra a la pàgina d'inici principal (\textit{Home page}).
 
 \subsection{Seguretat (JWT)}
 La seguretat es basa en JSON Web Tokens (JWT) \cite{rfc7519}. El flux d'autenticació comença amb una petició POST al servei \textbf{la-core-legacy}. Aquest servei no només valida l'usuari, sinó que interacciona amb \textbf{la-db-engine} per obtenir el perfil de permisos (\textit{grants}) associat. El token JWT resultant conté aquesta metadada xifrada, la qual cosa permet al \textit{frontend} (mitjançant \textit{guards} d'Angular) habilitar o deshabilitar botons de la interfície sense haver de fer consultes addicionals per cada acció de l'usuari.
@@ -92,7 +92,7 @@ Fent clic a la icona d'informació, es desplega un panell (Figura \ref{fig:ui_ho
   \label{fig:ui_errors}
 \end{figure}
 
-Per alertar de comunicacions asíncrones (errors interns o pèrdues de senyal com a la Figura \ref{fig:ui_errors}), s'utilitza un servei de notificacions emergents a la cantonada, informant l'operador sense trencar la seva operativa.
+Per alertar de comunicacions asíncrones (errors interns o pèrdues de senyal com a la Figura \ref{fig:ui_errors}), el \textit{frontend} obre una connexió WebSocket amb \textbf{la-core-notifier}, el qual avisa a l'instant de nous errors i alertes globals (mostrats a la pàgina d'errors), així com si el sistema està entrant en fase d'actualització o reinici (\textit{rebooting}), cas en què redirigeix automàticament a la pàgina d'actualització. D'altra banda, per obtenir informació estàtica com la versió de l'NVR o les dades de l'usuari per als panells, l'aplicació es comunica amb \textbf{la-core-legacy} sol·licitant l'estructura \texttt{config\_data.xml}.
 
 \section{Configuració del Sistema i Motor Dinàmic}
 El menú de configuració és on es materialitza el component més innovador del sistema: el motor dinàmic \textit{Schema-driven}.
@@ -118,7 +118,7 @@ El menú de configuració és on es materialitza el component més innovador del
   \label{fig:ui_system3}
 \end{figure}
 
-Com s'aprecia a les vistes de configuració (Figures \ref{fig:ui_system1}, \ref{fig:ui_system2} i \ref{fig:ui_system3}), la interfície no està programada de forma estàtica. El gravador envia un fitxer JSON que el component genèric \texttt{Config\-Input\-Component} interpreta de manera recursiva mitjançant un flux \textit{switch-case}:
+Com s'aprecia a les vistes de configuració (Figures \ref{fig:ui_system1}, \ref{fig:ui_system2} i \ref{fig:ui_system3}), la interfície no està programada de forma estàtica, sinó sota un disseny basat en esquemes. El servei \textbf{la-core-legacy} envia fitxers JSON que actuen com a diccionari, i el component genèric \texttt{Config\-Input\-Component} els interpreta de manera recursiva per renderitzar i automatitzar les pàgines mitjançant un flux \textit{switch-case}:
 \begin{itemize}
   \item \texttt{type: "boolean"} $\rightarrow$ Es mapeja cap a un \texttt{ToggleComponent}.
   \item \texttt{type: "integer"} amb restriccions $\rightarrow$ Genera un \texttt{SliderComponent}.
@@ -126,8 +126,45 @@ Com s'aprecia a les vistes de configuració (Figures \ref{fig:ui_system1}, \ref{
   \item \texttt{type: "object"} o \texttt{array} $\rightarrow$ Genera pestanyes i llistes indexades.
 \end{itemize}
 
+\subsection{Validació Dinàmica a ConfigInputComponent}
+Per seguir estrictament la filosofia \textit{schema-driven}, el component \texttt{ConfigInputComponent} ha estat refactoritzat per llegir de manera nativa i dinàmica les propietats d'esquema de cada node (com \texttt{\_regex}, \texttt{\_min}, \texttt{\_maxLength}) sense dependre de paràmetres rígids. S'ha unificat el tractament d'errors a través d'una variable reactiva calculada (\textit{computed signal}), que compila les expressions regulars i avalua els límits numèrics i de text.
+
+\begin{lstlisting}[language=JavaScript, caption={Lògica de validació dinàmica amb \textit{Signals} i \textit{Regex} a ConfigInputComponent.}]
+computedValidationError = computed(() => {
+  const value = this.currentValue();
+  const def = this.fieldDef();
+  if (!def) return null;
+
+  if (def._regex) {
+    const rx = new RegExp(def._regex);
+    if (!rx.test(String(value))) return def._description || 'Format invàlid';
+  }
+  if (def._type === 'integer' || def._type === 'number') {
+    if (def._min !== undefined && value < def._min) return `Mínim: ${def._min}`;
+    if (def._max !== undefined && value > def._max) return `Màxim: ${def._max}`;
+  }
+  if (def._type === 'string') {
+    if (def._minLength && String(value).length < def._minLength) return `Mínim ${def._minLength} caràcters`;
+    if (def._maxLength && String(value).length > def._maxLength) return `Màxim ${def._maxLength} caràcters`;
+  }
+  return null;
+});
+\end{lstlisting}
+
 \subsection{Bloqueig de Configuració (Pessimistic Locking)}
-Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy}. Si un altre usuari el té, la pantalla es bloqueja com a "Només lectura" via \textit{Signals}.
+Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy} a l'adreça \texttt{/webprotocol/device-service/properties/lock?node=config\&seed=...}. 
+
+Si la sol·licitud és reeixida, el servidor retorna una estructura JSON que autoritza l'edició:
+\begin{lstlisting}[language=json, caption={Estructura JSON del bloqueig de configuració.}]
+{
+  "path": "config",
+  "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "expiresIn": 30,
+  "seed": "8b9f27cda0134e7f8a9bcdef01234567"
+}
+\end{lstlisting}
+
+El camp \texttt{token} actua com a signatura per a les operacions d'escriptura posteriors, garantint que només el posseïdor pugui fer modificacions. El camp \texttt{expiresIn} defineix en segons el marge de temps abans que el cadenat expiri si el \textit{heartbeat} no el renova des del \textit{frontend} a través de la crida \texttt{acquireLock()}. Si un altre usuari el té, la pantalla es bloqueja com a "Només lectura" via \textit{Signals}.
 
 \begin{figure}[htbp]
   \centering
@@ -151,29 +188,41 @@ private scheduleRenewal(ms: number) {
 \end{lstlisting}
 
 \subsection{Detecció de Deltes al Desar (Save)}
-Quan l'administrador fa clic al botó de desar (\textit{Save}), en comptes d'enviar tot l'esquema sencer (que saturaria el gravador), s'executa un algorisme recursiu de diferències (\textit{delta payload}) que només extreu i envia els camps modificats:
+Quan l'administrador fa clic al botó de desar (\textit{Save}), en comptes d'enviar tot l'esquema sencer (que saturaria el gravador), s'executa un algorisme recursiu de diferències (\textit{delta payload}). Aquests canvis s'envien habitualment a \textbf{la-core-legacy} mitjançant peticions HTTP \texttt{PATCH}, tot i que per modificacions estructurals en algun cas s'utilitza \texttt{PUT}. L'algorisme de detecció actua de la següent manera:
 
-\begin{lstlisting}[language=JavaScript, caption={Algorisme recursiu de detecció de Deltes per a l'optimització de payloads.}]
+\begin{lstlisting}[language=JavaScript, caption={Algorisme recursiu de detecció de Deltes per a l'optimització de payloads amb normalització de primitius.}]
 export function getObjectDelta(current: any, original: any, path: string = ''): any {
-  if (current === original) return undefined;
-  if (typeof current !== 'object' || current === null) return current;
+  // Normalització de tipus primitius booleans
+  const normalize = (val: any) => {
+    if (val === 'true') return true;
+    if (val === 'false') return false;
+    return val;
+  };
+
+  const normCurrent = normalize(current);
+  const normOriginal = normalize(original);
+
+  if (normCurrent === normOriginal) return undefined;
+  if (typeof normCurrent !== 'object' || normCurrent === null) return normCurrent;
 
   const delta: any = {};
   let hasChanges = false;
 
-  for (const key in current) {
-    if (key.startsWith('_')) continue; // Ignora camps visuals
-    const currentVal = current[key];
-    const originalVal = original ? original[key] : undefined;
+  for (const key in normCurrent) {
+    if (key.startsWith('_')) continue; // Ignora camps visuals o privats
+    
+    const currentVal = normCurrent[key];
+    const originalVal = normOriginal ? normOriginal[key] : undefined;
 
-    if (JSON.stringify(currentVal) !== JSON.stringify(originalVal)) {
-      const diff = getObjectDelta(currentVal, originalVal, `${path}.${key}`);
-      if (diff !== undefined) {
-        delta[key] = diff;
-        hasChanges = true;
-      }
+    const diff = getObjectDelta(currentVal, originalVal, `${path}.${key}`);
+    
+    // Evitar propagació d'objectes o nodes buits
+    if (diff !== undefined && (typeof diff !== 'object' || Object.keys(diff).length > 0)) {
+      delta[key] = diff;
+      hasChanges = true;
     }
   }
+  
   return hasChanges ? delta : undefined;
 }
 \end{lstlisting}
@@ -191,10 +240,12 @@ Atès que, per motius de seguretat, algunes càmeres IP estan connectades a port
   \label{fig:ui_proxy}
 \end{figure}
 
-Mitjançant aquesta pantalla (Figura \ref{fig:ui_proxy}), l'administrador pot introduir la IP local de la càmera i el port, i el gravador crearà un túnel invers intern per accedir al portal web natiu de la càmera des de dins de l'aplicació \textit{Web Core View}.
+Mitjançant aquesta pantalla senzilla (Figura \ref{fig:ui_proxy}), l'administrador pot introduir la IP local de la càmera i el port. El \textit{frontend} es comunica amb \textbf{la-core-legacy} per ordenar la creació d'un túnel invers intern, permetent l'accés al portal web natiu de la càmera des de dins de l'aplicació \textit{Web Core View}.
 
 \section{Visualització Multimèdia en Directe (WebRTC)}
-La visualització del vídeo de les càmeres és la funcionalitat crítica de seguretat diària. El repte arquitectònic recau en establir un canal de baixa latència ($<300$ms) mitjançant WebRTC amb un sistema de degradació a HLS en cas de fallada.
+La visualització del vídeo de les càmeres és la funcionalitat crítica de seguretat diària. Per al \textit{streaming}, la web obre connexions WebSockets amb \textbf{la-core-legacy}, el qual es comunica al seu torn amb el \textbf{la-video-engine}. Com a mètode principal de transport, utilitza WebRTC atesa la seva baixa latència i rendiment òptim. Com a protocol secundari per si WebRTC falla en determinats entorns de xarxa, el sistema empra HLS.
+
+A la pàgina també hi ha els botons d'Entrades i Sortides digitals (\textit{I/O}). Per gestionar-los, s'utilitza un WebSocket connectat directament a \textbf{la-core-notifier}, el qual envia constantment els canvis en els estats d'aquests sensors. Així, quan un usuari canvia l'estat d'un relé, l'acció viatja cap al \textit{backend} i s'actualitza en temps real a la interfície.
 
 \begin{figure}[htbp]
   \centering
@@ -236,26 +287,35 @@ Aquest intercanvi permet establir el canal UDP de vídeo, descrit en el següent
   \label{fig:seq_video_streaming}
 \end{figure}
 
-Per orquestrar aquesta complexitat (obrir, tancar connexions quan canvia la càmera, o mostrar avisos de "NO SIGNAL" com es veia a la secció d'errors), s'utilitzen els \textit{Effects} de les \textit{Angular Signals}. Així, si falla el protocol UDP pel tallafocs, l'efecte neteja les instàncies i invoca l'alternativa HLS per TCP:
+\subsection{Orquestració de Vídeo amb el Patró Strategy}
+Atès que el sistema pot haver de suportar múltiples mètodes de transmissió en el futur, s'ha aplicat el patró de disseny \textit{Strategy} d'Angular per desacoblar \texttt{GridVideoPlayerComponent} dels serveis concrets com \texttt{WebRTCService} i \texttt{HlsService}. S'ha definit una interfície comuna \texttt{StreamingStrategy}:
 
-\begin{lstlisting}[language=JavaScript, caption={Orquestració reactiva de protocols de vídeo mitjançant Angular Effects.}]
-constructor() {
-  effect(() => {
-    const streamName = this.cameraStreamName();
-    const signalAvailable = this.hasSignal();
-
-    this.webrtcService.closeStream();
-    this.hlsService.closeStream();
-
-    if (!signalAvailable) return;
-
-    if (getStreamingMethod() === 'hls') {
-      this.hlsService.startStream(this.videoPlayer().nativeElement, streamName);
-    } else {
-      this.webrtcService.startStream(streamName);
-    }
-  });
+\begin{lstlisting}[language=JavaScript, caption={Interfície comuna \texttt{StreamingStrategy}.}]
+export interface StreamingStrategy {
+  connectionState: Signal<'connecting' | 'connected' | 'error' | 'idle'>;
+  errorMessage: Signal<string | null>;
+  startStream(videoElement: HTMLVideoElement, cameraName: string): Promise<void>;
+  closeStream(): void;
 }
+\end{lstlisting}
+
+S'ha creat un \textit{InjectionToken} i un proveïdor dinàmic al component per instanciar l'estratègia correcta segons el mètode de visualització seleccionat, delegant la responsabilitat d'execució de manera totalment transparent.
+
+\begin{lstlisting}[language=JavaScript, caption={Proveïdor per a la injecció dinàmica de l'estratègia de vídeo al \texttt{GridVideoPlayerComponent}.}]
+export const STREAMING_STRATEGY_TOKEN = new InjectionToken<StreamingStrategy>('StreamingStrategy');
+
+@Component({
+  // ...
+  providers: [
+    {
+      provide: STREAMING_STRATEGY_TOKEN,
+      useFactory: () => {
+        const method = getStreamingMethod();
+        return method === 'hls' ? inject(HlsService) : inject(WebRTCService);
+      }
+    }
+  ]
+})
 \end{lstlisting}
 
 \section{Reproducció de Gravacions i Històric}
@@ -268,7 +328,7 @@ Per consultar esdeveniments passats sota el protocol de \textit{fallback} HLS, s
   \label{fig:ui_recordings}
 \end{figure}
 
-A la interfície (Figura \ref{fig:ui_recordings}), l'operador pot triar la data mitjançant un calendari esquerre. L'element clau és la línia de temps (\textit{Timeline}) inferior, que descarrega l'índex de gravacions del backend i representa gràficament amb diferents colors si hi ha gravació contínua o d'alarma. En moure el lliscador, el reproductor de vídeo sol·licita dinàmicament el fragment HLS (fitxer `.ts`) de l'instant seleccionat de forma transparent a l'usuari, emulant un reproductor clàssic amb botons de velocitat variable.
+A la interfície (Figura \ref{fig:ui_recordings}), l'operador pot triar la data mitjançant un calendari esquerre. L'element clau és la línia de temps (\textit{Timeline}) inferior, que descarrega l'índex de gravacions del backend i representa gràficament amb diferents colors si hi ha gravació contínua o d'alarma. Per a l'emissió del vídeo s'estableix una connexió directa amb \textbf{la-video-engine}. Aquesta pàgina funciona mitjançant el protocol HLS típic, on el \textit{frontend} demana la \textit{playlist} HLS (\texttt{.m3u8}) corresponent a la franja de temps escollida i, a mesura que l'usuari mou el lliscador, va demanant recursivament els trossos de vídeo (fitxers \texttt{.ts}), emulant un reproductor clàssic.
 
 \section{Sistema d'Alarmes i Comunicació asíncrona}
 Per a la gestió de les notificacions, s'ha evitat l'obertura de múltiples connexions per cada component que necessiti dades. S'ha implementat un \textbf{servei de missatgeria centralitzat} que manté un únic canal WSS obert amb el mòdul \textit{Core Notifier}. 
@@ -309,13 +369,65 @@ this.socket$.pipe(
 });
 \end{lstlisting}
 
-El flux de dades asíncron segueix un camí crític des del maquinari fins a la interfície:
-\begin{enumerate}
-    \item El servei \textbf{la-core-alarm} detecta un canvi d'estat en els relés o una intrusió i publica un esdeveniment al bus D-Bus intern.
-    \item El mòdul de \textit{Protocol Bridging} (Core Notifier) captura aquest missatge, el transforma a format JSON i l'injecta al túnel de \textbf{WebSockets} gestionat per NGINX.
-    \item Al \textit{frontend}, el servei \texttt{WebSocketService} rep el paquet i actualitza un \texttt{Signal} d'Angular. 
-    \item Gràcies a la reactivitat granular de la versió 19, la fila corresponent de la taula d'alarmes es renderitza de nou instantàniament sense afectar la reproducció de vídeo activa, garantint que l'operador rebi la alerta en un temps mitjà de 200ms.
-\end{enumerate}
+Per assegurar l'eficiència en la gestió de les alarmes, la pàgina d'alarmes obre un WebSocket directe connectat amb \textbf{la-core-alarm}. Aquests dos extrems es comuniquen per transmetre totes les alarmes registrades i enviar els nous canvis en temps real (com ara les accions de marcar una alarma com a llegida, arxivar-la o esborrar-la).
+
+Al mateix temps, de cara al \textit{backend}, \textbf{la-core-alarm} es comunica mitjançant crides \textbf{gRPC} amb \textbf{la-db-engine}. Aquest últim servei fa ús d'un driver personalitzat que opera sobre \textbf{SQLite3}, encarregat de guardar de manera persistent les alarmes, evitant pèrdues d'informació davant reinicis del gravador. Amb aquest disseny, quan la llista d'Angular rep un paquet WebSocket, s'actualitza el \texttt{Signal} corresponent i la fila de la taula d'alarmes es renderitza de nou instantàniament.
+
+\subsection{Estructures de Missatges del Canal Asíncron (WebSockets)}
+Per documentar el rigor de la integració, a continuació es detallen els missatges JSON que viatgen a través d'aquest servei de notificacions unificat.
+
+El primer missatge que s'envia (Client $\rightarrow$ Servidor) serveix per inicialitzar i subscriure's només a la telemetria desitjada, estalviant amplada de banda:
+\begin{lstlisting}[language=json, caption={Missatge d'inicialització del filtre de subscripció.}]
+{
+  "type": "filter_update",
+  "transactionId": "home-page-filter-2026-03-30/12:00:00.123",
+  "payload": {
+    "include_topics": ["device/notification", "io"]
+  }
+}
+\end{lstlisting}
+
+Quan una entrada digital canvia el seu estat físic, el servidor envia automàticament la notificació següent (Servidor $\rightarrow$ Client):
+\begin{lstlisting}[language=json, caption={Notificació asíncrona de canvi d'estat d'E/S.}]
+{
+  "event": "IO_NOTIFY",
+  "payload": [
+    {
+      "id": "01",
+      "idr": "01",
+      "data": "on",
+      "time": "2026-03-30T12:01:15Z",
+      "topic": "io/input"
+    }
+  ]
+}
+\end{lstlisting}
+
+Finalment, en el cas de rebre una alarma crítica des de la base de dades (com una intrusió generada des de \textbf{la-core-alarm}), el format inclou totes les metadades persistides a SQLite3:
+\begin{lstlisting}[language=json, caption={Notificació d'alarma en temps real de la base de dades.}]
+{
+  "event": "DB_ENGINE_ALARM_NOTIFY",
+  "payload": [
+    {
+      "alarm_id": "AL_05",
+      "db_id": "1054",
+      "description": "Intrusió Zona Nord",
+      "priority": "1",
+      "source": "Càmera 3",
+      "start_date": "2026-03-30T12:05:00Z",
+      "end_date": "-",
+      "status": "active",
+      "timestamp": "1711800300",
+      "topic": "db/alarms",
+      "type": "security",
+      "camera_num": "3",
+      "is_read": false,
+      "is_archived": false,
+      "is_locked": false
+    }
+  ]
+}
+\end{lstlisting}
 
 \section{Manteniment i Gestió del Maquinari}
 El darrer bloc engloba les funcionalitats essencials per allargar la vida útil i la traçabilitat de les accions al videogravador.
@@ -346,7 +458,7 @@ L'operador pot renovar el \textit{software} intern carregant un fitxer binari `.
   \label{fig:ui_updating_reboot}
 \end{figure}
 
-El procés (desgranat de les Figures \ref{fig:ui_update} a \ref{fig:ui_updating_reboot}) bloqueja la UI i obté \textit{feedback} via WebSocket, progressant per les fases de càrrega, verificació de signatura i aplicació a disc. En acabar amb èxit, es mostra una pantalla d'espera que envia "pings" a la API fins que l'equip torna a estar en línia després de reiniciar-se.
+El procés (desgranat de les Figures \ref{fig:ui_update} a \ref{fig:ui_updating_reboot}) comença quan l'usuari puja el fitxer d'actualització cap a \textbf{la-core-legacy}. Mentre es processa l'arxiu, el \textit{frontend} va fent \textit{polling} constant per conèixer l'estat actual de la instal·lació, el qual es reflecteix directament a la barra de progrés de la pantalla. Quan l'actualització finalitza i el gravador s'està reiniciant, la interfície web s'espera 15 segons abans de començar a fer un \textit{polling} rutinari de connectivitat. Un cop el servidor torna a respondre (indicant que hi ha xarxa de nou), la plataforma reprèn el \textit{polling} d'estat per confirmar que el \textit{firmware} està operatiu.
 
 \subsection{Configuració Bàsica: Còpies de Seguretat}
 \begin{figure}[htbp]
@@ -356,7 +468,7 @@ El procés (desgranat de les Figures \ref{fig:ui_update} a \ref{fig:ui_updating_
   \label{fig:ui_configuration_actions}
 \end{figure}
 
-El panell de configuració global (Figura \ref{fig:ui_configuration_actions}) permet exportar completament la base de dades a l'ordinador local (\textit{Backup}) per poder-ho carregar posteriorment en un altre equip igual, o aplicar un restabliment destructiu a valors de fàbrica per netejar configuracions corruptes.
+El panell de configuració global (Figura \ref{fig:ui_configuration_actions}) és una pàgina senzilla que es comunica directament amb \textbf{la-core-legacy} per gestionar comandes globals. Des d'aquí es permet exportar completament la base de dades a l'ordinador local (\textit{Backup}) per poder-ho carregar posteriorment en un altre equip igual, o aplicar un restabliment destructiu a valors de fàbrica per netejar configuracions corruptes.
 
 \subsection{Visor de Registres (Logs)}
 \begin{figure}[htbp]
@@ -368,7 +480,7 @@ El panell de configuració global (Figura \ref{fig:ui_configuration_actions}) pe
 
 Tota acció (des d'autenticacions fallides fins a pèrdues de càmeres) queda registrada en aquest panell (Figura \ref{fig:ui_log}). S'ha implementat amb una taula reactiva de \textit{scroll} infinit, capaç de suportar el desplaçament per milers de files extraient-les de mica en mica, per no saturar la memòria RAM del navegador de l'usuari. Inclou filtres de data i botons per descarregar l'informe generat.
 
-La consulta de logs a gran escala s'ha optimitzat mitjançant una comunicació directa amb el servei \textbf{la-db-engine}. Atès que el videogravador pot emmagatzemar milions d'entrades de registre, el \textit{frontend} realitza peticions paginades mitjançant l'API REST. El servei de backend executa consultes SQL indexades sobre SQLite3 per retornar només els segments temporals visibles, evitant el col·lapse de la xarxa i permetent una navegació fluida per l'historial del sistema fins i tot en condicions de baixa amplada de banda.
+La consulta de logs a gran escala s'ha resolt mitjançant l'ús d'una pàgina senzilla on la interfície parla directament amb \textbf{la-core-legacy}. Aquest servei rep internament els logs capturats des de \textbf{la-video-engine}. En funció de la petició de l'usuari, el \textit{frontend} rep l'historial per renderitzar-lo a la graella en memòria de forma paginada o bé ofereix l'opció de descarregar-lo com a fitxer de text. Això evita el col·lapse de la xarxa i permet una navegació fluida per l'historial del sistema.
 
 \subsection{Documentació Integrada}
 \begin{figure}[htbp]
@@ -378,4 +490,4 @@ La consulta de logs a gran escala s'ha optimitzat mitjançant una comunicació d
   \label{fig:ui_documentation}
 \end{figure}
 
-Garantint l'operativa completament desconnectada (\textit{air-gapped}) de la xarxa exterior de moltes d'aquestes màquines de seguretat, tota la documentació oficial d'ús i guies ràpides està introduïda en la mateixa memòria web del dispositiu (Figura \ref{fig:ui_documentation}). L'usuari només ha de clicar a la fila corresponent i l'arxiu PDF es descarregarà al seu PC sense requerir accés a portals web corporatius externs.
+Garantint l'operativa completament desconnectada (\textit{air-gapped}) de la xarxa exterior de moltes d'aquestes màquines de seguretat, tota la documentació oficial d'ús i guies ràpides està introduïda en la mateixa memòria web del dispositiu (Figura \ref{fig:ui_documentation}). Mitjançant una vista senzilla que es comunica amb \textbf{la-core-legacy}, l'usuari només ha de clicar a la fila corresponent i l'arxiu PDF es descarregarà al seu PC sense requerir accés a portals web corporatius externs.

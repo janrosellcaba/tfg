@@ -4,33 +4,35 @@
 L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de modularitat, escalabilitat i eficiència en el consum de recursos. Atès que el programari s'executa en un entorn \textit{embedded} (el videogravador), s'ha optat per una arquitectura desacoblada on el \textit{frontend} assumeix la major part de la lògica de presentació per tal d'alliberar la CPU del hardware per a les tasques crítiques de seguretat.
 
 \section{Arquitectura Global del Sistema}
-El sistema es basa en un model de microserveis interns coordinats dins del sistema operatiu del gravador. La comunicació amb l'exterior es centralitza a través d'un punt d'entrada robust que gestiona el trànsit de dades i el flux de vídeo.
 
-A nivell de desplegament, el sistema segueix una distribució de components modular, detallada en el diagrama de desplegament de la Figura \ref{fig:deployment_diagram}.
+L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microserveis interns coordinats dins del sistema operatiu del gravador. La plataforma interactua amb els següents serveis crítics executant-se en l'entorn \textit{embedded}:
+
+\begin{itemize}
+    \item \textbf{la-core-legacy:} El cervell central, gestor de la configuració (API REST), autenticació i bloquejos (locks).
+    \item \textbf{la-video-engine:} El motor que processa el vídeo, el guarda als discos i el serveix via HLS o WebRTC.
+    \item \textbf{la-db-engine:} La base de dades on es guarden històrics d'alarmes i telemetria.
+    \item \textbf{la-core-notifier} i \textbf{la-core-alarm:} Les passarel·les de WebSockets que disparen les notificacions en temps real cap al frontend.
+\end{itemize}
+
+Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTP cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració, i connexions persistents de WebSockets (\textit{ws}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
+
+A nivell intern, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza trucades \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}, el qual al seu torn persisteix la informació mitjançant el motor de bases de dades \textbf{SQLite3}.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.9\textwidth]{figures/deployment_diagram.png}
-  \caption{Diagrama de desplegament físic i lògic del sistema WebCoreView.}
-  \label{fig:deployment_diagram}
+  \includegraphics[width=0.9\textwidth]{figures/arquitectura_serveis.png}
+  \caption{Relació i comunicació entre els serveis de l'NVR.}
+  \label{fig:arquitectura_serveis}
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\subsection{Capa de comunicació i Microserveis}
-Com es detalla a la Figura \ref{fig:deployment_diagram}, la interacció entre la interfície i el hardware es divideix en tres canals principals:
-
-Per tal de garantir l'operativa del sistema, la plataforma interactua amb quatre serveis crítics executant-se en l'entorn \textit{embedded}:
-\begin{itemize}
-    \item \textbf{la-core-legacy:} És el servei encarregat de la lògica de negoci heretada i la gestió de la configuració base del sistema. La interfície web hi comunica mitjançant peticions REST per validar credencials i obtenir els esquemes de configuració.
-    \item \textbf{la-video-engine:} Actua com el node central de processament multimèdia. Gestiona la negociació de les sessions WebRTC i la fragmentació de vídeo per a HLS. La web hi interacciona per establir els canals de visualització de baixa latència.
-    \item \textbf{la-core-alarm:} Servei especialitzat en la monitorització de sensors i lògiques de seguretat. Publica esdeveniments en temps real al bus de dades intern, que posteriorment són transmesos al \textit{frontend} mitjançant WebSockets.
-    \item \textbf{la-db-engine:} Gestiona la capa de persistència mitjançant SQLite. S'encarrega de l'emmagatzematge indexat de logs i l'historial d'alarmes, garantint que la web pugui realitzar cerques ràpides sobre milers de registres.
-\end{itemize}
+\subsection{Capa de comunicació i Proxy}
+A nivell de xarxa externa, la interacció entre la interfície i el maquinari es consolida a través d'un \textit{Gateway} o Proxy Invers:
 
 \begin{itemize}
     \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
     \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones via mòdul \textbf{la-core-legacy}. Gestiona la consulta i l'enviament de paràmetres de configuració.
-    \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textbf{la-core-legacy} i \textbf{la-core-alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
+    \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textbf{la-core-notifier} i \textbf{la-core-alarm} envien esdeveniments de forma asíncrona. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
 \end{itemize}
 
 Internament, els serveis del backend embedded es comuniquen mitjançant \textbf{gRPC} \cite{grpc_up_running} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu. El repte de disseny rau en el fet que el navegador no pot parlar directament amb els dimonis de backend (que utilitzen gRPC o D-Bus). S'ha implementat una capa de \textbf{Gateway} utilitzant \textbf{NGINX} com a \textit{Proxy} invers, que redirigeix el trànsit segons el path:
