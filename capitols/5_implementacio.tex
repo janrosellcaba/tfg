@@ -4,7 +4,7 @@
 En aquest capítol es detalla el procés de construcció del sistema \textit{Web Core View}. Es descriu l'entorn de treball i s'explora el funcionament tècnic de cada mòdul al mateix temps que s'analitza la seva interfície gràfica d'usuari (UI). Aquest recorregut pràctic permet entendre com els requisits funcionals i l'arquitectura de \textit{software} s'han traduït en una experiència d'usuari intuïtiva.
 
 \section{Entorn de desenvolupament i tecnologies}
-Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte segueix un enfocament de components de tipus \textit{stand\-alone}, eliminant la dependència de mòduls clàssics per optimitzar el procés de \textit{tree-shaking} i la càrrega inicial.
+Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte s'ha dissenyat basant-se en components completament independents, una decisió que permet simplificar notablement el codi i assegurar que l'aplicació web carregui d'una manera molt més ràpida al navegador.
 
 Pel que fa als estils, s'ha utilitzat \textbf{SCSS modular}. S'han definit variables globals per mantenir la consistència visual i s'ha aplicat l'estratègia de detecció de canvis \texttt{OnPush} per garantir que la interfície només es refresqui quan realment hi hagi canvis d'estat significatius.
 
@@ -18,16 +18,56 @@ El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de
   \label{fig:ui_login}
 \end{figure}
 
-L'autenticació la gestiona directament el \textit{backend} (\texttt{la-core-legacy}), el qual avalua les credencials introduïdes a la Figura \ref{fig:ui_login}. Les credencials s'envien per HTTPS en text pla per tal que el servei comprovi la seva validesa. Si són correctes, el servidor retorna un JSON amb l'estatus d'\textit{èxit}, dades addicionals de l'usuari i els seus permisos (\textit{grants}); en cas contrari, es retorna un \textit{error}. Aquest servei també implementa mesures de seguretat com el bloqueig després d'un màxim de 5 intents fallits. Un cop validat pel sistema, l'usuari aterra a la pàgina d'inici principal (\textit{Home page}).
+L'API d'autenticació del sistema s'executa com un procés en dues fases coordinat a través del punt d'accés unificat \texttt{/WebLogin}, gestionat pel microservei \textbf{la-core-legacy} i exposat a l'exterior de forma segura mitjançant el proxy invers d'NGINX sota HTTPS.
 
-\subsection{Seguretat (JWT)}
-La seguretat es basa en JSON Web Tokens (JWT) \cite{rfc7519}. El flux d'autenticació comença amb una petició POST al servei \textbf{la-core-legacy}. Aquest servei no només valida l'usuari, sinó que interacciona amb \textbf{la-db-engine} per obtenir el perfil de permisos (\textit{grants}) associat. El token JWT resultant conté aquesta metadada xifrada, la qual cosa permet al \textit{frontend} (mitjançant \textit{guards} d'Angular) habilitar o deshabilitar botons de la interfície sense haver de fer consultes addicionals per cada acció de l'usuari.
+\subsection{Fase 1: Verificació de credencials (PlainLogin)}
+El client envia les credencials introduïdes per l'operador. Tot i que viatgen en text pla dins del JSON, la confidencialitat està garantida pel xifrat de la capa de transport (HTTPS/TLS). S'efectua una petició HTTP POST a \texttt{/WebLogin}.
 
-S'ha implementat un servei (\texttt{auth.service.ts}) que gestiona les crides a l'API. Un cop el gravador valida les credencials, retorna aquest token que s'emmagatzema exclusivament en l'estat en memòria d'un Signal privatiu.
+\begin{lstlisting}[language=json, caption={Petició d'enviament de credencials al servidor.}]
+{
+  "call": "PlainLogin",
+  "User": "admin",
+  "Password": "ElTeuPasswordSegur"
+}
+\end{lstlisting}
 
-La gestió de la sessió s'ha dissenyat sota un esquema de \textbf{zero-persistence} per maximitzar la seguretat. A diferència de les aplicacions web convencionals que emmagatzemen el JWT a \texttt{localStorage} (vulnerable a atacs \textit{Cross-Site Scripting} o XSS), Web Core View manté el token exclusivament en l'estat d'un \textbf{Signal privat} dins del servei d'autenticació.
+Depenent de la validesa de les credencials o de l'estat de seguretat del compte, el servidor pot retornar tres escenaris diferents:
 
-Aquesta decisió implica que, si un atacant aconseguís injectar un script maliciós, aquest no tindria una API de navegador on anar a buscar les credencials. El cost d'aquest disseny és que un refresc manual de la pàgina (\texttt{F5}) tanca la sessió, una penalització d'experiència d'usuari (UX) que es considera acceptable i desitjable en una aplicació de seguretat industrial.
+\begin{itemize}
+    \item \textbf{Autenticació reeixida (Success):} El servidor valida les credencials i estableix la sessió, retornant el token de sessió pertinent.
+    \item \textbf{Credencials incorrectes (Unauthorized):} Es denega l'accés i es retorna el nombre d'intents restants abans del bloqueig del terminal.
+    \item \textbf{Compte bloquejat (Locked):} Si s'ha superat el límit de 5 intents fallits, el servei bloqueja les peticions d'aquest usuari temporalment.
+\end{itemize}
+
+\begin{lstlisting}[language=json, caption={Exemples de resposta segons l'escenari d'autenticació.}]
+// Cas A: Success
+{ "LoginResponse": "success", "RetryCount": null }
+
+// Cas B: Unauthorized
+{ "LoginResponse": "unauthorized", "RetryCount": "3" }
+
+// Cas C: Locked
+{ "LoginResponse": "locked", "RetryCount": "0" }
+\end{lstlisting}
+
+\subsection{Fase 2: Obtenció del context i permisos (GetWhoamI)}
+Un cop es rep la confirmació d'èxit de la Fase 1, el component de \textit{login} invoca automàticament el servei d'usuaris. Aquest fa una segona crida per determinar de manera segura la identitat de l'usuari associat al token i quins permisos (\textit{grants}) té assignats. Això es fa mitjançant una nova petició a \texttt{/WebLogin} injectant el token a la capçalera \texttt{Authorization}.
+
+\begin{lstlisting}[language=json, caption={Petició \textit{GetWhoamI} i resposta amb els permisos.}]
+// Petició
+{
+  "call": "GetWhoamI"
+}
+
+// Resposta
+{
+  "user": "admin",
+  "profile": "administrator",
+  "grants": "configuration+live+record+managment+users"
+}
+\end{lstlisting}
+
+La gestió d'aquesta sessió s'ha dissenyat sota un esquema de \textbf{zero-persistence} per maximitzar la seguretat. El token obtingut no s'emmagatzema al \texttt{localStorage} per evitar atacs \textit{Cross-Site Scripting} (XSS), sinó que es manté exclusivament en l'estat d'un \textbf{Signal privat} en memòria de l'aplicació. El cost d'aquest disseny és que un refresc manual de la pàgina (\texttt{F5}) tanca la sessió, una decisió considerada desitjable en una aplicació de seguretat industrial.
 
 \begin{figure}[htbp]
   \centering
@@ -37,7 +77,7 @@ Aquesta decisió implica que, si un atacant aconseguís injectar un script malic
   \small Font: Elaboració pròpia.
 \end{figure}
 
-Per garantir que totes les peticions enviades cap al gravador estan autoritzades (Figura \ref{fig:seq_login}), s'ha definit un interceptor funcional d'Angular 19, anomenat \texttt{authInterceptor}:
+Per garantir que totes les peticions posteriors enviades cap al gravador estan autoritzades (Figura \ref{fig:seq_login}), s'ha definit un interceptor funcional d'Angular 19, anomenat \texttt{authInterceptor}, que injecta automàticament la capçalera \texttt{Authorization: Bearer <token>} a les crides HTTP:
 
 \begin{lstlisting}[language=JavaScript, caption={Implementació del HttpInterceptorFn en Angular 19.}]
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -54,11 +94,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 \end{lstlisting}
 
-Addicionalment, s'han implementat \textbf{Functional Guards} (\texttt{CanActivateFn}) que injecten el servei de seguretat, llegeixen el rol descodificat i bloquegen l'accés a rutes prohibides (per exemple, un operador intentant entrar a configuració). També s'utilitza el \texttt{LanguageInitResolver} per carregar les traduccions abans de renderitzar la vista.
+Addicionalment, s'han implementat \textbf{Functional Guards} (\texttt{CanActivateFn}) que llegeixen el perfil i bloquegen l'accés a rutes prohibides de l'aplicació en base als \textit{grants} de l'operador.
 
-El mecanisme de \textbf{Keep-Alive} actua com un batec de cor (\textit{heartbeat}) coordinat entre el \textit{frontend} i el servei \textbf{la-core-legacy}. S'ha configurat un interval de 60 segons per realitzar peticions síncrones que estenguin la validesa de la sessió al backend. 
+Si en qualsevol moment el servidor detecta que el token ha expirat o ha estat invalidat per falta d'activitat, retornarà un codi d'error \textbf{HTTP 401 Unauthorized}, i el \textit{frontend} forçarà immediatament la redirecció de l'usuari cap a la pantalla de \textit{login} netejant tot l'estat de memòria. Per evitar que la sessió expiri de manera imprevista mentre l'operador utilitza l'eina, el mecanisme de \textbf{Keep-Alive} envia peticions síncrones cada 60 segons per estendre la validesa de la sessió al \textit{backend}.
 
-Si el servei de backend detecta l'absència de dos pings consecutius, invalida automàticament el token a la base de dades \textbf{la-db-engine}, garantint que les sessions abandonades per talls de connectivitat o tancaments inesperats del navegador no quedin obertes. Al \textit{frontend}, si la petició de Keep-Alive retorna un error 401, l'interceptor funcional (Lògica 5.1) redirigeix l'usuari a la pantalla de \textit{login} de forma immediata, protegint la integritat del sistema.
+Si el servei de \textit{backend} detecta l'absència de dos \textit{pings} consecutius, invalida automàticament el token internament, garantint que les sessions abandonades per talls de connectivitat o tancaments inesperats del navegador no quedin obertes. Al \textit{frontend}, si la petició de Keep-Alive retorna un error 401, l'interceptor funcional redirigeix l'usuari a la pantalla de \textit{login} de forma immediata, protegint la integritat del sistema.
 
 \section{Tauler Principal i Panells d'Informació}
 La pàgina d'inici (\textit{Home page}) és el punt central de l'aplicació on l'usuari aterra un cop validat pel sistema.
@@ -152,7 +192,7 @@ computedValidationError = computed(() => {
 \end{lstlisting}
 
 \subsection{Bloqueig de Configuració (Pessimistic Locking)}
-Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy} a l'adreça \texttt{/webprotocol/device-service/properties/lock?node=config\&seed=...}. 
+Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy} a l'adreça \texttt{/webprotocol/device-service/properties/lock?node=config\&seed=...}.
 
 Si la sol·licitud és reeixida, el servidor retorna una estructura JSON que autoritza l'edició:
 \begin{lstlisting}[language=json, caption={Estructura JSON del bloqueig de configuració.}]
@@ -331,7 +371,7 @@ Per consultar esdeveniments passats sota el protocol de \textit{fallback} HLS, s
 A la interfície (Figura \ref{fig:ui_recordings}), l'operador pot triar la data mitjançant un calendari esquerre. L'element clau és la línia de temps (\textit{Timeline}) inferior, que descarrega l'índex de gravacions del backend i representa gràficament amb diferents colors si hi ha gravació contínua o d'alarma. Per a l'emissió del vídeo s'estableix una connexió directa amb \textbf{la-video-engine}. Aquesta pàgina funciona mitjançant el protocol HLS típic, on el \textit{frontend} demana la \textit{playlist} HLS (\texttt{.m3u8}) corresponent a la franja de temps escollida i, a mesura que l'usuari mou el lliscador, va demanant recursivament els trossos de vídeo (fitxers \texttt{.ts}), emulant un reproductor clàssic.
 
 \section{Sistema d'Alarmes i Comunicació asíncrona}
-Per a la gestió de les notificacions, s'ha evitat l'obertura de múltiples connexions per cada component que necessiti dades. S'ha implementat un \textbf{servei de missatgeria centralitzat} que manté un únic canal WSS obert amb el mòdul \textit{Core Notifier}. 
+Per a la gestió de les notificacions, s'ha evitat l'obertura de múltiples connexions per cada component que necessiti dades. S'ha implementat un \textbf{servei de missatgeria centralitzat} que manté un únic canal WSS obert amb el mòdul \textit{Core Notifier}.
 
 Aquest servei utilitza un flux de dades basat en el patró \textit{Observable Shared}, on els diferents components de la interfície (el mosaic de vídeo, la taula d'alarmes i la barra d'estat) se subscriuen a la mateixa connexió. Aquesta arquitectura redueix dràsticament la càrrega de treball del Proxy Invers \textbf{NGINX} i el consum de sockets al sistema operatiu del gravador, permetent una escalabilitat del sistema sense degradació del rendiment.
 Per alertar d'intrusions o problemes detectats pels relés, el sistema implementa un canal de \textbf{WebSockets (WSS)} basat en un patró observador asíncron.
