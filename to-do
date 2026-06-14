@@ -13,6 +13,10 @@ pensar si poso reports (jo crec que no)
 
 la-dbengine no guarda res a bd, nomes fa de vfs, drive i ho envia per unix al video engine. fa de passarel.la.
 
+captura del wizards
+
+explicar molt mes en detall lo de gravacions (mirar be el video engine)
+
 #
 
 # DONE
@@ -22,6 +26,7 @@ la-dbengine no guarda res a bd, nomes fa de vfs, drive i ho envia per unix al vi
 tema de grants i de login (es fa un login pla).
 explicar idiomes i18n a la part de info-usr a home page
 
+averiguar tema del token
 averiguar com va el login en el corelegacy
 captures
 treure floritures
