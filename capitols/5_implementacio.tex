@@ -27,16 +27,16 @@ El client envia les credencials introduïdes per l'operador. Tot i que viatgen e
 {
   "call": "PlainLogin",
   "User": "admin",
-  "Password": "ElTeuPasswordSegur"
+  "Password": "LaTevaContrasenya"
 }
 \end{lstlisting}
 
 Depenent de la validesa de les credencials o de l'estat de seguretat del compte, el servidor pot retornar tres escenaris diferents:
 
 \begin{itemize}
-    \item \textbf{Autenticació reeixida (Success):} El servidor valida les credencials i estableix la sessió, retornant el token de sessió pertinent.
-    \item \textbf{Credencials incorrectes (Unauthorized):} Es denega l'accés i es retorna el nombre d'intents restants abans del bloqueig del terminal.
-    \item \textbf{Compte bloquejat (Locked):} Si s'ha superat el límit de 5 intents fallits, el servei bloqueja les peticions d'aquest usuari temporalment.
+  \item \textbf{Autenticació reeixida (Success):} El servidor valida les credencials i estableix la sessió, retornant el token de sessió pertinent.
+  \item \textbf{Credencials incorrectes (Unauthorized):} Es denega l'accés i es retorna el nombre d'intents restants abans del bloqueig del terminal.
+  \item \textbf{Compte bloquejat (Locked):} Si s'ha superat el límit de 5 intents fallits, el servei bloqueja les peticions d'aquest usuari temporalment.
 \end{itemize}
 
 \begin{lstlisting}[language=json, caption={Exemples de resposta segons l'escenari d'autenticació.}]
@@ -51,7 +51,7 @@ Depenent de la validesa de les credencials o de l'estat de seguretat del compte,
 \end{lstlisting}
 
 \subsection{Fase 2: Obtenció del context i permisos (GetWhoamI)}
-Un cop es rep la confirmació d'èxit de la Fase 1, el component de \textit{login} invoca automàticament el servei d'usuaris. Aquest fa una segona crida per determinar de manera segura la identitat de l'usuari associat al token i quins permisos (\textit{grants}) té assignats. Això es fa mitjançant una nova petició a \texttt{/WebLogin} injectant el token a la capçalera \texttt{Authorization}.
+Un cop es rep la confirmació d'èxit de la Fase 1 (en la qual el servidor ha retornat el token de sessió d'accés), el component de \textit{login} invoca automàticament el servei d'usuaris. Aquest fa una segona crida per determinar de manera segura la identitat de l'usuari associat a aquest token i quins permisos (\textit{grants}) té assignats. Això es fa mitjançant una nova petició a \texttt{/WebLogin} injectant el token a la capçalera \texttt{Authorization}.
 
 \begin{lstlisting}[language=json, caption={Petició \textit{GetWhoamI} i resposta amb els permisos.}]
 // Petició
@@ -123,7 +123,7 @@ A la part superior dreta de l'aplicació, s'ubiquen els controls globals.
   \label{fig:ui_home_panels}
 \end{figure}
 
-Fent clic a la icona d'informació, es desplega un panell (Figura \ref{fig:ui_home_panels}, esquerra) que mostra l'estat de salut del maquinari en temps real (IP, versió, estat dels discos durs, temperatura). Al seu costat, el panell d'usuari (Figura \ref{fig:ui_home_panels}, dreta) mostra l'operador actual i els seus permisos, complint amb el requisit d'autenticació basat en rols (RF-1.1), incloent-hi el botó de tancament de sessió segur.
+Fent clic a la icona d'informació, es desplega un panell (Figura \ref{fig:ui_home_panels}, esquerra) que mostra l'estat de salut del maquinari en temps real (IP, versió, estat dels discos durs, temperatura). Al seu costat, el panell d'usuari (Figura \ref{fig:ui_home_panels}, dreta) mostra l'operador actual i els seus permisos, complint amb el requisit d'autenticació basat en rols (RF-1.1), incloent-hi el botó de tancament de sessió segur. En aquest mateix menú també s'hi ubica el botó per reiniciar el videogravador, així com un selector per canviar l'idioma de la interfície a l'anglès, el francès o l'espanyol. Aquesta gestió dels idiomes es realitza de forma autònoma i dinàmica des del \textit{frontend} mitjançant la internacionalització (\textit{i18n}).
 
 \begin{figure}[htbp]
   \centering
@@ -411,7 +411,7 @@ this.socket$.pipe(
 
 Per assegurar l'eficiència en la gestió de les alarmes, la pàgina d'alarmes obre un WebSocket directe connectat amb \textbf{la-core-alarm}. Aquests dos extrems es comuniquen per transmetre totes les alarmes registrades i enviar els nous canvis en temps real (com ara les accions de marcar una alarma com a llegida, arxivar-la o esborrar-la).
 
-Al mateix temps, de cara al \textit{backend}, \textbf{la-core-alarm} es comunica mitjançant crides \textbf{gRPC} amb \textbf{la-db-engine}. Aquest últim servei fa ús d'un driver personalitzat que opera sobre \textbf{SQLite3}, encarregat de guardar de manera persistent les alarmes, evitant pèrdues d'informació davant reinicis del gravador. Amb aquest disseny, quan la llista d'Angular rep un paquet WebSocket, s'actualitza el \texttt{Signal} corresponent i la fila de la taula d'alarmes es renderitza de nou instantàniament.
+Al mateix temps, de cara al \textit{backend}, \textbf{la-core-alarm} es comunica mitjançant crides \textbf{gRPC} amb \textbf{la-db-engine}. Aquest últim servei fa ús d'un \textit{driver} personalitzat que opera sobre \textbf{SQLite3} com un \textit{Virtual File System} (VFS). Tot i que \textbf{la-db-engine} orquestra la base de dades lògicament i actua com a passarel·la principal, no guarda directament al disc. En comptes d'això, es comunica mitjançant \textit{sockets} de Unix amb \textbf{la-video-engine} —l'únic servei autoritzat amb accés a disc— perquè aquest darrer guardi de manera persistent les alarmes de la base de dades, evitant pèrdues d'informació davant reinicis del gravador. Amb aquest disseny, quan la llista d'Angular rep un paquet WebSocket, s'actualitza el \texttt{Signal} corresponent i la fila de la taula d'alarmes es renderitza de nou instantàniament.
 
 \subsection{Estructures de Missatges del Canal Asíncron (WebSockets)}
 Per documentar el rigor de la integració, a continuació es detallen els missatges JSON que viatgen a través d'aquest servei de notificacions unificat.

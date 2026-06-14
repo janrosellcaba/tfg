@@ -10,13 +10,13 @@ L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microse
 \begin{itemize}
     \item \textbf{la-core-legacy:} El cervell central, gestor de la configuració (API REST), autenticació i bloquejos (locks).
     \item \textbf{la-video-engine:} El motor que processa el vídeo, el guarda als discos i el serveix via HLS o WebRTC.
-    \item \textbf{la-db-engine:} La base de dades on es guarden històrics d'alarmes i telemetria.
+    \item \textbf{la-db-engine:} Funciona com un \textit{Virtual File System} (VFS) i un \textit{driver} de passarel·la que dirigeix la base de dades lògica. S'encarrega d'ordenar la persistència dels històrics d'alarmes i telemetria, delegant l'escriptura física al disc exclusivament a \textbf{la-video-engine}.
     \item \textbf{la-core-notifier} i \textbf{la-core-alarm:} Les passarel·les de WebSockets que disparen les notificacions en temps real cap al frontend.
 \end{itemize}
 
 Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTP cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració, i connexions persistents de WebSockets (\textit{ws}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
 
-A nivell intern, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza trucades \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}, el qual al seu torn persisteix la informació mitjançant el motor de bases de dades \textbf{SQLite3}.
+A nivell intern, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza trucades \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}, el qual actua com un \textit{driver} o VFS per a la base de dades \textbf{SQLite3}. Com a orquestrador, \textbf{la-db-engine} no guarda la informació directament al disc, sinó que es comunica via \textit{sockets} de Unix amb \textbf{la-video-engine} —l'únic servei amb permisos i funcions per escriure a disc— perquè persisteixi físicament la informació de forma segura.
 
 \begin{figure}[htbp]
   \centering
