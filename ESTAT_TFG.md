@@ -32,20 +32,20 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 
 **Correcció aplicada:** L'Annex A.1 ara mostra el format real: diccionari pla amb claus en notació de punts (`"camera.{id}.stream.codec"`) i metadades underscore-prefixades (`_type`, `_allowedValues`, `_min`, `_max`, `_default`, `_description`). Text explicatiu actualitzat per justificar la convenció dels underscores. Compilació verificada (100 pàgines, sense errors).
 
-### 2. Mòdul "Reports" — eliminar del menú ⚠️
-**Problema:** La secció 5.3 (Home Page) llista "Reports" al menú de Manteniment però no té secció d'implementació corresponent.
+### 2. Mòdul "Reports" — eliminar del menú ✅ RESOLT (juny 2026)
+~~**Problema:** La secció 5.3 (Home Page) llista "Reports" al menú de Manteniment però no té secció d'implementació corresponent.~~
 
-**Acció:** Eliminar "Reports" de la llista del menú. No es documenta al TFG per no afegir complexitat.
+**Correcció aplicada:** "Reports" eliminat de la llista de mòduls de Manteniment a `5_implementacio.tex`. El menú queda: Update, Configuration, Log, Documentation.
 
-### 3. Contradicció sobre sessió (menor) ℹ️
-**Problema:** El capítol 3 diu "No es permet l'ús de galetes; s'ha d'usar LocalStorage". El capítol 5 implementa cookies HttpOnly/Secure via NGINX i Signal en memòria (zero-persistence, sense LocalStorage).
+### 3. Contradicció sobre sessió ✅ RESOLT (juny 2026)
+~~**Problema:** El capítol 3 deia "No es permet l'ús de galetes; s'ha d'usar LocalStorage". El capítol 5 implementa cookies HttpOnly/Secure via NGINX i Signal en memòria.~~
 
-**Acció:** Corregir el capítol 3: s'eviten cookies llegibles per JavaScript (`document.cookie`), però s'usen cookies `HttpOnly` gestionades exclusivament per NGINX, immune a XSS. El LocalStorage tampoc s'usa.
+**Correcció aplicada:** `3_requisits.tex` §Restriccions i §Minimització de dades actualitzats: s'explica que s'usen cookies `HttpOnly`/`Secure` controlades per NGINX (inaccessibles des de JavaScript) i un Signal de zero-persistència, eliminant tota referència a LocalStorage.
 
-### 4. FS2 — afegir paràgraf breu (millora) ℹ️
-**Oportunitat:** La secció de gravacions del capítol 5 menciona `fs2_file_read_buffer` sense explicar el concepte.
+### 4. FS2 — paràgraf breu ✅ RESOLT (juny 2026)
+~~**Oportunitat:** La secció de gravacions del capítol 5 mencionava `fs2_file_read_buffer` sense explicar el concepte.~~
 
-**Acció:** Afegir un paràgraf breu explicant que FS2 és un sistema de fitxers propietari de Lanaccess que opera sobre la partició raw del disc dur (bypassa ext4), garantint escriptura atòmica i rendiment d'alt débit per a fluxos continus de vídeo.
+**Correcció aplicada:** Nova subsecció "Emmagatzematge de Vídeo: el Sistema de Fitxers Propietari FS2" afegida a `5_implementacio.tex` abans del servidor HLS. Explica el bypass d'ext4, l'escriptura en blocs físics contigus, l'atomicitat en cas de tall elèctric i l'accés via `aligned_alloc(HD_BYTES_PER_SECTOR, ...)`. El document passa de 100 a 101 pàgines.
 
 ---
 
@@ -55,10 +55,11 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 - Cookies `HttpOnly` + `Secure` gestionades per NGINX (no JavaScript).
 - Estat de sessió: Signal privat en memòria (zero-persistence). F5 = logout. Comportament intencional.
 
-### WebRTC — dues connexions separades
-- **Senyalització SDP (WHEP):** HTTP POST via NGINX → `/video-engine/stream/<camera_id>/whep`.
-- **Flux de vídeo (SRTP/UDP):** Connexió directa peer-to-peer, bypassa NGINX. Ports 10000–20000 (ICE dinàmic).
+### WebRTC — dues connexions separades ✅ Documentat al capítol 4 (juny 2026)
+- **Pla de control (senyalització SDP/WHEP):** HTTP POST via NGINX → `/video-engine/stream/<camera_id>/whep`.
+- **Pla de dades (flux de vídeo):** SRTP/UDP directe peer-to-peer, bypassa NGINX. Ports 10000–20000 (ICE dinàmic). Latència < 300 ms.
 - En LAN no cal STUN/TURN (Host Candidates). Per NAT extern caldria STUN/TURN extern.
+- Separació explicada a §Estratègia de Fallback i §Proxy Invers a `4_arquitectura.tex`. Taula de comunicació actualitzada (dues files per WebRTC: WHEP via NGINX + SRTP/UDP directe).
 
 ### Schema-Driven — format real
 - Underscores prefixats: `_type`, `_min`, `_max`, `_regex`, `_allowedValues`, `_description`, `_default`.

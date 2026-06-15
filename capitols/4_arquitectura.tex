@@ -39,7 +39,7 @@ Internament, els serveis del backend embedded es comuniquen mitjançant \textbf{
 
 \begin{itemize}
     \item Les peticions \texttt{/api/v1/config/*} es deriven a \textbf{la-core-legacy}.
-    \item El flux de senyalització WebRTC es negocia directament amb \textbf{la-video-engine}.
+    \item Les peticions de senyalització WebRTC (protocol WHEP, camí \texttt{/video-engine/stream/\{id\}/whep}) es deriven a través de NGINX cap a \textbf{la-video-engine} (pla de control). Un cop establerta la sessió, el flux de vídeo SRTP/UDP circula directament entre el navegador i el port de \textbf{la-video-engine} negociat per ICE (ports 10000–20000), sense intermediació de NGINX (pla de dades).
     \item Les consultes de dades històriques es canalitzen cap a \textbf{la-db-engine}.
 \end{itemize}
 
@@ -57,7 +57,8 @@ Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:
     \textbf{Origen} & \textbf{Destinació} & \textbf{Protocol} & \textbf{Finalitat} \\ \midrule
     Frontend (Navegador) & NGINX & HTTPS & Peticions REST i descàrrega de l'App \\
     Frontend (Navegador) & NGINX & WSS & Notificacions d'alarmes en temps real \\
-    Frontend (Navegador) & \textbf{la-video-engine} & WebRTC (UDP) & Streaming de vídeo de baixa latència \\
+    Frontend (Navegador) & NGINX & HTTPS (WHEP) & Senyalització SDP per a WebRTC (pla de control) \\
+    Frontend (Navegador) & \textbf{la-video-engine} & SRTP/UDP (directe) & Flux de vídeo WebRTC (pla de dades) \\
     NGINX (Proxy) & \textbf{la-core-legacy} & HTTP (Intern) & Gestió de configuració i usuaris \\
     NGINX (Proxy) & \textbf{la-db-engine} & HTTP (Intern) & Consultes a la base de dades SQLite \\ \bottomrule
   \end{tabular}
@@ -109,6 +110,8 @@ server {
 
 \subsection{Estratègia de Fallback i robustesa del canal de vídeo}
 La integració de WebRTC com a mètode de visualització de vídeo de baixa latència ($<300$~ms) requereix un mecanisme d'alta disponibilitat que respongui davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pels tallafocs de seguretat. Per a aquest propòsit, s'ha dissenyat un sistema de \textit{fallback} transparent a HLS \cite{hls_apple}.
+
+La connexió WebRTC es divideix en dos plans de comunicació independents. El \textbf{pla de control} gestiona la senyalització SDP seguint el protocol WHEP (\textit{WebRTC-HTTP Egress Protocol}) \cite{webrtc_w3c}: el navegador realitza un HTTP POST a \texttt{/video-engine/stream/\{camera\_id\}/whep}, que NGINX reenvia internament cap a \textbf{la-video-engine}, el qual retorna la descripció de sessió SDP amb les candidatures ICE. El \textbf{pla de dades}, en canvi, és un flux SRTP xifrat sobre UDP que circula directament entre el navegador i el port de \textbf{la-video-engine} acordat per ICE (rang 10000–20000); aquest trànsit no passa mai per NGINX. Aquesta separació és el que garanteix una latència de visualització inferior a 300~ms: el vídeo no ha de travessar cap capa de proxy invers.
 
 El client web inicia la negociació SDP mitjançant la referència del protocol WebRTC W3C \cite{webrtc_w3c}. Si el navegador detecta que l'estat de la connexió ICE (\textit{Interactive Connectivity Establishment}) transita cap a \texttt{failed} o \texttt{disconnected} després d'un \textit{timeout} de seguretat de 5 segons, s'activa automàticament la lògica de degradació de servei. En aquest instant, es tanquen de manera neta els descriptors de WebRTC i s'inicialitza la reproducció d'un flux de vídeo HLS a través del Proxy Invers NGINX (TCP, port 443 xifrat), assegurant que l'operador continuï visualitzant la càmera sense interrupció.
 

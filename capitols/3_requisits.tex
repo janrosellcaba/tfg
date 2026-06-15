@@ -234,7 +234,7 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 \section{Restriccions del sistema}
 El desenvolupament s'ha de cenyir a les següents limitacions:
 \begin{itemize}
-  \item \textbf{Seguretat:} No es permet l'ús de galetes (\textit{cookies}) per a l'emmagatzematge de dades de sessió per evitar atacs CSRF; s'ha d'usar \textit{LocalStorage} amb protecció de rutes.
+  \item \textbf{Seguretat:} Per evitar atacs \textit{Cross-Site Scripting} (XSS) i \textit{Cross-Site Request Forgery} (CSRF), no s'utilitzen cookies llegibles per JavaScript (\texttt{document.cookie}) ni el \textit{LocalStorage} del navegador per emmagatzemar dades de sessió. La sessió es gestiona amb cookies \textit{HttpOnly} i \textit{Secure} controlades exclusivament per NGINX (inaccessibles des de codi JavaScript) i un Signal privat en memòria al \textit{frontend} de zero-persistència: un recarregament de pàgina tanca la sessió, comportament intencionat per a entorns de seguretat industrial.
   \item \textbf{Same-Origin Policy:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
   \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}
@@ -244,7 +244,7 @@ Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real, r
 \subsection{Protecció de Dades de Caràcter Personal (RGPD i LOPDGDD)}
 El sistema s'adapta al \textbf{Reglament General de Protecció de Dades (RGPD - Reglament UE 2016/679)} \cite{gdpr_reg} i a la legislació de transposició espanyola, la \textbf{Llei Orgànica 3/2018 de Protecció de Dades Personals i Garantia dels Drets Digitals (LOPDGDD)} \cite{lopdgdd_spain}. Especialment, el disseny s'alinea amb l'\textbf{Article 22 de la LOPDGDD}, que regula específicament el tractament d'imatges amb finalitats de videovigilància, sota el principi fonamental de **Privadesa per Disseny (Privacy by Design)**:
 \begin{itemize}
-  \item \textbf{Minimització de dades:} No s'emmagatzemen imatges, captures ni dades personals de forma persistent en el navegador, exceptuant el \textit{token} de sessió protegit en el \textit{LocalStorage}.
+  \item \textbf{Minimització de dades:} No s'emmagatzemen imatges, captures ni dades personals de forma persistent en el navegador. La sessió d'autenticació no es persiste en cap emmagatzematge del client: les cookies de sessió \textit{HttpOnly} les gestiona el servidor NGINX, i l'estat en memòria del \textit{frontend} desapareix en tancar la pestanya o recarregar la pàgina.
   \item \textbf{Seguretat d'accés:} L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només els operadors explícitament autoritzats puguin visualitzar el vídeo en directe i els històrics.
 \end{itemize}
 

@@ -202,7 +202,7 @@ Per garantir una experiència d'usuari (UX) neta, adaptada al context de treball
 \begin{itemize}
   \item \textbf{Configuració:} Reuneix l'accés a la configuració del sistema (\textit{System}), els assistents guiats d'instal·lació (\textit{Wizards}) i l'eina de mapeig de túnels de xarxa per a càmeres aïllades (\textit{Web Proxy}).
   \item \textbf{Vídeo:} Agrupa el visualitzador de càmeres en temps real (\textit{Cameras}), la consulta del reproductor històric de gravacions (\textit{Recordings}) i la consola de supervisió d'incidents actius (\textit{Alarms}).
-  \item \textbf{Manteniment:} Conté els mòduls de diagnòstic avançat (\textit{Reports}), actualització del microprogramari (\textit{Update}), restauració i còpies de seguretat de fitxers de configuració (\textit{Configuration}), el visor de registres històrics (\textit{Log}) i la descàrrega directa de manuals d'usuari integrats (\textit{Documentation}).
+  \item \textbf{Manteniment:} Conté l'eina d'actualització del microprogramari (\textit{Update}), la restauració i còpies de seguretat de fitxers de configuració (\textit{Configuration}), el visor de registres històrics (\textit{Log}) i la descàrrega directa de manuals d'usuari integrats (\textit{Documentation}).
 \end{itemize}
 
 L'aspecte més destacable d'aquest disseny és que el motor de renderitzat del *frontend* avalua de forma immediata el mètode reactiu \texttt{functionalities} derivat de la llista de \textit{grants} de l'usuari a través d'Angular Signals. Si l'operador actual manca d'un permís determinat (com ara l'accés a la modificació d'usuaris o a l'actualització de firmware), els botons i rutes d'aquella secció específica s'exclouen directament del cicle de vida del DOM del client. Això no només augmenta la seguretat en l'entorn de treball, sinó que evita la renderització d'elements redundants que l'usuari final no pot utilitzar.
@@ -552,6 +552,9 @@ En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una sol
   \caption{Vista del reproductor de vídeo històric i component interactiu Timeline.}
   \label{fig:ui_recordings}
 \end{figure}
+
+\subsection{Emmagatzematge de Vídeo: el Sistema de Fitxers Propietari FS2}
+Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional, sinó en \textbf{FS2} (\textit{File System 2}), un sistema d'emmagatzematge propietari de Lanaccess que opera directament sobre la partició \textit{raw} del disc dur de l'NVR, sense intermediació del sistema de fitxers del nucli Linux (ext4). FS2 escriu els fotogrames de vídeo en espais contigus de mida fixa a nivell de blocs físics, cosa que elimina la fragmentació, redueix la latència d'escriptura i garanteix atomicitat en cas de tall elèctric sobtat: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada. L'accés de lectura als fitxers FS2 es realitza a través de la funció \texttt{fs2\_file\_read\_buffer}, que recupera blocs alineats al sector de disc (512 bytes) via \texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)} per maximitzar el rendiment de DMA i minimitzar les còpies de memòria durant el trans-muxing.
 
 \subsection{El Servidor de llistes de reproducció HLS (\texttt{hls-play.m3u8})}
 La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi obert **HLS (HTTP Live Streaming)**, el qual fragmenta la transmissió en fluxos d'arxius curts de pocs segons per evitar l'enviament de fitxers de gravació massius que col·lapsarien l'ample de banda i la memòria de l'equip de xarxa.
