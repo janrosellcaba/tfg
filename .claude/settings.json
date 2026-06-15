@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(latexmk -C main.tex)"
+      "Bash(latexmk -C main.tex)",
+      "Bash(pdflatex -interaction=nonstopmode /home/jan/uni/tfg/latex/main.tex)",
+      "Bash(pdflatex -interaction=nonstopmode main.tex)",
+      "Bash(pdflatex -interaction=scrollmode main.tex)",
+      "Bash(pdflatex -interaction=nonstopmode main.tex > /tmp/latex_run.txt 2>&1; grep -n \"BOOKMARK\\\\|File ended\\\\|Runaway\\\\|Missing\\\\|Extra\\\\|Emergency\" /tmp/latex_run.txt | head -20)",
+      "Read(//tmp/**)",
+      "Bash(echo \"Exit: $?\")"
     ]
   }
 }

@@ -97,9 +97,28 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    # Proxy Invers cap a la-core-legacy (configuració, auth i locks)
+    location /api/v1/config/ {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # Proxy Invers cap a la-video-engine (senyalització WebRTC/WHEP i HLS)
+    location /video-engine/ {
+        proxy_pass http://127.0.0.1:8082;
+        proxy_set_header Host $host;
+    }
+
+    # Proxy Invers cap a la-db-engine (consultes historiques d'alarmes)
+    location /webprotocol/ {
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+    }
+
     # Proxy Invers i Bridging per a WebSockets d'esdeveniments
     location /ws/ {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
