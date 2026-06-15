@@ -4,7 +4,7 @@
 En aquest capítol es descriu el marc metodològic utilitzat per al desenvolupament del projecte, la planificació temporal detallada de les tasques i l'anàlisi econòmica i de sostenibilitat del sistema.
 
 \section{Metodologia i eines de treball}
-El projecte es desenvolupa en un entorn professional dins de l’equip d’\textit{Embedded} de Lanaccess. S’ha optat per una \textbf{metodologia àgil basada en Kanban}, utilitzant l'eina \textit{Businessmap} per a la gestió visual del flux de treball. Aquesta elecció permet una gran flexibilitat i una resposta ràpida davant de canvis en els requeriments tècnics.
+El projecte es desenvolupa en un entorn professional dins de l’equip d’\textit{Embedded} de Lanaccess. S’ha optat per una \textbf{metodologia àgil basada en Kanban}, utilitzant l'eina \textit{Businessmap} per a la gestió visual del flux de treball. Aquesta elecció permet una gran flexibilitat i una resposta ràpida davant de canvis en els requisits tècnics.
 
 Els pilars del seguiment del projecte són:
 \begin{itemize}
@@ -62,7 +62,7 @@ Comprèn exclusivament els elements físics no informàtics i d'infraestructura:
 \end{itemize}
 
 \subsubsection{Recursos informàtics}
-Grup que agrupa tot el programari i el maquinari digital utilitzats pel projecte, evitant catalogar el software com a recurs material:
+Categoria que comprèn tot el programari i el maquinari digital del projecte:
 \begin{itemize}
   \item \textbf{Maquinari (Hardware):} Ordinador portàtil (ASUS Expertbook Intel Core i7, 16GB RAM, anomenat PC) i videogravador de proves real (NVR Lanaccess, anomenat NVR) per a proves d'streaming WebRTC/HLS.
   \item \textbf{Programari de desenvolupament (Software):} IDE Visual Studio Code, entorn de versions Git, intèrpret de terminal Bash i compilador de LaTeX.
@@ -103,7 +103,7 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
 \end{figure}
 
 \subsection{Gestió del risc i desviacions reals}
-Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns de videovigilància corporativa comporta un conjunt de riscos que cal monitorar de manera constant. Per respondre de forma preventiva i correctiva, s'ha definit una matriu de gestió de riscos on es classifiquen segons la seva tipologia, la probabilitat d'ocurrència (Alta, Mitjana, Baixa) i l'impacte potencial en el cicle de vida del projecte (Alt, Mitjà, Baix), tal com es recull a la Taula \ref{tab:matriu_riscos}.
+Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns de videovigilància corporativa comporta un conjunt de riscos que cal monitorar de manera constant. Per respondre de forma preventiva i correctiva, s'ha definit una matriu de gestió de riscos que classifica cada risc per tipologia, probabilitat d'ocurrència (Alta, Mitjana, Baixa) i impacte potencial en el cicle de vida del projecte (Alt, Mitjà, Baix), tal com es recull a la Taula \ref{tab:matriu_riscos}.
 
 \begin{table}[htbp]
   \centering
@@ -126,7 +126,7 @@ Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns 
 A nivell de desviacions reals experimentades, durant l'execució del projecte s'han confirmat dos dels riscos recollits en la planificació:
 \begin{enumerate}
   \item \textbf{Complexitat en la integració del còdec H.265:} El comportament de la descodificació nativa en diferents navegadors ha requerit un buffer d'Angular molt més complex per garantir la fluïdesa.
-  \item \textbf{Disseny arquitectònic del motor Schema-driven:} La complexitat teòrica del parseig de metadades JSON per garantir validacions complexes ha consumit més hores de l'estimat inicialment.
+  \item \textbf{Disseny arquitectònic del motor Schema-driven:} La complexitat teòrica del parseig de metadades JSON per garantir validacions complexes ha consumit més hores del previst inicialment.
 \end{enumerate}
 Aquestes desviacions i la seva gestió d'impacte es detallen en els següents apartats de rendiment i planificació econòmica.
 
@@ -176,7 +176,7 @@ Considerant tots els conceptes analitzats en la planificació econòmica, el pre
 D'aquesta manera, el pressupost final estimat del projecte ascendeix a \textbf{16.810,40~\euro{}}.
 
 \subsection{Control de gestió i seguiment de desviacions}
-Per garantir que el projecte no pateixi sobrecostos inassumibles o retards estructurals crítics en la fita final, s'ha dissenyat un sistema de control de gestió basat en mètriques de rendiment. El seguiment es realitza de forma setmanal pel Cap de Projecte, mesurant l'evolució del treball mitjançant el càlcul d'indicadors de desviació acumulats.
+Per garantir que el projecte no pateixi sobrecostos inassumibles o retards estructurals crítics en la fita final, s'ha dissenyat un sistema de control de gestió basat en mètriques de rendiment. El Cap de Projecte en fa el seguiment setmanalment, mesurant l'evolució del treball mitjançant el càlcul d'indicadors de desviació acumulats.
 
 Els indicadors aplicats són els següents:
 \begin{itemize}
@@ -190,7 +190,7 @@ Els indicadors aplicats són els següents:
   \item \textbf{Indicadors de Rendiment (EVM):} S'apliquen el CPI (\textit{Cost Performance Index}) i l'SPI (\textit{Schedule Performance Index}) per comparar l'evolució del valor obtingut enfront del cost real i planificat. Un valor inferior a 1,0 en ambdós indicadors marca alertes d'ineficiència temporal o sobrecost.
 \end{itemize}
 
-Per respondre ràpidament a aquests indicadors, s'estabilitza un protocol de llindars de tolerància i d'accions correctives immediates:
+Per respondre ràpidament a aquests indicadors, s'estableix un protocol de llindars de tolerància i d'accions correctives immediates:
 \begin{itemize}
   \item \textbf{Llindar Verd (Desviació < 5 \%):} Situació controlada. Qualsevol lleugera desviació d'hores es compensa en les tasques posteriors més flexibles, especialment en les de documentació i proves transversals.
   \item \textbf{Llindar Groc (Desviació 5 \% - 10 \%):} Alerta moderada. Requereix l'optimització de codi existent per evitar desbordaments temporals de rols d'Analista o Programador. Si hi ha desviació financera s'inicia el consum parcial del marge de contingència previst del 10 \%.
@@ -200,7 +200,7 @@ Per respondre ràpidament a aquests indicadors, s'estabilitza un protocol de lli
 \section{Tancament del projecte i desviacions finals}
 \label{sec:tancament_projecte}
 
-Un cop completat el cicle de desenvolupament i la redacció de la present memòria, es procedeix a realitzar el tancament del projecte. Aquest tancament té com a objectiu analitzar de forma retrospectiva les desviacions ocorregudes tant en la planificació temporal com en la gestió del pressupost, justificant les mesures correctores aplicades.
+Un cop completat el cicle de desenvolupament i la redacció de la present memòria, es formalitza el tancament del projecte, amb l'objectiu d'analitzar retrospectivament les desviacions ocorregudes tant en la planificació temporal com en la gestió del pressupost, justificant les mesures correctores aplicades.
 
 \subsection{Tancament temporal: Planificació prevista vs. real}
 Tot i que la càrrega de treball total s'ha mantingut en l'ordre de les \textbf{540 hores} globals definides durant la fase d'iniciativa GEP (corresponents a 18 crèdits ECTS), la distribució interna de les tasques ha patit desviacions significatives a causa de la complexitat tècnica del sistema.
@@ -230,17 +230,17 @@ La Taula~\ref{tab:desviacions_temporal} recull la comparativa de les hores previ
 Com s'observa en els indicadors, les fases de desenvolupament tècnic pur (\textbf{AV} i \textbf{GV}) han patit una desviació a l'alça acumulada de \textbf{+45 hores}. Aquesta desviació es justifica per dos motius principals:
 \begin{enumerate}
     \item \textbf{El buffer i reproducció H.265 (fase AV):} La implementació i proves de descompressió de vídeo en temps real natiu sense dependència de \textit{plugins} sota diferents navegadors moderns va presentar problemes insospitats de desbordament del buffer HTML5, forçant un desenvolupament asíncron addicional.
-    \item \textbf{El motor de parseig del Schema-driven (fase GV):} El recorregut recursiu i validació recursiva de JSONs amb validacions complexes sobre camps anidats va resultar arquitectònicament més complex de l'estimat.
+    \item \textbf{El motor de parseig del Schema-driven (fase GV):} El recorregut i la validació recursiva de JSONs amb validacions complexes sobre camps anidats va resultar arquitectònicament més complex del previst.
 \end{enumerate}
 
 Per mantenir la data de lliurament immutable i respectar les 540 hores màximes establertes, es van aplicar les següents accions correctores en les fases de finalització:
 \begin{itemize}
     \item \textbf{Optimització de la redacció (FM):} L'elaboració de la memòria es va realitzar de forma altament paral·lela i simplificada aprofitant els diagrames de Mermaid de la documentació tècnica de l'empresa, estalviant \textbf{25 hores} d'escriptura repetitiva.
-    \item \textbf{Retall d'abast no essencial:} Es van automatitzar les proves unitàries amb perfilador natiu en lloc de desplegar tests e2e extremadament densos que haguessin sobrecarregat les fases finals.
+    \item \textbf{Retall d'abast no essencial:} Es van automatitzar les proves unitàries amb perfilador natiu en lloc de desplegar proves e2e d'alta densitat que haguessin sobrecarregat les fases finals.
 \end{itemize}
 
 \subsection{Tancament econòmic: Pressupost estimat vs. final}
-La variació de les hores a nivell de tasques de desenvolupament ha repercutit directament sobre els costos associats als rols de personal corporatiu brut (\textbf{CPA}). No obstant això, el pressupost global del projecte no s'ha vist alterat.
+La variació de les hores en les tasques de desenvolupament ha repercutit directament sobre els costos associats als rols de personal corporatiu brut (\textbf{CPA}). No obstant això, el pressupost global del projecte no s'ha vist alterat.
 
 La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per cada un dels rols humans definits.
 
@@ -262,7 +262,7 @@ La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per 
   \small Font: Elaboració pròpia.
 \end{table}
 
-A causa de les desviacions de desenvolupament indicades anteriorment, s'ha hagut de destinar més temps d'enginyeria als rols d'\textbf{Analista} ($+20\text{ h}$) i \textbf{Programador} ($+35\text{ h}$), el que ha provocat un lleuger desviament brut del personal de \textbf{+101,25~\euro{}}. 
+A causa de les desviacions de desenvolupament indicades anteriorment, s'ha hagut de destinar més temps d'enginyeria als rols d'\textbf{Analista} ($+20\text{ h}$) i \textbf{Programador} ($+35\text{ h}$), cosa que ha provocat un lleuger desviament brut del personal de \textbf{+101,25~\euro{}}. 
 
 Aquest sobrecost s'ha aconseguit absorbir de forma directa mitjançant l'ús de la partida preventiva del \textbf{Marge de Contingència (10 \%)}, que estava pressupostada inicialment en \textbf{1.492,75~\euro{}}. Un cop alliberats els fons restants d'aquesta partida i consolidada la resta de costos immutables (amortitzacions de maquinari a \textbf{210,00~\euro{}} i costos indirectes d'oficina mantinguts en \textbf{1.150,00~\euro{}}), el pressupost total final executat s'ha tancat en \textbf{15.128,75~\euro{}} (enfront dels 16.810,40~\euro{} inicialment estimats incloent el total del marge sense consumir).
 
@@ -273,7 +273,7 @@ L'avaluació global del projecte requereix analitzar-ne l'impacte des de quatre 
 
 \begin{itemize}
   \item \textbf{Dimensió Econòmica:} La solució \textit{Schema-driven} permet adaptar el software a nous models de gravadors sense cost addicional d'enginyeria frontend, allargant la vida útil del producte i reduint el deute tècnic de l'empresa. El model \textit{single-NVR} democratitza l'accés a sistemes professionals per a petites empreses.
-  \item \textbf{Dimensió Ambiental:} L'ús d'una plataforma web remota accessible des de qualsevol navegador redueix dràsticament els desplaçaments físics de tècnics de manteniment a les instal·lacions del client, minimitzant directament la petjada de carboni associada a la flota de vehicles. L'optimització del codi (reducció del 35\% de CPU esmentada al capítol 6) té un impacte directe en l'eficiència energètica. Multiplicat pel nombre de terminals de control que operen 24/7 en un centre de videovigilància, la reducció de la càrrega computacional es tradueix en un menor consum elèctric i una menor generació de calor, allargant la vida útil del hardware dels clients.
+  \item \textbf{Dimensió Ambiental:} L'ús d'una plataforma web remota accessible des de qualsevol navegador redueix dràsticament els desplaçaments físics de tècnics de manteniment a les instal·lacions del client, minimitzant directament la petjada de carboni associada a la flota de vehicles. L'optimització del codi (reducció del 35\% de CPU esmentada al capítol 6) té un impacte directe en l'eficiència energètica. Multiplicat pel nombre de terminals de control que operen de forma contínua en un centre de videovigilància, la reducció de la càrrega computacional es tradueix en un menor consum elèctric i una menor generació de calor, allargant la vida útil del hardware dels clients.
   \item \textbf{Dimensió Social:} Millora significativament la interfície de treball dels operadors de seguretat. S'ha reduït la càrrega cognitiva gràcies a un disseny clar i reactiu, fet que disminueix l'estrès operatiu i la fatiga visual en situacions d'incident crític o torns de monitorització perllongats.
   \item \textbf{Implicacions Ètiques:} Tractant-se d'un sistema de videovigilància, el projecte ha integrat el principi de \textit{Privadesa per Disseny}. L'arquitectura assegura que només els usuaris amb privilegis explícits puguin visualitzar el vídeo. El compliment de les directives RGPD s'aborda tècnicament garantint l'esborrat de dades passats 30 dies i la no persistència d'imatges o dades biomètriques al terminal de l'operador. A més, s'evita la inclusió de perfilats automatitzats opacs, garantint que les decisions de seguretat recaiguin sempre sobre el judici humà sota una estricta traçabilitat auditable (\textit{Audit Log}).
 \end{itemize}

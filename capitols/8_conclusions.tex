@@ -8,8 +8,8 @@ Després de completar el cicle de desenvolupament i validació, es pot afirmar q
 
 \begin{itemize}
     \item \textbf{Modernització de la plataforma:} S'ha substituït amb èxit l'aplicació web \textit{legacy} dels anys 90, basada en ActiveX i tecnologies desfasades, per una interfície de gestió web moderna basada en Angular 19. La nova interfície és responsiva, ubiqüitària i accessible des de qualsevol navegador modern, sense dependència de \textit{plugins} propietaris.
-    \item \textbf{Motor dinàmic (Schema-driven):} Sistema de configuració que s'adapta automàtica\-ment al hardware Lanaccess mitjançant JSON, eliminant la necessitat de reprogramar el \textit{frontend} per a cada \textit{firmware}.
-    \item \textbf{Visualització d'alt rendiment:} Mitjançant la integració de WebRTC, s'han assolit latències inferiors als 300ms en la visualització de vídeo en directe, complint els requeriments operatius de seguretat.
+    \item \textbf{Motor dinàmic (Schema-driven):} Sistema de configuració que s'adapta automàtica\-ment al maquinari de Lanaccess mitjançant JSON, eliminant la necessitat de reprogramar el \textit{frontend} per a cada \textit{firmware}.
+    \item \textbf{Visualització d'alt rendiment:} Mitjançant la integració de WebRTC, s'han assolit latències inferiors als 300ms en la visualització de vídeo en directe, complint els requisits operatius de seguretat.
     \item \textbf{Gestió reactiva d'alarmes:} L'ús de WebSockets (WSS) i \textit{Angular Signals} ha permès crear una interfície que reacciona en temps real als esdeveniments del gravador sense penalitzar el rendiment del terminal de l'usuari.
     \item \textbf{Solució autònoma per a empreses petites (single-NVR):} S'ha aconseguit que l'aplicació funcioni de manera completament autònoma dins del propi videogravador, permetent a empreses petites amb un únic dispositiu gestionar-lo integralment des del navegador sense necessitat d'infraestructura centralitzada. Aquesta capacitat obre un nou segment de mercat per a Lanaccess que la plataforma anterior no cobria.
 \end{itemize}
@@ -27,8 +27,8 @@ Tot i que el sistema és totalment funcional en el seu mode autònom \textit{sin
 \section{Conclusions personals}
 La realització d'aquest TFG ha estat una experiència d'aprenentatge integral que ha anat molt més enllà de la simple programació. 
 
-A nivell tècnic, m'ha permès dominar les darreres funcionalitats d'Angular 19, especialment el canvi de paradigma que suposen els \textit{Signals} per a la gestió de l'estat reactiu. Així mateix, el repte de treballar amb protocols de vídeo com WebRTC i HLS m'ha proporcionat una visió profunda sobre la gestió de fluxos multimèdia en entorns de xarxa complexos.
+Tècnicament, m'ha permès dominar les darreres funcionalitats d'Angular 19, especialment el canvi de paradigma que suposen els \textit{Signals} per a la gestió de l'estat reactiu. Així mateix, el repte de treballar amb protocols de vídeo com WebRTC i HLS m'ha proporcionat una visió profunda sobre la gestió de fluxos multimèdia en entorns de xarxa complexos.
 
-A nivell de gestió, el projecte m'ha ensenyat la importància de l'arquitectura \textit{schema-driven}. Desenvolupar un software que no sàpiga exactament què ha de configurar fins que rep les dades del servidor requereix un nivell d'abstracció i rigor en el disseny que ha posat a prova els meus coneixements d'arquitectura de software i principis SOLID.
+Quant a la gestió, el projecte m'ha ensenyat la importància de l'arquitectura \textit{schema-driven}. Desenvolupar un software que no sàpiga exactament què ha de configurar fins que rep les dades del servidor requereix un nivell d'abstracció i rigor en el disseny que ha posat a prova els meus coneixements d'arquitectura de software i principis SOLID.
 
 Finalment, el fet de desenvolupar el projecte per a una empresa real com Lanaccess m'ha permès entendre les necessitats de mantenibilitat i escalabilitat que exigeix el mercat industrial, on el software ha de ser, per sobre de tot, robust i eficient. L'èxit de la visualització de baixa latència ha estat possible gràcies a l'estreta coordinació entre el frontend i el microservei \textbf{la-video-engine}, demostrant la viabilitat de WebRTC en entorns industrials.

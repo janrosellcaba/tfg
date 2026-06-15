@@ -1,7 +1,7 @@
 \chapter{Especificació de Requisits}
 \label{ch:requisits}
 
-L'especificació de requisits és la pedra angular del projecte \textit{Web Core View}. En tractar-se d'un sistema de gestió per a dispositius de seguretat crítica, la definició de les funcionalitats no només s'ha centrat en l'experiència d'usuari (UX), sinó també en la robustesa de la comunicació asíncrona i el desacoblament entre el hardware i la interfície.
+L'especificació de requisits és la pedra angular del projecte \textit{Web Core View}. En tractar-se d'un sistema de gestió per a dispositius de seguretat crítica, la definició de les funcionalitats no només s'ha centrat en l'experiència d'usuari (UX), sinó també en la robustesa de la comunicació asíncrona i el desacoblament entre el maquinari i la interfície.
 
 En aquest capítol es detallen els actors, les històries d'usuari mitjançant la metodologia \textit{Product Backlog}, i l'especificació detallada dels requisits funcionals i no funcionals.
 
@@ -27,9 +27,9 @@ S'han definit tres actors principals, classificant-los segons el seu nivell d'in
           \item Supervisió i silenciament d'alarmes en temps real.
         \end{itemize}
 
-  \item[Videogravador (System Actor):] Malgrat ser un element de hardware, en aquesta arquitectura actua com un usuari actiu que:
+  \item[Videogravador (System Actor):] Malgrat ser un element de maquinari, en aquesta arquitectura actua com un usuari actiu que:
         \begin{itemize}
-          \item Dicta la estructura de la interfície mitjançant esquemes JSON.
+          \item Dicta l'estructura de la interfície mitjançant esquemes JSON.
           \item Notifica esdeveniments de forma proactiva via WebSockets.
           \item Gestiona el control de concurrència per evitar col·lisions de dades.
         \end{itemize}
@@ -95,7 +95,7 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
 \end{description}
 
 \subsection{Flux d'Interacció (User Journey)}
-Per tal d'il·lustrar de quina manera els operadors de seguretat utilitzen aquest conjunt d'històries d'usuari per respondre de forma pràctica i integrada a un incident de seguretat real, es presenta el diagrama de User Journey (Figura \ref{fig:user_journey}).
+Per il·lustrar com els operadors de seguretat apliquen les històries d'usuari en la resposta a un incident real, es presenta el diagrama de User Journey (Figura \ref{fig:user_journey}).
 
 \begin{figure}[!htbp]
   \centering
@@ -125,7 +125,7 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 \subsection{RF-3: Motor de Configuració Dinàmica}
 Aquest és el requisit funcional més complex i innovador del sistema.
 \begin{itemize}
-  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Per tal d'il·lustrar la capacitat del motor dinàmic (\textit{schema-driven}) de desacoblar la interfície del frontend respecte de la lògica de baix nivell del gravador, es presenta a continuació un fragment d'esquema JSON de configuració avançada real enviat pel servei de vídeo. Aquest esquema defineix els tipus de transport tolerats pel maquinari de visualització d'una càmera IP física (utilitzant estructures d'enumeracions) i la restricció d'adreçaments de multidifusió (multicast) utilitzant expressions regulars complexes (\textit{regex}) que el motor del frontend compilarà i validarà dinàmicament.
+  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Per tal d'il·lustrar la capacitat del motor dinàmic (\textit{schema-driven}) de desacoblar la interfície del frontend respecte de la lògica de baix nivell del gravador, es presenta a continuació un fragment d'esquema JSON de configuració avançada real enviat pel servei de vídeo. Aquest esquema defineix els tipus de transport admesos pel maquinari de visualització d'una càmera IP física (per estructura d'enumeració) i la restricció d'adreces de multidifusió (multicast) mitjançant expressions regulars (\textit{regex}) que el motor del frontend compilarà i validarà dinàmicament.
 \end{itemize}
 
 \begin{lstlisting}[language=JavaScript, caption={Exemple d'esquema avançat JSON de metadades per a IP Video amb restriccions regex.}]
@@ -147,7 +147,7 @@ Aquest és el requisit funcional més complex i innovador del sistema.
     "_type": "integer",
     "_min": 1024,
     "_max": 65535,
-    "_description": "Puerto de destinació per a la transmissió Multicast de dades de vídeo",
+    "_description": "Port de destinació per a la transmissió Multicast de dades de vídeo",
     "_default": 30010
   }
 }
@@ -242,9 +242,9 @@ El desenvolupament s'ha de cenyir a les següents limitacions:
 Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real, reproduccions d'imatges de persones físiques i dades de configuració de dispositius de seguretat crítics, el disseny i desenvolupament de \textit{Web Core View} s'ha cenyit als estàndards legals i regulacions tècniques nacionals i europees:
 
 \subsection{Protecció de Dades de Caràcter Personal (RGPD i LOPDGDD)}
-El sistema s'adapta al \textbf{Reglament General de Protecció de Dades (RGPD - Reglament UE 2016/679)} \cite{gdpr_reg} i a la legislació de transposició espanyola, la \textbf{Llei Orgànica 3/2018 de Protecció de Dades Personals i Garantia dels Drets Digitals (LOPDGDD)} \cite{lopdgdd_spain}. Especialment, el disseny s'alinea amb l'\textbf{Article 22 de la LOPDGDD}, que regula específicament el tractament d'imatges amb finalitats de videovigilància, sota el principi fonamental de **Privadesa per Disseny (Privacy by Design)**:
+El sistema s'adapta al \textbf{Reglament General de Protecció de Dades (RGPD - Reglament UE 2016/679)} \cite{gdpr_reg} i a la legislació de transposició espanyola, la \textbf{Llei Orgànica 3/2018 de Protecció de Dades Personals i Garantia dels Drets Digitals (LOPDGDD)} \cite{lopdgdd_spain}. Especialment, el disseny s'alinea amb l'\textbf{Article 22 de la LOPDGDD}, que regula específicament el tractament d'imatges amb finalitats de videovigilància, sota el principi fonamental de \textbf{Privadesa per Disseny} (\textit{Privacy by Design}):
 \begin{itemize}
-  \item \textbf{Minimització de dades:} No s'emmagatzemen imatges, captures ni dades personals de forma persistent en el navegador. La sessió d'autenticació no es persiste en cap emmagatzematge del client: les cookies de sessió \textit{HttpOnly} les gestiona el servidor NGINX, i l'estat en memòria del \textit{frontend} desapareix en tancar la pestanya o recarregar la pàgina.
+  \item \textbf{Minimització de dades:} No s'emmagatzemen imatges, captures ni dades personals de forma persistent en el navegador. La sessió d'autenticació no es desa en cap emmagatzematge del client: les cookies de sessió \textit{HttpOnly} les gestiona el servidor NGINX, i l'estat en memòria del \textit{frontend} desapareix en tancar la pestanya o recarregar la pàgina.
   \item \textbf{Seguretat d'accés:} L'accés a les imatges està rígidament controlat per rols d'usuari i privilegis definits en el \textit{backend}, assegurant que només els operadors explícitament autoritzats puguin visualitzar el vídeo en directe i els històrics.
 \end{itemize}
 

@@ -18,7 +18,7 @@ S'ha dissenyat i executat un pla d'automatització de proves per assegurar la ro
     \item \textbf{Proves E2E i Integració:} S'ha fet ús de la plataforma d'automatització moderna \textbf{Playwright} \cite{playwright_testing} per verificar els fluxos de treball complets des de l'òptica de l'usuari. S'han dissenyat scripts automatitzats que simulen l'inici de sessió amb credencials correctes i errònies, la navegació entre pantalles modulars i el bloqueig simultani de la configuració (\textit{Config Lock}).
 \end{itemize}
 
-S'ha posat especial èmfasi en la validació del motor \textit{Schema-driven} mitjançant proves de robustesa. Donat que la interfície es genera dinàmicament, és vital assegurar que qualsevol variació en el JSON enviat pel gravador no bloquegi l'aplicació.
+S'ha posat especial èmfasi en la validació del motor \textit{Schema-driven} mitjançant proves de robustesa. Atès que la interfície es genera dinàmicament, és fonamental assegurar que qualsevol variació en el JSON enviat pel gravador no bloquegi l'aplicació.
 
 \subsection{Validació del Parser de metadades}
 S'han creat casos de prova automatitzats on s'envien esquemes JSON amb valors límit, tipus de dades erronis o nodes inexistents. El sistema ha demostrat ser capaç de:
@@ -29,7 +29,7 @@ S'han creat casos de prova automatitzats on s'envien esquemes JSON amb valors l�
 \end{itemize}
 
 \section{Resultats de rendiment i latència}
-La visualització de vídeo és el requeriment més crític. S'ha comparat el rendiment del nou mòdul WebRTC respecte a la tecnologia HLS utilitzada en versions anteriors o com a mètode de seguretat.
+La visualització de vídeo és el requisit més crític. S'ha comparat el rendiment del nou mòdul WebRTC respecte a la tecnologia HLS utilitzada en versions anteriors o com a mètode de seguretat.
 
 Com es pot observar a la Taula \ref{tab:latencies}, el protocol WebRTC ofereix un rendiment molt superior, reduint el retard a valors operatius reals per a vigilància activa.
 
@@ -51,18 +51,18 @@ RTSP (Web Legacy)  & 200 -- 400                     & Alta                 \\ \b
 Aquests resultats validen que la solució web moderna és capaç d'igualar o millorar la latència de l'antiga plataforma web basada en ActiveX, eliminant un dels principals arguments en contra de les solucions basades en navegadors actuals.
 
 \subsection{Consum de CPU, Memòria i Absència de Fugues (Memory Leaks)}
-En un entorn \textit{embedded} on l'aplicació web corre directament en el hardware de gravació i els clients la visualitzen des de navegadors de terminals de control, l'optimització de recursos és crítica. 
+En un entorn \textit{embedded} on l'aplicació web corre directament en el maquinari de gravació i els clients la visualitzen des de navegadors de terminals de control, l'optimització de recursos és crítica. 
 
 S'han dut a terme anàlisis de rendiment utilitzant el perfilador de memòria de Chrome DevTools durant sessions de reproducció continuada de vídeo WebRTC de dues hores de durada. Els resultats indiquen:
 \begin{itemize}
-    \item \textbf{Estabilitat de memòria (Heap):} El perfil del consum de memòria presenta una forma de "dent de serra" perfectament estable, oscil·lant entre els 45~MB i els 65~MB. Cada descens o caiguda abrupta en aquest perfil de "dent de serra" representa l'actuació de l'escombrador de memòria o \textbf{Garbage Collector} (GC) del motor V8 del navegador, el qual allibera de forma immediata i eficient la memòria HEAP ocupada pels elements i estructures de dades descartades. Un cop finalitzades les connexions, aquest procés allibera el 100\% dels recursos gràcies al tancament net de la \texttt{RTCPeerConnection}, l'aturada activa de totes les pistes de vídeo (\texttt{track.stop()}), i la cancel·lació estricta de les subscripcions asíncrones, demostrant una **absència total de fugues de memòria** (\textit{memory leaks}).
+    \item \textbf{Estabilitat de memòria (Heap):} El perfil del consum de memòria presenta una forma de "dent de serra" perfectament estable, oscil·lant entre els 45~MB i els 65~MB. Cada descens o caiguda abrupta en aquest perfil de "dent de serra" representa l'actuació de l'escombrador de memòria o \textbf{Garbage Collector} (GC) del motor V8 del navegador, el qual allibera immediatament i eficientment la memòria HEAP ocupada pels elements i estructures de dades descartades. Un cop finalitzades les connexions, aquest procés allibera el 100\% dels recursos gràcies al tancament net de la \texttt{RTCPeerConnection}, l'aturada activa de totes les pistes de vídeo (\texttt{track.stop()}), i la cancel·lació estricta de les subscripcions asíncrones, demostrant una \textbf{absència total de fugues de memòria} (\textit{memory leaks}).
     \item \textbf{Optimització de CPU:} Gràcies a l'eliminació de les comprovacions de cicle complet de \textit{Zone.js} en Angular 19 i a la reactivitat granular basada exclusivament en \textbf{Signals}, l'ús de la CPU en el fil d'execució del navegador s'ha reduït en un 35\% respecte a prototips previs basats en RxJS/comprovacions estàndard. Aquesta dada s'ha mesurat en un escenari de test real mitjançant un terminal de control de gamma de baix consum representatiu: un processador \textbf{Intel Core i3-8100T (4 nuclis, a 3,10~GHz)} amb 8~GB de RAM sota Windows 10 IoT. Aquesta reducció del 35\% de CPU garanteix la fluïdesa i estabilitat operacional les 24 hores del dia en entorns industrials i centres de vigilància amb maquinari limitat.
 \end{itemize}
 
 \section{Proves de Robustesa i Comunicació asíncrona}
 S'ha validat la persistència de la sessió i la recepció d'alarmes mitjançant el sistema \textit{Keep-alive} i la reconnexió automàtica de \textit{WebSockets}.
 
-En les proves de connectivitat, s'ha validat l'eficiència de l'algorisme de \textbf{backoff exponencial} implementat amb RxJS (Lògica 5.6). Davant d'una caiguda de xarxa, el sistema no intenta reconnectar de forma agressiva, la qual cosa podria provocar un atac de denegació de servei (DoS) involuntari sobre el gravador quan la xarxa es recuperi. 
+En les proves de connectivitat, s'ha validat l'eficiència de l'algorisme de \textbf{backoff exponencial} implementat amb RxJS (Lògica 5.6). Davant d'una caiguda de xarxa, el sistema no intenta reconnectar de forma agressiva, cosa que podria provocar un atac de denegació de servei (DoS) involuntari sobre el gravador quan la xarxa es recuperi. 
 
 L'estratègia triada dobla el temps d'espera entre intents (1s, 2s, 4s, 8s...), protegint la CPU del dispositiu \textit{embedded}. Durant aquest període de desconnexió, la interfície utilitza un \texttt{Signal} global de \texttt{connectivityStatus} per posar l'aplicació en mode segur, desactivant les accions d'escriptura per evitar inconsistències en la configuració.
 \subsection{Escenari de tall de connectivitat}

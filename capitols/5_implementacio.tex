@@ -1,13 +1,13 @@
 \chapter{Implementació}
 \label{ch:implementacio}
 
-En aquest capítol es detalla el procés de construcció del sistema \textit{Web Core View}. Es descriu l'entorn de treball i s'explora el funcionament tècnic de cada mòdul al mateix temps que s'analitza la seva interfície gràfica d'usuari (UI). Aquest recorregut pràctic permet entendre com els requisits funcionals i l'arquitectura de \textit{software} s'han traduït en una experiència d'usuari intuïtiva.
+En aquest capítol es detalla el procés de construcció del sistema \textit{Web Core View}. Es descriu l'entorn de treball i s'explora el funcionament tècnic de cada mòdul alhora que s'analitza la seva interfície gràfica d'usuari (UI). Aquest recorregut pràctic permet entendre com els requisits funcionals i l'arquitectura de \textit{software} s'han traduït en una experiència d'usuari intuïtiva.
 
 \section{Entorn de desenvolupament i tecnologies}
-Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte s'ha dissenyat basant-se en components completament independents (\textit{Standalone Components}), una decisió que permet simplificar notablement el codi, optimitzar el procés de \textit{tree-shaking} i assegurar que l'aplicació web carregui d'una manera molt més ràpida al navegador mitjançant la descàrrega sota demanda (\textit{lazy loading}).
+Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte s'ha dissenyat basant-se en components completament independents (\textit{Standalone Components}), una decisió que permet simplificar notablement el codi, optimitzar el procés de \textit{tree-shaking} i assegurar que l'aplicació web carregui molt més ràpidament al navegador mitjançant la descàrrega sota demanda (\textit{lazy loading}).
 
 \section{Disseny de la Capa d'Estils i Consistència Visual}
-Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en el preprocessador \textbf{SASS (SCSS)}. El repte de disseny visual residia en la convivència de dos entorns d'ús molt diferents: la consola d'administració tècnica (que requereix claredat i alt contrast amb fons clars sota llum natural) i el mosaic de visualització de vídeo (on els operadors treballen 24/7 en entorns foscos de centres de control i requereixen fons gairebé negres per evitar la fatiga visual).
+Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en el preprocessador \textbf{SASS (SCSS)}. El repte de disseny visual residia en la convivència de dos entorns d'ús molt diferents: la consola d'administració tècnica (que requereix claredat i alt contrast amb fons clars sota llum natural) i el mosaic de visualització de vídeo (on els operadors treballen de forma contínua en entorns foscos de centres de control i requereixen fons gairebé negres per evitar la fatiga visual).
 
 \subsection{Modularització SASS i Arquitectura de Variables}
 La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SASS (Llistat \ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:
@@ -44,7 +44,7 @@ Per maximitzar el rendiment i evitar sobrecarregar el processador del client (es
 \end{itemize}
 
 \subsection{Adaptabilitat de Disseny (Breakpoints i Responsivitat)}
-Per donar resposta al requisit de compatibilitat multi-terminal (des de tauletes de manteniment de 1024px d'amplada de tècnics de camp, fins a monitors de definició 4K de centres de control), s'ha implementat un disseny totalment adaptatiu utilitzant regles flexibles de **Flexbox** i **CSS Grid**.
+Per donar resposta al requisit de compatibilitat multi-terminal (des de tauletes de manteniment de 1024px d'amplada de tècnics de camp, fins a monitors de definició 4K de centres de control), s'ha implementat un disseny totalment adaptatiu utilitzant regles flexibles de \textbf{Flexbox} i \textbf{CSS Grid}.
 
 S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substituint-les per unitats de mesura relatives basades en el tamany de font del document (\texttt{rem}) i de l'espai d'execució de la pantalla (\texttt{vh}, \texttt{vw}, \texttt{\%}). Les variacions d'esquema més dràstiques es controlen mitjançant consultes de mitjans (@media queries) enfocades als llindars de resolució següents:
 
@@ -94,7 +94,7 @@ Depenent de la validesa de les credencials o de l'estat de seguretat del compte,
 \begin{itemize}
   \item \textbf{Autenticació reeixida (Success):} El servidor valida les credencials, estableix una \textit{cookie} de sessió segura gestionada nativament pel navegador (mitjançant polítiques \textit{Same-Origin} i atributs \textit{HttpOnly} i \textit{Secure} configurats a NGINX per evitar vectors de robatori de dades des d'scripts externs) i retorna una resposta d'èxit.
   \item \textbf{Credencials incorrectes (Unauthorized):} Es denega l'accés i es retorna el nombre d'intents restants abans del bloqueig del compte.
-  \item \textbf{Compte bloquejat (Locked):} Si s'ha superat el límit de 5 intents fallits, el servei bloqueja les peticions d'aquest usuari de forma temporal durant 15 minuts.
+  \item \textbf{Compte bloquejat (Locked):} Si s'ha superat el límit de 5 intents fallits, el servei bloqueja les peticions d'aquest usuari temporalment durant 15 minuts.
 \end{itemize}
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Exemples de resposta segons l'escenari d'autenticació.}]
@@ -109,7 +109,7 @@ Depenent de la validesa de les credencials o de l'estat de seguretat del compte,
 \end{lstlisting}
 
 \subsection{Fase 2: Obtenció del context i resolució de permisos (GetWhoamI)}
-Un cop es rep la confirmació d'èxit de la Fase 1, l'aplicació s'ha d'inicialitzar. Com que les dades de sessió no s'emmagatzemen al magatzem local (\textit{LocalStorage}) per tal d'evitar atacs de tipus \textit{Cross-Site Scripting} (XSS), el frontend de l'aplicació utilitza la comunicació asíncrona validada per la cookie de sessió mantinguda al navegador.
+Un cop es rep la confirmació d'èxit de la Fase 1, l'aplicació s'ha d'inicialitzar. Com que les dades de sessió no s'emmagatzemen al magatzem local (\textit{LocalStorage}) per evitar atacs de tipus \textit{Cross-Site Scripting} (XSS), el frontend de l'aplicació utilitza la comunicació asíncrona validada per la cookie de sessió mantinguda al navegador.
 
 El component de \textit{login} invoca el mètode \texttt{onInitPage()} de l'injector \texttt{UserService}, el qual realitza una nova petició POST cap a \texttt{/WebLogin} sota la comanda de control de context \texttt{GetWhoamI}:
 
@@ -130,7 +130,7 @@ El component de \textit{login} invoca el mètode \texttt{onInitPage()} de l'inje
 Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. Aquests es divideixen en un diccionari del costat de client que s'utilitza per mapar les funcionalitats i ocultar o mostrar elements del DOM en temps real mitjançant l'ús de \textit{Signals}:
 
 \begin{itemize}
-  \item \textbf{configuration:} Permet accedir aux menús de configuració de xarxa, rellotge, entrades/sortides físiques i virtuals, i alarmes.
+  \item \textbf{configuration:} Permet accedir als menús de configuració de xarxa, rellotge, entrades/sortides físiques i virtuals, i alarmes.
   \item \textbf{users:} Habilita l'edició de comptes de tercers usuaris, actualització de contrasenyes i definició de permisos de perfil.
   \item \textbf{live:} Autoritza la visualització de vídeo en temps real de les càmeres IP connectades. Si s'utilitza en combinació amb el grant \textit{live-limited}, l'accés es restringeix exclusivament als canals indicats al camp \texttt{visual-cams} de la seva fitxa d'usuari.
   \item \textbf{record / download:} Habilita la consulta, reproducció històrica (\textit{playback}) i descàrrega de fragments d'enregistrament de vídeo emmagatzemats als discs durs del gravador.
@@ -169,7 +169,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 \end{lstlisting}
 
 \subsection{Subscripció Asíncrona de Temps Real i Notificacions}
-Immediatament després d'un inici de sessió reeixit i la redirecció de l'operador cap a la pàgina d'inici de l'aplicació (\texttt{/home}), s'inicialitza la comunicació bidireccional de temps real amb el microservei unificat de notificacions de l'NVR. L'aplicació obre un único canal de comunicació persistent via WebSocket Segur (\textbf{WSS}) cap al camí d'execució \texttt{/ws/la-core-notifier/}.
+Immediatament després d'un inici de sessió reeixit i la redirecció de l'operador cap a la pàgina d'inici de l'aplicació (\texttt{/home}), s'inicialitza la comunicació bidireccional de temps real amb el microservei unificat de notificacions de l'NVR. L'aplicació obre un únic canal de comunicació persistent via WebSocket Segur (\textbf{WSS}) cap al camí d'execució \texttt{/ws/la-core-notifier/}.
 
 Aquesta connexió unificada és fonamental per rebre d'una sola vegada totes les notificacions de canvis d'estats de les entrades digitals de l'equip, errors globals del maquinari i alertes de pèrdues de senyal de vídeo, evitant que els diferents components de la interfície hagin de mantenir múltiples sockets oberts cap al microprogramari.
 
@@ -194,7 +194,7 @@ La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el des
   \label{fig:ui_home}
 \end{figure}
 
-Des d'aquesta pantalla centralitzada, l'usuari pot navegar de manera asíncrona mitjançant el menú de mosaic o utilitzar els controls globals de la capçalera de l'aplicació per acceder a les diferents eines operatives.
+Des d'aquesta pantalla centralitzada, l'usuari pot navegar de manera asíncrona mitjançant el menú de mosaic o utilitzar els controls globals de la capçalera de l'aplicació per accedir a les diferents eines operatives.
 
 \subsection{Organització de Funcionalitats i Autorització Dinàmica}
 Per garantir una experiència d'usuari (UX) neta, adaptada al context de treball i lliure de sobrecàrregues cognitives, les eines del sistema s'organitzen visualment en tres grans seccions funcionals de treball:
@@ -225,7 +225,7 @@ Fent clic a la icona d'informació de maquinari, es desplega un panell lateral q
   \item Versió del firmware del sistema operatiu i model del dispositiu de gravació.
   \item \textbf{Estat de l'emmagatzematge físic:} Llista normalitzada dels discos durs muntats al sistema, detallant-ne la capacitat, el model de fabricant, el número de sèrie, el mode de redundància de dades (RAID) actiu i el percentatge d'espai utilitzat.
   \item Temperatura del processador central obtinguda directament dels sensors integrats.
-  \item \textbf{Estat de la llicència:} Des d'aquest panell d'informació del videogravador podem veure l'estat actual de la llicència, amb un botó accionable que redirigeix directament a la pàgina de llicència.
+  \item \textbf{Estat de la llicència:} Des d'aquest panell d'informació del videogravador es pot consultar l'estat actual de la llicència, amb un botó que redirigeix directament a la pàgina de llicència.
 \end{itemize}
 
 Per alimentar aquest panell de diagnòstic, l'aplicació web realitza una petició HTTP GET cap a la ruta d'API xifrada \texttt{/webprotocol/config\_data.xml?requests=system+network}. El microservei \textbf{la-core-legacy} s'encarrega d'analitzar les variables del sistema, unificar les metadades en un fitxer estructurat XML i transmetre'l cap a l'aplicació web, la qual l'interpreta asíncronament sense necessitat de recarregar la pàgina.
@@ -259,7 +259,7 @@ Un element clau de la capçalera és la icona de la campana de notificacions (Fi
 
 Per aconseguir-ho, l'aplicació implementa una subscripció asíncrona persistent mitjançant el servei de notificacions d'errors unificat (\texttt{AlertService}). Aquest servei manté una connexió constant via WebSocket Segur amb el microservei \textbf{la-core-notifier}. Quan es produeix un esdeveniment a l'NVR, aquest és publicat al bus intern de Linux \textbf{D-Bus}. El servei de notificacions llegeix el senyal, el converteix en un missatge estructurat amb el format \texttt{ERRORS\_NOTIFY} i el transmet immediatament cap al frontend per fer aparèixer un globus de notificació (\textit{badge}) amb el nombre d'alertes pendents sobre la icona de la campana.
 
-Si l'operador fait clic sobre aquest indicador, el sistema el redirigeix cap al panell de diagnòstic d'errors actius (Figura \ref{fig:ui_errors}), on es mostren en detall les fallides actives del sistema, podent interaccionar directament per apagar el senyal de led de l'alarma des de la pantalla web un cop s'ha revisat la incidència.
+Si l'operador fa clic sobre aquest indicador, el sistema el redirigeix cap al panell de diagnòstic d'errors actius (Figura \ref{fig:ui_errors}), on es mostren en detall les fallides actives del sistema. Des d'aquesta vista, l'operador pot apagar el senyal de led de l'alarma directament des de la pantalla web un cop s'ha revisat la incidència.
 
 \section{Configuració del Sistema i Motor Dinàmic (Schema-Driven)}
 El disseny de la gestió de configuració de la plataforma \textit{Web Core View} representa una evolució significativa respecte als mètodes tradicionals basats en formularis estàtics o fitxers de configuració dispersos. En lloc de duplicar la lògica de validació al front-end, s'ha implementat una arquitectura de \textbf{Soberania del Backend} (\textit{Backend-Driven Development}), on el gravador NXT actua com a única font de veritat (\textit{Single Source of Truth}).
@@ -447,17 +447,17 @@ La visualització de vídeo en directe representa el component més crític de l
   \label{fig:ui_cameras}
 \end{figure}
 
-A nivell de maquinari del gravador, l'arquitectura de transmisssió de vídeo es divideix en dues capes diferenciades coordinades pel microservei \textbf{la-video-engine}:
+Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix en dues capes diferenciades coordinades pel microservei \textbf{la-video-engine}:
 
 \begin{enumerate}
   \item \textbf{Motor d'Adquisició i Processat (GStreamer):} Per a cadascuna de les càmeres IP físiques instal·lades, l'NVR inicialitza un pipeline de dades basat en el framework multimèdia industrial \textbf{GStreamer}. Aquest pipeline s'encarrega d'obrir el flux \textit{RTSP} natiu de la càmera, extreure'n els paquets de vídeo, normalitzar el senyal de rellotge i decodificar de forma accelerada per maquinari part dels fotogrames crítics per a la generació de metadades analítiques.
   \item \textbf{Servidor de Mitjans WebRTC (MediaMTX):} Els fotogrames de vídeo capturats i empaquetats per GStreamer es canalitzen internament en un pipeline d'escriptura cap al servidor multimèdia d'alt rendiment \textbf{MediaMTX} (actuant com a servidor centralitzat de WebRTC i WHEP). Aquest servei gestiona la negociació SDP (\textit{Session Description Protocol}), el xifratge de paquets SRTP sobre transport UDP, i serveix el vídeo amb una latència punta a punta inferior a 300 ms natius en qualsevol navegador web actual, recolzant-se en la targeta gràfica (GPU) del dispositiu del client per a la descodificació fina.
 \end{enumerate}
 
-Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa (la qual cosa impedeix establir el canal de vídeo per defecte d'ICE), el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
+Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE,, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
 
 \subsection{La Interfície de Càmeres i el Disseny de Mosaic}
-A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$, $2\times2$ i $4\times4$). Cadascuna de les cel·les que formen acest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
+A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$, $2\times2$ i $4\times4$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
 
 La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag and Drop}) nativa integrada amb la llista lateral de càmeres del panell esquerre. L'usuari pot arrossegar qualsevol càmera cap a una cel·la del mosaic. Aquesta acció de drop recupera la identitat del dispositiu d'entrada, demana el seu mètode d'accessibilitat i demana de forma dinàmica la càrrega del flux, seguint el cicle d'activitat descrit a la Figura \ref{fig:activity_video_connection}.
 
@@ -528,7 +528,7 @@ export const STREAMING_STRATEGY_TOKEN = new InjectionToken<StreamingStrategy>('S
 })
 \end{lstlisting}
 
-Gràcies a l'arquitectura del patró de disseny *Strategy*, el component de visualització és capaç d'intercanviar protocols de transport de manera totalment asíncrona i transparent per a l'usuari en temps de d'execució.
+Gràcies a l'arquitectura del patró de disseny *Strategy*, el component de visualització és capaç d'intercanviar protocols de transport de manera totalment asíncrona i transparent per a l'usuari en temps d'execució.
 
 \subsection{Gestió en Temps Real de les Entrades i Sortides Digitals (I/O)}
 De forma complementària al panell de visualització de les càmeres de seguretat, la vista principal disposa d'un panell lateral interactiu de control d'entrades i sortides lògiques (I/O), anomenat \texttt{CamerasIoPanelComponent}. Aquest panell permet realitzar la supervisió d'accessos en temps real i accionar relés de manera manual des d'una interfície unificada.
@@ -538,7 +538,7 @@ La reactivitat dels indicadors visuals es manté gràcies a l'obertura d'un cana
 \begin{itemize}
   \item \textbf{Supervisió de Canvis (Estat d'Entrada):} El servei escolta el flux del canal i rep el tipus d'esdeveniment \texttt{IO\_NOTIFY}. En rebre la dada, actualitza a l'instant el mètode reactiu de la llista de sensors digital, fent canviar el color de l'indicador del DOM (verd per a \textit{deactivated/idle}, vermell per a \textit{activated/on}).
   \item \textbf{Activació Manual (Estat de Sortida):} Si el perfil de l'operador disposa de permisos de control d'I/O de tipus d'escriptura actius, pot realitzar un doble clic sobre qualsevol de les sortides lògiques configurades, o obrir el menú contextual a través de la icona corresponent.
-  \item \textbf{Viatge de Dades:} Aquesta interacció de client desencadena de forma immediata una petició d'escriptura POST unificada cap al servei \textbf{la-core-legacy} sota la ruta \texttt{output-status-set.cgi}. El backend llegeix el camí, valida la intenció i commuta l'estat del relé físic a nivell del maquinari. Un cop realitzat el canvi de sortida, l'NVR llança el senyal de variació a D-Bus, que es propaga a tots os clients connectats a través de WebSocket unificat, garantint la consistència immediata de l'estat global del sistema.
+  \item \textbf{Viatge de Dades:} Aquesta interacció de client desencadena de forma immediata una petició d'escriptura POST unificada cap al servei \textbf{la-core-legacy} sota la ruta \texttt{output-status-set.cgi}. El backend llegeix el camí, valida la intenció i commuta l'estat del relé físic a nivell del maquinari. Un cop realitzat el canvi de sortida, l'NVR llança el senyal de variació a D-Bus, que es propaga a tots els clients connectats a través de WebSocket unificat, garantint la consistència immediata de l'estat global del sistema.
 \end{itemize}
 
 \section{Reproducció de Gravacions Històriques i Arquitectura de Playback}
@@ -557,12 +557,12 @@ En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una sol
 Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional, sinó en \textbf{FS2} (\textit{File System 2}), un sistema d'emmagatzematge propietari de Lanaccess que opera directament sobre la partició \textit{raw} del disc dur de l'NVR, sense intermediació del sistema de fitxers del nucli Linux (ext4). FS2 escriu els fotogrames de vídeo en espais contigus de mida fixa a nivell de blocs físics, cosa que elimina la fragmentació, redueix la latència d'escriptura i garanteix atomicitat en cas de tall elèctric sobtat: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada. L'accés de lectura als fitxers FS2 es realitza a través de la funció \texttt{fs2\_file\_read\_buffer}, que recupera blocs alineats al sector de disc (512 bytes) via \texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)} per maximitzar el rendiment de DMA i minimitzar les còpies de memòria durant el trans-muxing.
 
 \subsection{El Servidor de llistes de reproducció HLS (\texttt{hls-play.m3u8})}
-La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi obert **HLS (HTTP Live Streaming)**, el qual fragmenta la transmissió en fluxos d'arxius curts de pocs segons per evitar l'enviament de fitxers de gravació massius que col·lapsarien l'ample de banda i la memòria de l'equip de xarxa.
+La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi obert \textbf{HLS (HTTP Live Streaming)}, el qual fragmenta la transmissió en fluxos d'arxius curts de pocs segons per evitar l'enviament de fitxers de gravació massius que col·lapsarien l'ample de banda i la memòria de l'equip de xarxa.
 
 Quan l'operador selecciona un interval de temps a la interfície d'Angular, el client demana la llista de reproducció realitzant una crida HTTP GET cap a la ruta \texttt{/hls-play.m3u8?token=...\&start=...\&end=...}. El servidor de vídeo de l'NVR intercepta la petició mitjançant la funció unificada \texttt{cgi\_hls} i executa el següent algorisme en temps real:
 \begin{enumerate}
   \item \textbf{Cerca de fitxers d'enregistrament:} Mitjançant la biblioteca d'indexació \texttt{lanaccess::searcher}, s'interroga l'historial de gravacions associat al token per localitzar els fitxers d'enregistrament d'FS2 (*File System 2*) que contenen vídeo dins de l'interval indicat pel client.
-  \item \textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}) la capçalera unificada que conté els metadades d'índex de tots os *buffers* de vídeo que formen el fitxer físic d'enregistrament.
+  \item \textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}) la capçalera unificada que conté els metadades d'índex de tots els buffers de vídeo que formen el fitxer físic d'enregistrament.
   \item \textbf{Generació del fitxer de manifest m3u8:} El servidor analitza el timestamp i la durada de cadascun dels buffers de dades i genera de forma dinàmica un fitxer de llista de reproducció que s'ajusta a l'estàndard HLS de l'W3C.
   \item \textbf{Gestió de talls de vídeo (\textit{Discontinuity}):} Si l'NVR detecta que el salt temporal entre dos buffers de gravació és superior a 3.0 segons natius (a causa d'una gravació per esdeveniments interrompuda), el servidor injecta de manera automàtica les directives especials \texttt{\#EXT-X-DISCONTINUITY} i \texttt{\#EXT-X-PROGRAM-DATE-TIME}. Això és un requisit crític que informa el reproductor de la interfície d'Angular que la línia temporal s'ha trencat, evitant congelacions en el motor de descodificació de vídeo del client.
 \end{enumerate}
@@ -570,16 +570,16 @@ Quan l'operador selecciona un interval de temps a la interfície d'Angular, el c
 \subsection{El Servidor de Segmentació Dinàmica (\texttt{segment.ts})}
 Quan el reproductor d'Angular avança a través de la llista de reproducció, demana de manera recursiva i asíncrona cadascun dels segments virtuals llistats mitjançant crides a \texttt{/segment.ts?id=...\&buffer=...\&codec=...}.
 
-La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la petició d'escriptura, obrir el fitxer físic sota \texttt{fs2\_file\_read\_buffer} i carregar el bloc en memòria en un espai temporal de baix nivell unificat de 8 MB assignat per l'arena d'emmagatzematge de dades de l'equip (\texttt{Buffer8MBPlayer}). Un cop en memòria, en lloc de decodificar o transcodificar el vídeo (el que inutilitzaria la CPU del dispositiu embedded), el servidor executa un procés de **trans-muxing ràpid sota demanda**:
+La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la petició d'escriptura, obrir el fitxer físic sota \texttt{fs2\_file\_read\_buffer} i carregar el bloc en memòria en un espai temporal de baix nivell unificat de 8 MB assignat per l'arena d'emmagatzematge de dades de l'equip (\texttt{Buffer8MBPlayer}). Un cop en memòria, en lloc de decodificar o transcodificar el vídeo (el que inutilitzaria la CPU del dispositiu embedded), el servidor executa un procés de \textbf{trans-muxing ràpid sota demanda}:
 \begin{enumerate}
   \item S'inicialitza un contenidor buit de flux de transport MPEG-TS, inserint-hi de manera unificada els paquets de 188 bytes regulats per a la taula d'associació de programes (PAT) i la taula de mapa de programes (PMT).
-  \item Per a cadascun dels fotogrames emmagatzemats dins del buffer, s'insereixen de forma nativa els valors del senyal de rellotge de referència de programa (\textbf{PCR}) i os timestamps de presentació (\textbf{PTS}) ajustant les trames a una base de temps de 90 kHz d'alta precisió.
-  \item Es calcula la longitud i es preparen os paquets de la capçalera PES (\textit{Packetized Elementary Stream}) encapsulant el flux elemental multimèdia d'origen.
+  \item Per a cadascun dels fotogrames emmagatzemats dins del buffer, s'insereixen de forma nativa els valors del senyal de rellotge de referència de programa (\textbf{PCR}) i els timestamps de presentació (\textbf{PTS}) ajustant les trames a una base de temps de 90 kHz d'alta precisió.
+  \item Es calcula la longitud i es preparen els paquets de la capçalera PES (\textit{Packetized Elementary Stream}) encapsulant el flux elemental multimèdia d'origen.
   \item Es retorna el segment complet amb la capçalera de tipus MIME unificada \texttt{Content-Type: video/MP2T}.
 \end{enumerate}
 
 \subsection{Coexistència i descodificació de Còdecs H.264 i H.265 (HEVC)}
-Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació **H.265 (HEVC)** de forma paral·lela a **H.264 (AVC)**. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu procésament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (*plugins*) pesats o controls ActiveX degut a restriccions de patents.
+Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació \textbf{H.265 (HEVC)} de forma paral·lela a \textbf{H.264 (AVC)}. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu procésament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (*plugins*) pesats o controls ActiveX degut a restriccions de patents.
 
 Amb el nou disseny, el motor de segmentació del backend és capaç d'empaquetar i servir ambdós formats de manera dinàmica. Tanmateix, per tal que el descodificador per maquinari de la GPU del client pugui processar un segment de vídeo H.265, necessita rebre immediatament abans de cada imatge clau (IDR) les metadades de paràmetres de seqüència, imatge i vídeo (SPS, PPS i VPS).
 
@@ -597,7 +597,7 @@ El cicle de funcionament de la interfície segueix els passos següents:
 \begin{enumerate}
   \item El client demana l'índex de gravacions per a una càmera i data seleccionades. El frontend rep un llistat de metadades que indiquen els intervals de temps en què s'ha registrat vídeo a l'NVR.
   \item El component dibuixa la barra de la línia de temps en temps real utilitzant un codi de colors: verd o blau per a gravació de tipus continu, i vermell o taronja per a dades de gravació disparada per un esdeveniment d'alarma, de moviment o analítica (obtingut mitjançant consultes a l'historial del dispositiu).
-  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el *timestamp* exacte de destí i executa el mètace reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
+  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el *timestamp* exacte de destí i executa el mètode reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
 \end{enumerate}
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:hls_load_code}, caption={Càrrega dinàmica de llista de reproducció HLS basada en franges de temps.}]
@@ -633,7 +633,7 @@ loadVideo(): void {
 \section{Sistema d'Alarmes i Comunicació Asíncrona Multi-capa}
 La gestió, notificació i persistència de dades d'incidents d'alarma constitueix un dels requisits operatius més crítics d'un sistema de videovigilància professional. Qualsevol pèrdua de dades o retard en la senyalització pot tenir conseqüències greus per a la seguretat física de les instal·lacions.
 
-En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron multi-capa extrem a extrem: de del model de subscripció reactiva al costat de client d'Angular 19, passant pels canals de comunicació full-duplex de WebSockets i el servei d'orquestració multithreading de dades en C++11, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
+En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron multi-capa extrem a extrem: des del model de subscripció reactiva al costat de client d'Angular 19, passant pels canals de comunicació full-duplex de WebSockets i el servei d'orquestració multithreading de dades en C++11, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
 
 Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el següent diagrama de blocs del recorregut que segueix una alarma des que s'origina fins que es renderitza i es confirma a la pantalla de l'operador:
 
@@ -683,12 +683,12 @@ void wait_and_pop(T& value) {
 }
 \end{lstlisting}
 
-El fil d'execució de persistència \texttt{db\_client\_thread} es desperta immediatament per processar l'alarma. Aquest fil actua com a client de la base de dades i realitza crides d'alt rendiment mitjançant comunicació binària **gRPC** cap al servidor local \texttt{la-db-engine}.
+El fil d'execució de persistència \texttt{db\_client\_thread} es desperta immediatament per processar l'alarma. Aquest fil actua com a client de la base de dades i realitza crides d'alt rendiment mitjançant comunicació binària \textbf{gRPC} cap al servidor local \texttt{la-db-engine}.
 
 Si el canvi és d'estat d'inici de succés (\texttt{status = "start"}), s'efectua una operació d'inserció atòmica. En canvi, si és d'acabament d'incident (\texttt{status = "end"}), l'algorisme face primer una consulta selectiva per recuperar l'identificador històric original i actualitza la línia de base de dades del registre corresponent, assegurant la correlació exacta dels estats.
 
 \subsection{Arquitectura del VFS del Motor SQLite3 i Seguretat per Sockets}
-Per assegurar l'atominicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional **SQLite3**. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
+Per assegurar l'atominicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional \textbf{SQLite3}. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
 
 \begin{enumerate}
   \item \textbf{Aïllament de Processos (\textit{Sandbox}):} El microservei d'orquestració de dades \texttt{la-db-engine} actua com a gestor de la base de dades sqlite i del servei gRPC, però s'executa com un procés separat d'usuari restringit, de manera que no disposa de permisos d'escriptura sobre el disc físic de gravació.
@@ -715,7 +715,7 @@ Aquesta regla relacional garanteix de forma asíncrona la poda activa del sistem
 \subsection{El Cicle de Vida de les Alarmes i Consum de Sockets per la Web}
 Un cop es realitza l'escriptura d'una nova alarma en base de dades o el client emet una ordre de canvi, el mòdul del backend llança l'esdeveniment unificat a la cua \texttt{global\_emission\_queue}, des d'on s'extreu per al seu enviament a través del WebSocket d'alta velocitat de notificacions (\texttt{la-core-notifier}).
 
-A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de **Signals** (Figura \ref{fig:ui_alarms}). Les alarmes passen per un cicle d'estats unificat (Figura \ref{fig:state_alarm}) que es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
+A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura \ref{fig:ui_alarms}). Les alarmes passen per un cicle d'estats unificat (Figura \ref{fig:state_alarm}) que es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
 
 \begin{figure}[htbp]
   \centering
@@ -785,7 +785,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/ui_updating3.png}
-  \caption{Pantalla de reinici automàtic amb poldeig de reconnectivitat.}
+  \caption{Pantalla de reinici automàtic amb sondeig de reconnectivitat.}
   \label{fig:ui_updating_reboot}
 \end{figure}
 
@@ -801,12 +801,12 @@ El panell d'accions de configuració unifica les comandes administratives destru
 
 \begin{itemize}
   \item \textbf{Còpia de Seguretat (Backup):} El frontend sol·licita l'exportació de la base de dades. El servidor munta un fitxer binari unificat amb extensió \texttt{.cfg}. Per motius de seguretat, les contrasenyes i dades de tipus \texttt{password} s'exclouen d'aquesta llista i es substitueixen per la clau enmascarada \texttt{\_\_reserved\_pwd\_} per evitar l'exposició d'identitats de connexió. El component \texttt{ConfigInputComponent} del frontend està programat per reconèixer el valor del centinela de contrasenya segura i renderitzar un camp buit o enmascarat de manera transparent. Si l'usuari deixa el camp sense modificar (mantenint el centinela), l'algorisme de deltes del client detecta que no hi ha hagut variació real i s'absté d'enviar-lo en la petició d'escriptura, evitant així sobreescriure la clau xifrada del backend amb dades incompletes.
-  \item \textbf{Restauració de Còpia (Restore):} Permet pujar un fitxer de configuració del tipus \texttt{.cfg} compatible. S'incorporar l'opció \texttt{preserveNetwork} dissenyada per evitar que l'instal·lador o tècnic de camp perdi la llista de connexió de xarxa en entorns de xarxa remots en cas que s'hagi de carregar una configuració heretada amb un enrutament diferent.
+  \item \textbf{Restauració de Còpia (Restore):} Permet pujar un fitxer de configuració del tipus \texttt{.cfg} compatible. S'incorpora l'opció \texttt{preserveNetwork} dissenyada per evitar que l'instal·lador o tècnic de camp perdi la llista de connexió de xarxa en entorns de xarxa remots en cas que s'hagi de carregar una configuració heretada amb un enrutament diferent.
   \item \textbf{Restabliment de Fàbrica (Factory Reset):} Permet retornar la base de dades a l'estat d'origen. Per evitar la pèrdua accidental de dades o atacs de tipus CSRF, s'imposa un mètode securitzat d'un sol ús: el client demana primer un token d'autorització d'escriptura de canvis d'un sol ús (\textit{Token de seguretat}) a la-core-legacy, i només si és vàlid, es pot processar la crida destructiva.
 \end{itemize}
 
 \subsection{Visor d'Auditoria i Registre de Successos (Logs)}
-El visor de registres (Figura \ref{fig:ui_log}) s'ha programat per complir de manera rigorosa amb la normativa de seguretat **UNE-EN 62676**, que exigeix la traçabilitat absoluta i inalterable d'accions sensibles (com ara qui ha visualitzat quin canal de vídeo històric, en quines dates i hores exactes, o quins intents fallits d'accés s'han produït).
+El visor de registres (Figura \ref{fig:ui_log}) s'ha programat per complir de manera rigorosa amb la normativa de seguretat \textbf{UNE-EN 62676}, que exigeix la traçabilitat absoluta i inalterable d'accions sensibles (com ara qui ha visualitzat quin canal de vídeo històric, en quines dates i hores exactes, o quins intents fallits d'accés s'han produït).
 
 \begin{figure}[htbp]
   \centering

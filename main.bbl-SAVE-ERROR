@@ -1,0 +1,409 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{rfc8825}{report}{}{}
+      \name{author}{3}{}{%
+        {{hash=79df140c80c36407eb1f77c2b6541821}{%
+           family={Holmberg},
+           familyi={H\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+        {{hash=b10776a96eae601402d41256723b11b2}{%
+           family={Alvestrand},
+           familyi={A\bibinitperiod},
+           given={H.},
+           giveni={H\bibinitperiod}}}%
+        {{hash=2b9b685aeb00b7403c66a051d9c8ee6e}{%
+           family={Jennings},
+           familyi={J\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IETF}%
+      }
+      \strng{namehash}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{fullhash}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{fullhashraw}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{bibnamehash}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{authorbibnamehash}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{authornamehash}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{authorfullhash}{d8621403a7aaa0f7449b810da81be8e4}
+      \strng{authorfullhashraw}{d8621403a7aaa0f7449b810da81be8e4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{number}{8825}
+      \field{title}{Overview: Real-Time Communication with WebRTC}
+      \field{type}{RFC}
+      \field{year}{2021}
+      \verb{urlraw}
+      \verb https://datatracker.ietf.org/doc/html/rfc8825
+      \endverb
+      \verb{url}
+      \verb https://datatracker.ietf.org/doc/html/rfc8825
+      \endverb
+    \endentry
+    \entry{hls_apple}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=3325b015fbae57ba74629a53f1ead961}{%
+           family={{Apple Inc.}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{3325b015fbae57ba74629a53f1ead961}
+      \strng{fullhash}{3325b015fbae57ba74629a53f1ead961}
+      \strng{fullhashraw}{3325b015fbae57ba74629a53f1ead961}
+      \strng{bibnamehash}{3325b015fbae57ba74629a53f1ead961}
+      \strng{authorbibnamehash}{3325b015fbae57ba74629a53f1ead961}
+      \strng{authornamehash}{3325b015fbae57ba74629a53f1ead961}
+      \strng{authorfullhash}{3325b015fbae57ba74629a53f1ead961}
+      \strng{authorfullhashraw}{3325b015fbae57ba74629a53f1ead961}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{HTTP Live Streaming (HLS) Authoring Specification}
+      \field{urlday}{12}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://developer.apple.com/documentation/http-live-streaming
+      \endverb
+      \verb{url}
+      \verb https://developer.apple.com/documentation/http-live-streaming
+      \endverb
+    \endentry
+    \entry{angular_signals}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=06b65c863b37fb47b326b52a216ad6ab}{%
+           family={{Google - Angular Team}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{fullhash}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{fullhashraw}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{bibnamehash}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{authorbibnamehash}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{authornamehash}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{authorfullhash}{06b65c863b37fb47b326b52a216ad6ab}
+      \strng{authorfullhashraw}{06b65c863b37fb47b326b52a216ad6ab}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Angular Signals Guide}
+      \field{urlday}{12}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://angular.dev/guide/signals
+      \endverb
+      \verb{url}
+      \verb https://angular.dev/guide/signals
+      \endverb
+    \endentry
+    \entry{gdpr_reg}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=c7ff7d2e96b57f0524dcf17952f8f1b4}{%
+           family={{Unió Europea}},
+           familyi={U\bibinitperiod}}}%
+      }
+      \strng{namehash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{fullhash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{fullhashraw}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{bibnamehash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{authorbibnamehash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{authornamehash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{authorfullhash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \strng{authorfullhashraw}{c7ff7d2e96b57f0524dcf17952f8f1b4}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{DOUE-L-2016-80807}
+      \field{title}{Reglament (UE) 2016/679 del Parlament Europeu i del Consell (Reglament General de Protecció de Dades - RGPD)}
+      \field{year}{2016}
+      \verb{urlraw}
+      \verb https://eur-lex.europa.eu/eli/reg/2016/679/oj
+      \endverb
+      \verb{url}
+      \verb https://eur-lex.europa.eu/eli/reg/2016/679/oj
+      \endverb
+    \endentry
+    \entry{lopdgdd_spain}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=65071c37a888c7d12ded8c516e5e4a79}{%
+           family={{Boletín Oficial del Estado}},
+           familyi={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{fullhash}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{fullhashraw}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{bibnamehash}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{authorbibnamehash}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{authornamehash}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{authorfullhash}{65071c37a888c7d12ded8c516e5e4a79}
+      \strng{authorfullhashraw}{65071c37a888c7d12ded8c516e5e4a79}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{BOE-A-2018-16673}
+      \field{title}{Ley Orgánica 3/2018, de 5 de diciembre, de Protección de Datos Personales y garantía de los derechos digitales (LOPDGDD)}
+      \field{year}{2018}
+      \verb{urlraw}
+      \verb https://www.boe.es/eli/es/lo/2018/12/05/3
+      \endverb
+      \verb{url}
+      \verb https://www.boe.es/eli/es/lo/2018/12/05/3
+      \endverb
+    \endentry
+    \entry{grpc_up_running}{book}{}{}
+      \name{author}{2}{}{%
+        {{hash=fcde449540659c9eabdadf7a046ab008}{%
+           family={Indrasiri},
+           familyi={I\bibinitperiod},
+           given={Kasun},
+           giveni={K\bibinitperiod}}}%
+        {{hash=4c7794a4af02a3d5c3ac4cbc75dd6395}{%
+           family={Kuruppu},
+           familyi={K\bibinitperiod},
+           given={Danesh},
+           giveni={D\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {O'Reilly Media}%
+      }
+      \strng{namehash}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{fullhash}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{fullhashraw}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{bibnamehash}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{authorbibnamehash}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{authornamehash}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{authorfullhash}{61cc1d11e32fb2486edbb1af60b02041}
+      \strng{authorfullhashraw}{61cc1d11e32fb2486edbb1af60b02041}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{isbn}{978-1492058335}
+      \field{title}{gRPC: Up and Running: Building High-Performance APIs with gRPC and Protocol Buffers}
+      \field{year}{2020}
+    \endentry
+    \entry{rfc6455}{report}{}{}
+      \name{author}{2}{}{%
+        {{hash=1057c0ce811151df0862cf5b26064896}{%
+           family={Fette},
+           familyi={F\bibinitperiod},
+           given={I.},
+           giveni={I\bibinitperiod}}}%
+        {{hash=2f848d58c5d28e172fbc9ab51a059f6e}{%
+           family={Melnikov},
+           familyi={M\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IETF}%
+      }
+      \strng{namehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{fullhash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{fullhashraw}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{bibnamehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authorbibnamehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authornamehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authorfullhash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authorfullhashraw}{a384119ffa0f3414225b956a30c34bd9}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{number}{6455}
+      \field{title}{The WebSocket Protocol}
+      \field{type}{RFC}
+      \field{year}{2011}
+      \verb{urlraw}
+      \verb https://datatracker.ietf.org/doc/html/rfc6455
+      \endverb
+      \verb{url}
+      \verb https://datatracker.ietf.org/doc/html/rfc6455
+      \endverb
+    \endentry
+    \entry{webrtc_w3c}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=920927923fb759d596905d6fd374d1f1}{%
+           family={{W3C WebRTC Working Group}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{920927923fb759d596905d6fd374d1f1}
+      \strng{fullhash}{920927923fb759d596905d6fd374d1f1}
+      \strng{fullhashraw}{920927923fb759d596905d6fd374d1f1}
+      \strng{bibnamehash}{920927923fb759d596905d6fd374d1f1}
+      \strng{authorbibnamehash}{920927923fb759d596905d6fd374d1f1}
+      \strng{authornamehash}{920927923fb759d596905d6fd374d1f1}
+      \strng{authorfullhash}{920927923fb759d596905d6fd374d1f1}
+      \strng{authorfullhashraw}{920927923fb759d596905d6fd374d1f1}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{WebRTC 1.0: Real-Time Communication Between Browsers}
+      \field{urlday}{17}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.w3.org/TR/webrtc/
+      \endverb
+      \verb{url}
+      \verb https://www.w3.org/TR/webrtc/
+      \endverb
+    \endentry
+    \entry{learning_angular}{book}{}{}
+      \name{author}{2}{}{%
+        {{hash=0fdda45bf5fcf4d716f9dee1a319bdb1}{%
+           family={Bampakos},
+           familyi={B\bibinitperiod},
+           given={Aristeidis},
+           giveni={A\bibinitperiod}}}%
+        {{hash=809e2b3ab2b20bf7cad07aedb23032c4}{%
+           family={Deeleman},
+           familyi={D\bibinitperiod},
+           given={Pablo},
+           giveni={P\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Packt Publishing}%
+      }
+      \strng{namehash}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{fullhash}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{fullhashraw}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{bibnamehash}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{authorbibnamehash}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{authornamehash}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{authorfullhash}{b3d682e68c367ec4d2632cd048d4de39}
+      \strng{authorfullhashraw}{b3d682e68c367ec4d2632cd048d4de39}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{4th}
+      \field{isbn}{978-1803233819}
+      \field{title}{Learning Angular: Build modern web applications with the latest features of Angular}
+      \field{year}{2023}
+    \endentry
+    \entry{playwright_testing}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=140864078aeca1c7c35b4beb33c53c34}{%
+           family={{Microsoft}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{fullhashraw}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{bibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorbibnamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authornamehash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhash}{140864078aeca1c7c35b4beb33c53c34}
+      \strng{authorfullhashraw}{140864078aeca1c7c35b4beb33c53c34}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Playwright Web Testing and Automation}
+      \field{urlday}{17}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://playwright.dev
+      \endverb
+      \verb{url}
+      \verb https://playwright.dev
+      \endverb
+    \endentry
+    \entry{solid_principles}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=6f41df64eb0dc4855be70172368604c2}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{The Principles of Agile Design}
+      \field{year}{2000}
+      \verb{urlraw}
+      \verb http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
+      \endverb
+      \verb{url}
+      \verb http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
+      \endverb
+    \endentry
+    \entry{grpc_io}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=a3a4dde425c214175e79ec479deea1fa}{%
+           family={{gRPC Authors}},
+           familyi={g\bibinitperiod}}}%
+      }
+      \strng{namehash}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{fullhash}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{fullhashraw}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{bibnamehash}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{authorbibnamehash}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{authornamehash}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{authorfullhash}{a3a4dde425c214175e79ec479deea1fa}
+      \strng{authorfullhashraw}{a3a4dde425c214175e79ec479deea1fa}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Introduction to gRPC}
+      \field{year}{2024}
+      \verb{urlraw}
+      \verb https://grpc.io/docs/what-is-grpc/introduction/
+      \endverb
+      \verb{url}
+      \verb https://grpc.io/docs/what-is-grpc/introduction/
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
