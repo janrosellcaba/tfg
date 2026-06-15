@@ -125,6 +125,35 @@
       \verb https://angular.dev/guide/signals
       \endverb
     \endentry
+    \entry{solid_principles}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=6f41df64eb0dc4855be70172368604c2}{%
+           family={Martin},
+           familyi={M\bibinitperiod},
+           given={Robert\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
+      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{The Principles of Agile Design}
+      \field{year}{2000}
+      \verb{urlraw}
+      \verb http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
+      \endverb
+      \verb{url}
+      \verb http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
+      \endverb
+    \endentry
     \entry{gdpr_reg}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=c7ff7d2e96b57f0524dcf17952f8f1b4}{%
@@ -139,8 +168,8 @@
       \strng{authornamehash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
       \strng{authorfullhash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
       \strng{authorfullhashraw}{c7ff7d2e96b57f0524dcf17952f8f1b4}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{DOUE-L-2016-80807}
@@ -167,8 +196,8 @@
       \strng{authornamehash}{65071c37a888c7d12ded8c516e5e4a79}
       \strng{authorfullhash}{65071c37a888c7d12ded8c516e5e4a79}
       \strng{authorfullhashraw}{65071c37a888c7d12ded8c516e5e4a79}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{BOE-A-2018-16673}
@@ -205,8 +234,8 @@
       \strng{authornamehash}{61cc1d11e32fb2486edbb1af60b02041}
       \strng{authorfullhash}{61cc1d11e32fb2486edbb1af60b02041}
       \strng{authorfullhashraw}{61cc1d11e32fb2486edbb1af60b02041}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{978-1492058335}
@@ -237,8 +266,8 @@
       \strng{authornamehash}{a384119ffa0f3414225b956a30c34bd9}
       \strng{authorfullhash}{a384119ffa0f3414225b956a30c34bd9}
       \strng{authorfullhashraw}{a384119ffa0f3414225b956a30c34bd9}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{number}{6455}
@@ -266,8 +295,8 @@
       \strng{authornamehash}{920927923fb759d596905d6fd374d1f1}
       \strng{authorfullhash}{920927923fb759d596905d6fd374d1f1}
       \strng{authorfullhashraw}{920927923fb759d596905d6fd374d1f1}
-      \field{sortinit}{9}
-      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{WebRTC 1.0: Real-Time Communication Between Browsers}
@@ -345,35 +374,6 @@
       \endverb
       \verb{url}
       \verb https://playwright.dev
-      \endverb
-    \endentry
-    \entry{solid_principles}{online}{}{}
-      \name{author}{1}{}{%
-        {{hash=6f41df64eb0dc4855be70172368604c2}{%
-           family={Martin},
-           familyi={M\bibinitperiod},
-           given={Robert\bibnamedelima C.},
-           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
-      }
-      \strng{namehash}{6f41df64eb0dc4855be70172368604c2}
-      \strng{fullhash}{6f41df64eb0dc4855be70172368604c2}
-      \strng{fullhashraw}{6f41df64eb0dc4855be70172368604c2}
-      \strng{bibnamehash}{6f41df64eb0dc4855be70172368604c2}
-      \strng{authorbibnamehash}{6f41df64eb0dc4855be70172368604c2}
-      \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
-      \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
-      \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{The Principles of Agile Design}
-      \field{year}{2000}
-      \verb{urlraw}
-      \verb http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
-      \endverb
-      \verb{url}
-      \verb http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod
       \endverb
     \endentry
     \entry{grpc_io}{online}{}{}

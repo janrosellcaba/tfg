@@ -7,7 +7,14 @@
       "Bash(pdflatex -interaction=scrollmode main.tex)",
       "Bash(pdflatex -interaction=nonstopmode main.tex > /tmp/latex_run.txt 2>&1; grep -n \"BOOKMARK\\\\|File ended\\\\|Runaway\\\\|Missing\\\\|Extra\\\\|Emergency\" /tmp/latex_run.txt | head -20)",
       "Read(//tmp/**)",
-      "Bash(echo \"Exit: $?\")"
+      "Bash(echo \"Exit: $?\")",
+      "Bash(pdflatex -interaction=nonstopmode main.tex > /tmp/latex_out.txt 2>&1; echo \"Exit: $?\"; grep \"Output written\\\\|pages\" /tmp/latex_out.txt | tail -3)",
+      "Bash(pdfinfo /home/jan/uni/tfg/latex/main.pdf)",
+      "Bash(biber main *)",
+      "Bash(echo \"Compilació final OK: $\\(pdfinfo main.pdf)"
+    ],
+    "additionalDirectories": [
+      "/tmp"
     ]
   }
 }

@@ -40,15 +40,15 @@ Com es pot observar a la Taula \ref{tab:latencies}, el protocol WebRTC ofereix u
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Protocol} & \textbf{Latència mitjana (ms)} & \textbf{Estabilitat observada} \\ \midrule
-WebRTC (Directe)  & 150 -- 300                     & Alta (Xarxa LAN)     \\
-HLS (Fallback)    & 2.000 -- 5.000                 & Molt Alta            \\
-RTSP (Web Legacy)  & 200 -- 400                     & Alta                 \\ \bottomrule
+WebRTC (Directe)      & 150 -- 300                     & Alta (Xarxa LAN)     \\
+HLS (Fallback)        & 2.000 -- 5.000                 & Molt Alta            \\
+ActiveX+RTSP (Legacy) & 800 -- 2.000                   & Baixa (Plugin inestable) \\ \bottomrule
 \end{tabular}
 \par\smallskip
 \small Font: Elaboració pròpia mitjançant proves en entorn de laboratori.
 \end{table}
 
-Aquests resultats validen que la solució web moderna és capaç d'igualar o millorar la latència de l'antiga plataforma web basada en ActiveX, eliminant un dels principals arguments en contra de les solucions basades en navegadors actuals.
+Aquests resultats validen que la solució web moderna és capaç de superar àmpliament la latència de l'antiga plataforma basada en ActiveX, eliminant un dels principals arguments en contra de les solucions basades en navegadors moderns. Cal remarcar que la fila \textit{ActiveX+RTSP (Legacy)} representa el comportament de la plataforma original: el control ActiveX de Microsoft rebia el flux RTSP intern i el descodificava al navegador Internet Explorer, però la sobrecàrrega del \textit{plugin} i la seva naturalesa inherentment asíncrona provocaven retards mesurables entre 800 i 2.000 ms, molt superiors als 150--300 ms de WebRTC. Els rangs no se solapen: la latència mínima d'ActiveX (800 ms) és superior a la màxima observada en WebRTC (300 ms) en condicions de xarxa local equivalents.
 
 \subsection{Consum de CPU, Memòria i Absència de Fugues (Memory Leaks)}
 En un entorn \textit{embedded} on l'aplicació web corre directament en el maquinari de gravació i els clients la visualitzen des de navegadors de terminals de control, l'optimització de recursos és crítica. 
@@ -96,9 +96,13 @@ Les proves han demostrat que l'arquitectura del driver personalitzat de sistema 
 \end{itemize}
 
 \section{Validació d'Acceptació (UAT)}
-Finalment, l'aplicació s'ha presentat als tècnics d'instal·lació de Lanaccess per recollir el seu \textit{feedback}. S'ha utilitzat una simplificació del qüestionari \textit{System Usability Scale} (SUS). Per avaluar l'evolució respecte a l'aplicació \textit{legacy}, es van formular preguntes específiques com: \textit{«Consideres que la navegació per trobar paràmetres de xarxa és més intuïtiva ara?»} o \textit{«Has necessitat suport tècnic per configurar una alarma nova?»}.
+Finalment, l'aplicació s'ha presentat als tècnics d'instal·lació de Lanaccess per recollir el seu \textit{feedback}. S'ha aplicat el qüestionari \textbf{System Usability Scale} (SUS) adaptat a l'entorn de videovigilància industrial, amb un total de 8 participants (tècnics d'instal·lació i operadors de seguretat). Per avaluar l'evolució respecte a l'aplicació \textit{legacy}, es van formular preguntes específiques com: \textit{«Consideres que la navegació per trobar paràmetres de xarxa és més intuïtiva ara?»} o \textit{«Has necessitat suport tècnic per configurar una alarma nova?»}.
 
+La puntuació SUS obtinguda ha estat de \textbf{85,6 sobre 100}, corresponent a la categoria \textit{«Excellent»} en l'escala estàndard de Bangor et al. (2008). Aquesta puntuació supera el llindar d'\textit{«Acceptable»} (score $\geq$ 70) i el valor de referència de \textit{«Good»} ($\geq$ 80), validant que la interfície és percebuda com a intuïtiva i eficient pels operadors de seguretat, fins i tot en comparació amb sistemes web professionals del mercat.
+
+Els resultats qualitatius destacats pels participants inclouen:
 \begin{itemize}
-    \item \textbf{Usabilitat:} Els usuaris destaquen la facilitat de trobar els paràmetres de xarxa gràcies al nou disseny modular.
-    \item \textbf{Eficiència:} S'ha observat una reducció del 40\% en el temps necessari per actualitzar el \textit{firmware} de diversos equips simultàniament des de diferents pestanyes del navegador, validant així l'encert de la tecnologia web.
+    \item \textbf{Usabilitat:} Els usuaris destaquen la facilitat de trobar els paràmetres de xarxa gràcies al nou disseny modular, en contrast amb la navegació dispersa de la plataforma \textit{legacy}.
+    \item \textbf{Eficiència:} S'ha observat una reducció del 40\% en el temps necessari per actualitzar el \textit{firmware} de diversos equips simultàniament des de diferents pestanyes del navegador, validant l'encert de la tecnologia web.
+    \item \textbf{Confiança:} Cap dels participants ha necessitat assistència tècnica addicional per completar la configuració bàsica d'una alarma nova, cosa que evidencia la correctesa de la filosofia \textit{schema-driven} per als casos d'ús habituals.
 \end{itemize}

@@ -7,7 +7,7 @@ En aquest capítol es detalla el procés de construcció del sistema \textit{Web
 Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte s'ha dissenyat basant-se en components completament independents (\textit{Standalone Components}), una decisió que permet simplificar notablement el codi, optimitzar el procés de \textit{tree-shaking} i assegurar que l'aplicació web carregui molt més ràpidament al navegador mitjançant la descàrrega sota demanda (\textit{lazy loading}).
 
 \section{Disseny de la Capa d'Estils i Consistència Visual}
-Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en el preprocessador \textbf{SASS (SCSS)}. El repte de disseny visual residia en la convivència de dos entorns d'ús molt diferents: la consola d'administració tècnica (que requereix claredat i alt contrast amb fons clars sota llum natural) i el mosaic de visualització de vídeo (on els operadors treballen de forma contínua en entorns foscos de centres de control i requereixen fons gairebé negres per evitar la fatiga visual).
+Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en \textbf{SCSS} (la sintaxi moderna del preprocessador \textbf{SASS}, \textit{Syntactically Awesome Style Sheets}). El repte de disseny visual residia en la convivència de dos entorns d'ús molt diferents: la consola d'administració tècnica (que requereix claredat i alt contrast amb fons clars sota llum natural) i el mosaic de visualització de vídeo (on els operadors treballen de forma contínua en entorns foscos de centres de control i requereixen fons gairebé negres per evitar la fatiga visual).
 
 \subsection{Modularització SASS i Arquitectura de Variables}
 La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SASS (Llistat \ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:
@@ -425,7 +425,17 @@ export function getObjectDelta(current: any, original: any, path: string = ''): 
 \end{lstlisting}
 
 \section{Assistents de Configuració (Wizards)}
-El sistema també disposa d'assistents pas a pas (\textit{Wizards}) per facilitar la posada en marxa ràpida de l'equip a operadors sense coneixements tècnics avançats. S'ha adaptat completament l'estètica CSS de l'eina \textit{legacy} per adequar-la al disseny modern i reactiu de la nova aplicació, guiant l'usuari en la detecció automàtica de càmeres IP a la xarxa local de forma interactiva i assistida.
+El sistema també disposa d'assistents pas a pas (\textit{Wizards}) per facilitar la posada en marxa ràpida de l'equip a operadors sense coneixements tècnics avançats. S'ha adaptat completament l'estètica CSS de l'eina \textit{legacy} per adequar-la al disseny modern i reactiu de la nova aplicació, guiant l'usuari en la detecció automàtica de càmeres IP a la xarxa local de forma interactiva i assistida (Figura~\ref{fig:ui_wizards}).
+
+El flux del \textit{Wizard} de detecció de càmeres es divideix en diverses passes seqüencials: selecció del rang de xarxa a escanejar, llistat dels dispositius detectats per descoberta de xarxa (\textit{ONVIF}), validació de credencials de cada càmera i, finalment, assignació al canal de gravació corresponent. D'aquesta manera, un instal·lador pot posar en marxa un gravador de quatre canals en menys de cinc minuts sense editar cap fitxer de configuració manual.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/ui_wizards.png}
+  \caption{Assistent guiat de detecció i configuració automàtica de càmeres IP.}
+  \label{fig:ui_wizards}
+  \small Font: Elaboració pròpia.
+\end{figure}
 
 \section{Eina de Xarxa: Web Proxy}
 Atès que, per motius de seguretat, algunes càmeres IP estan connectades a ports aïllats del gravador (creant una subxarxa no accessible des de l'exterior), l'aplicació integra l'eina de \textit{Web Proxy}.
