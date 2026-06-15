@@ -1,0 +1,21 @@
+# LaTeX Build Files
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+indent.log
+
+# Compiled Output
+*.pdf
+
+# Hide figures from text searches (Claude can view images when explicitly asked)
+figures/*.png

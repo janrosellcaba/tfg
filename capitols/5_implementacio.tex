@@ -12,7 +12,7 @@ Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arqu
 \subsection{Modularització SASS i Arquitectura de Variables}
 La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SASS (Llistat \ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:
 
-\begin{lstlisting}[language=SQL, label={lst:scss_variables}, caption={Fragment del fitxer de definició de variables d'estil SASS.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=SQL, label={lst:scss_variables}, caption={Fragment del fitxer de definició de variables d'estil SASS.}]
 // Paleta unificada d'identitat corporativa i estat semàntic
 $int-dark-blue: #223a75;
 $int-dark-gray: #5e5e5f;
@@ -48,7 +48,7 @@ Per donar resposta al requisit de compatibilitat multi-terminal (des de tauletes
 
 S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substituint-les per unitats de mesura relatives basades en el tamany de font del document (\texttt{rem}) i de l'espai d'execució de la pantalla (\texttt{vh}, \texttt{vw}, \texttt{\%}). Les variacions d'esquema més dràstiques es controlen mitjançant consultes de mitjans (@media queries) enfocades als llindars de resolució següents:
 
-\begin{lstlisting}[language=SQL, caption={Exemple de Media Query responsiva per a la graella de mosaics del tauler principal.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=SQL, caption={Exemple de Media Query responsiva per a la graella de mosaics del tauler principal.}]
 .section h2 {
   width: 1020px;
 
@@ -81,7 +81,7 @@ L'API d'autenticació del sistema s'executa com un procés en dues fases coordin
 \subsection{Fase 1: Verificació de credencials (PlainLogin)}
 El client envia les credencials introduïdes per l'operador. Tot i que viatgen en text pla dins del JSON, la confidencialitat està garantida pel xifrat de la capa de transport (HTTPS/TLS). S'efectua una petició HTTP POST a \texttt{/WebLogin} enviant el següent payload:
 
-\begin{lstlisting}[language=json, caption={Petició d'enviament de credencials al servidor (PlainLogin).}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Petició d'enviament de credencials al servidor (PlainLogin).}]
 {
   "call": "PlainLogin",
   "User": "admin",
@@ -97,7 +97,7 @@ Depenent de la validesa de les credencials o de l'estat de seguretat del compte,
   \item \textbf{Compte bloquejat (Locked):} Si s'ha superat el límit de 5 intents fallits, el servei bloqueja les peticions d'aquest usuari de forma temporal durant 15 minuts.
 \end{itemize}
 
-\begin{lstlisting}[language=json, caption={Exemples de resposta segons l'escenari d'autenticació.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Exemples de resposta segons l'escenari d'autenticació.}]
 // Cas A: Success
 { "LoginResponse": "success", "RetryCount": null }
 
@@ -113,7 +113,7 @@ Un cop es rep la confirmació d'èxit de la Fase 1, l'aplicació s'ha d'iniciali
 
 El component de \textit{login} invoca el mètode \texttt{onInitPage()} de l'injector \texttt{UserService}, el qual realitza una nova petició POST cap a \texttt{/WebLogin} sota la comanda de control de context \texttt{GetWhoamI}:
 
-\begin{lstlisting}[language=json, caption={Petició d'obtenció de perfil i permisos del context d'usuari.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Petició d'obtenció de perfil i permisos del context d'usuari.}]
 // Petició
 {
   "call": "GetWhoamI"
@@ -142,7 +142,7 @@ L'estat de sessió d'usuari es manté en memòria de l'aplicació sota un model 
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\textwidth]{figures/seq_login.png}
+  \includegraphics[width=0.65\textwidth]{figures/seq_login.png}
   \caption{Diagrama de seqüència del flux de control d'inici de sessió.}
   \label{fig:seq_login}
   \small Font: Elaboració pròpia.
@@ -151,7 +151,7 @@ L'estat de sessió d'usuari es manté en memòria de l'aplicació sota un model 
 \subsection{L'Interceptor d'Escriptura i el Control de Concurrència}
 Cal destacar que l'aplicació Angular implementa l'interceptor de dades de configuració d'Angular 19 \texttt{authInterceptor} (vegeu el llistat \ref{lst:auth_interceptor_code}). A diferència d'altres aplicacions que afegeixen el token d'usuari per capçalera per validar la sessió (gestió que aquí s'ha delegat de forma nativa i més segura a les cookies del navegador), el nostre interceptor s'encarrega d'injectar de forma dinàmica el token de bloqueig d'escriptura (\textbf{Config Lock Token}) adquirit del servei \texttt{ConfigLockService} com a paràmetre de consulta. Això assegura que qualsevol petició cap a les APIs de configuració del gravador estigui autoritzada per l'exclusivitat del cadenat, evitant així escriptures concurrents de diferents administradors.
 
-\begin{lstlisting}[language=JavaScript, label={lst:auth_interceptor_code}, caption={Implementació del HttpInterceptorFn per al control del Config Lock en Angular 19.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:auth_interceptor_code}, caption={Implementació del HttpInterceptorFn per al control del Config Lock en Angular 19.}]
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const lockService = inject(ConfigLockService);
   const token = lockService.lockToken();
@@ -176,7 +176,7 @@ Aquesta connexió unificada és fonamental per rebre d'una sola vegada totes les
 \subsection{Mecanisme de Keep-Alive i Heartbeat de Sessió}
 El manteniment de la sessió es coordina entre el client i el microservei \textbf{la-core-legacy} a través de la persistència del \textit{Heartbeat} emès pel servei \texttt{KeepAliveService}. Aquest mètode executa una crida POST cap a l'endpoint de validació de sessió de forma periòdica cada 60 segons:
 
-\begin{lstlisting}[language=json, caption={Trama de Keep-Alive enviada periòdicament al servidor.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Trama de Keep-Alive enviada periòdicament al servidor.}]
 {
   "call": "KeepAliveSession"
 }
@@ -322,7 +322,7 @@ El client web actua com un intèrpret asíncron de les definicions d'esquema exp
 \subsection{Validació Dinàmica a ConfigInputComponent}
 Per seguir estrictament la filosofia \textit{schema-driven}, el component \texttt{ConfigInputComponent} ha estat refactoritzat per llegir de manera nativa i dinàmica les propietats d'esquema de cada node (com \texttt{\_regex}, \texttt{\_min}, \texttt{\_maxLength}) sense dependre de paràmetres rígids. S'ha unificat el tractament d'errors a través d'una variable reactiva calculada (\textit{computed signal}), que compila les expressions regulars i avalua els límits numèrics i de text.
 
-\begin{lstlisting}[language=JavaScript, caption={Lògica de validació dinàmica amb \textit{Signals} i \textit{Regex} a ConfigInputComponent.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica de validació dinàmica amb \textit{Signals} i \textit{Regex} a ConfigInputComponent.}]
 computedValidationError = computed(() => {
   const value = this.inputValue();
   const def = this.fieldDef();
@@ -350,7 +350,7 @@ computedValidationError = computed(() => {
 Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy} a l'adreça \texttt{/webprotocol/device-service/properties/lock?node=config\&seed=...}.
 
 Si la sol·licitud és reeixida, el servidor retorna una estructura JSON que autoritza l'edició:
-\begin{lstlisting}[language=json, caption={Estructura JSON del bloqueig de configuració.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Estructura JSON del bloqueig de configuració.}]
 {
   "path": "config",
   "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
@@ -363,7 +363,7 @@ El camp \texttt{token} actua com a signatura per a les operacions d'escriptura p
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.9\textwidth]{figures/seq_config_lock.png}
+  \includegraphics[width=0.65\textwidth]{figures/seq_config_lock.png}
   \caption{Diagrama de seqüència del procés d'adquisició i alliberament de Lock de configuració.}
   \label{fig:seq_config_lock}
   \small Font: Elaboració pròpia.
@@ -371,7 +371,7 @@ El camp \texttt{token} actua com a signatura per a les operacions d'escriptura p
 
 L'adquisició del cadenat requereix un batec de cor (\textit{heartbeat}) per mantenir el token de bloqueig active. Per no saturar la CPU del terminal disparant el cicle d'Angular, s'executa fora de \textit{Zone.js}:
 
-\begin{lstlisting}[language=JavaScript, caption={Optimització del cicle de vida de \textit{Zone.js} per renovació de \textit{tokens}.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Optimització del cicle de vida de \textit{Zone.js} per renovació de \textit{tokens}.}]
 private scheduleRenewal(ms: number) {
   this.stopRenewal();
   this.zone.runOutsideAngular(() => {
@@ -385,7 +385,7 @@ private scheduleRenewal(ms: number) {
 \subsection{Detecció de Deltes al Desar (Save)}
 Quan l'administrador fa clic al botó de desar (\textit{Save}), en comptes d'enviar tot l'esquema sencer (que saturaria el gravador), s'executa un algorisme recursiu de diferències (\textit{delta payload}). Aquests canvis s'envien habitualment a \textbf{la-core-legacy} mitjançant peticions HTTP \texttt{PATCH}, tot i que per modificacions estructurals en algun cas s'utilitza \texttt{PUT}. L'algorisme de detecció actua de la següent manera:
 
-\begin{lstlisting}[language=JavaScript, caption={Algorisme recursiu de detecció de Deltes per a l'optimització de payloads amb normalització de primitius.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Algorisme recursiu de detecció de Deltes per a l'optimització de payloads amb normalització de primitius.}]
 export function getObjectDelta(current: any, original: any, path: string = ''): any {
   // Normalització de tipus primitius booleans
   const normalize = (val: any) => {
@@ -463,7 +463,7 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.65\textwidth]{figures/activity_video_connection.png}
+  \includegraphics[width=0.5\textwidth]{figures/activity_video_connection.png}
   \caption{Diagrama d'activitat de la lògica de connexió i reconnexió de vídeo.}
   \label{fig:activity_video_connection}
 \end{figure}
@@ -471,7 +471,7 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 \subsection{Negociació SDP i Establiment del Canal de Streaming}
 Si la xarxa del client disposa dels canals lliures de comunicació, el frontend i el servidor MediaMTX inicien la negociació SDP mitjançant el protocol d'egress de mitjans unificat \textbf{WHEP} (\textit{WebRTC HTTP Egress Protocol}):
 
-\begin{lstlisting}[language=JavaScript, caption={Lògica simplificada de la PeerConnection per WebRTC.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica simplificada de la PeerConnection per WebRTC.}]
 async startStreaming(cameraId: string) {
   const pc = new RTCPeerConnection(this.config);
   
@@ -491,7 +491,7 @@ Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figur
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\textwidth]{figures/seq_video_streaming.png}
+  \includegraphics[width=0.7\textwidth]{figures/seq_video_streaming.png}
   \caption{Diagrama de seqüència de l'establiment de streaming de vídeo (SDP).}
   \label{fig:seq_video_streaming}
 \end{figure}
@@ -499,7 +499,7 @@ Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figur
 \subsection{Orquestració de Vídeo amb el Patró Strategy}
 Per estructurar el reproductor multifluj, s'ha aplicat el patró de disseny de programari \textbf{Strategy} d'Angular. Aquest disseny desacobla completament el component visual de la graella de les APIs i llibreries de tercers implicades en la descodificació. Es defineix la interfície comuna \texttt{StreamingStrategy} que actua com a contracte o interfície abstracta unificada:
 
-\begin{lstlisting}[language=JavaScript, caption={Interfície comuna \texttt{StreamingStrategy}.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Interfície comuna \texttt{StreamingStrategy}.}]
 export interface StreamingStrategy {
   connectionState: Signal<'connecting' | 'connected' | 'error' | 'idle'>;
   errorMessage: Signal<string | null>;
@@ -510,7 +510,7 @@ export interface StreamingStrategy {
 
 Un \textit{InjectionToken} personalitzat allotjat a la declaració del component injecta dinàmicament l'estratègia correcta (ja sigui el servei WebRTC o la via de redundància HLS) en funció de les capacitats obtingudes del mètode de streaming triat:
 
-\begin{lstlisting}[language=JavaScript, caption={Proveïdor per a la injecció dinàmica de l'estratègia de vídeo al \texttt{GridVideoPlayerComponent}.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Proveïdor per a la injecció dinàmica de l'estratègia de vídeo al \texttt{GridVideoPlayerComponent}.}]
 export const STREAMING_STRATEGY_TOKEN = new InjectionToken<StreamingStrategy>('StreamingStrategy');
 
 @Component({
@@ -597,7 +597,7 @@ El cicle de funcionament de la interfície segueix els passos següents:
   \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el *timestamp* exacte de destí i executa el mètace reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
 \end{enumerate}
 
-\begin{lstlisting}[language=JavaScript, label={lst:hls_load_code}, caption={Càrrega dinàmica de llista de reproducció HLS basada en franges de temps.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:hls_load_code}, caption={Càrrega dinàmica de llista de reproducció HLS basada en franges de temps.}]
 loadVideo(): void {
   const token = this.selectedToken();
   if (this.hls) {
@@ -636,7 +636,7 @@ Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el 
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{figures/alarms_data_flow.png}
+  \includegraphics[width=0.3\textwidth]{figures/alarms_data_flow.png}
   \caption{Topologia del canal de dades, persistència i difusió asíncrona d'alarmes.}
   \label{fig:alarms_data_flow}
 \end{figure}
@@ -644,7 +644,7 @@ Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el 
 \subsection{Adquisició de Senyals i Cues Threads-Safe de Processament}
 El punt d'entrada de qualsevol notificació al microservei \texttt{la-core-alarm} és el fil d'execució asíncron de lectura de D-Bus \texttt{dbus\_listen\_alarms\_thread} (Llistat \ref{lst:dbus_listen_code}). Aquest fil manté una connexió de sistema bloquejant per escoltar de forma passiva qualsevol senyal \texttt{ALARM\_NOTIFY} de la interfície \texttt{com.lanaccess.sysevents}.
 
-\begin{lstlisting}[language=C++, label={lst:dbus_listen_code}, caption={Funció d'escolta i filtrat de senyals del bus D-Bus.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=C++, label={lst:dbus_listen_code}, caption={Funció d'escolta i filtrat de senyals del bus D-Bus.}]
 static int signal_callback(sd_bus_message *msg, void *userdata, sd_bus_error *ret_error) {
     const char *timestamp, *source, *status, *alarm_id, *description, *priority, *type, *camera_num;
     
@@ -670,7 +670,7 @@ static int signal_callback(sd_bus_message *msg, void *userdata, sd_bus_error *re
 
 Un cop rebut, el missatge es diposita a la cua unificada de tipus \texttt{SafeQueue} anomenada \texttt{global\_alarm\_queue}. Aquesta classe utilitza una variable de condició de la biblioteca estàndard de C++ (\texttt{std::condition\_variable}) i un bloqueig exclusiu mutex (\texttt{std::mutex}) per optimitzar la concurrència sense consum de CPU d'espera activa (*busy-waiting*):
 
-\begin{lstlisting}[language=C++, caption={Lògica de la cua thread-safe de concurrència d'accessos.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=C++, caption={Lògica de la cua thread-safe de concurrència d'accessos.}]
 void wait_and_pop(T& value) {
     unique_lock<mutex> lk(mtx_);
     // El fil de processat adorm la seva execucio fins que hi hagi dades reals
@@ -697,7 +697,7 @@ Per assegurar l'atominicitat de les dades (propietats ACID) del servei de persis
 \subsection{Protecció i Poda de dades Activa via Triggers de SQLite3}
 Com que el videogravador de seguretat opera de manera ininterrompuda (24/7), el volum d'alarmes i logs emmagatzemats podria provocar un desgast excessiu de la memòria de disc flaix o alentir les cerques. Durant la fase d'inicialització de la base de dades, el motor \texttt{DatabaseManager} actualitza un disparador automàtic relacional o **Trigger** dins del fitxer de la base de dades que s'executa després de cada inserció de nova alarma:
 
-\begin{lstlisting}[language=SQL, caption={Trigger de base de dades per a la poda automatica del registre d'alarmes.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=SQL, caption={Trigger de base de dades per a la poda automatica del registre d'alarmes.}]
 CREATE TRIGGER limit_alarms_trigger
 AFTER INSERT ON ALARMS
 BEGIN
@@ -730,7 +730,7 @@ A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva
 
 L'operador pot interaccionar amb qualsevol dels registres per tal d'assentir-los (\textit{Acknowledgment}) fent clic sobre el botó \textit{Ack} al final de la fila. Aquesta ordre viatja cap a la cua de comandes de \texttt{la-core-alarm} mitjançant el missatge de WebSocket següent:
 
-\begin{lstlisting}[language=json, caption={Missatge de canvi d'estat d'alarma cap al servidor (ALARM\_READ).}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Missatge de canvi d'estat d'alarma cap al servidor (ALARM\_READ).}]
 {
   "event": "ALARM_READ",
   "payload": [
@@ -766,6 +766,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
           \item \texttt{REBOOTING:} S'ordena el reinici del sistema físic.
           \item \texttt{ERROR / INCONSISTENT:} El procés es cancel·la a causa de dades corrompudes o errors de xarxa, activant immediatament la lògica de retorn segur a la partició anterior (\textit{dual-boot rollback}).
         \end{itemize}
+        Durant la fase de flashing o escriptura a disc del nou binari, el microservei de backend envia a D-Bus un senyal global de canvi d'estat a nivell de maquinari. El canal persistent de WebSocket de l'aplicació web intercepta l'esdeveniment i, de forma completament asíncrona, redirigeix tots els usuaris connectats cap a la pantalla d'actualització de firmware actiu, impedint que es realitzin noves modificacions de configuració concorrentment durant la reinicialització física de l'equip.
   \item \textbf{Recuperació de la Connectivitat (Figura \ref{fig:ui_updating_reboot}):} Quan s'inicia el reinici físic del gravador, l'aplicació web bloqueja la interfície amb una pantalla d'espera i s'absté de fer peticions durant 15 segons de marge segur. Transcorregut aquest temps, inicia un procés de consulta ràpida de la connectivitat IP de xarxa (\texttt{connectivity.cgi}). Un cop restablerta la connexió, es verifica l'èxit definitiu de l'operació preguntant l'estat lògic final, i es permet l'accés un altre cop a la interfície.
 \end{enumerate}
 
@@ -796,7 +797,7 @@ El panell d'accions de configuració unifica les comandes administratives destru
 \end{figure}
 
 \begin{itemize}
-  \item \textbf{Còpia de Seguretat (Backup):} El frontend sol·licita l'exportació de la base de dades. El servidor munta un fitxer binari unificat amb extensió \texttt{.cfg}. Per motius de seguretat, les contrasenyes i dades de tipus \texttt{password} s'exclouen d'aquesta llista i es substitueixen per la clau enmascarada \texttt{\_\_reserved\_pwd\_} per evitar l'exposició d'identitats de connexió.
+  \item \textbf{Còpia de Seguretat (Backup):} El frontend sol·licita l'exportació de la base de dades. El servidor munta un fitxer binari unificat amb extensió \texttt{.cfg}. Per motius de seguretat, les contrasenyes i dades de tipus \texttt{password} s'exclouen d'aquesta llista i es substitueixen per la clau enmascarada \texttt{\_\_reserved\_pwd\_} per evitar l'exposició d'identitats de connexió. El component \texttt{ConfigInputComponent} del frontend està programat per reconèixer el valor del centinela de contrasenya segura i renderitzar un camp buit o enmascarat de manera transparent. Si l'usuari deixa el camp sense modificar (mantenint el centinela), l'algorisme de deltes del client detecta que no hi ha hagut variació real i s'absté d'enviar-lo en la petició d'escriptura, evitant així sobreescriure la clau xifrada del backend amb dades incompletes.
   \item \textbf{Restauració de Còpia (Restore):} Permet pujar un fitxer de configuració del tipus \texttt{.cfg} compatible. S'incorporar l'opció \texttt{preserveNetwork} dissenyada per evitar que l'instal·lador o tècnic de camp perdi la llista de connexió de xarxa en entorns de xarxa remots en cas que s'hagi de carregar una configuració heretada amb un enrutament diferent.
   \item \textbf{Restabliment de Fàbrica (Factory Reset):} Permet retornar la base de dades a l'estat d'origen. Per evitar la pèrdua accidental de dades o atacs de tipus CSRF, s'imposa un mètode securitzat d'un sol ús: el client demana primer un token d'autorització d'escriptura de canvis d'un sol ús (\textit{Token de seguretat}) a la-core-legacy, i només si és vàlid, es pot processar la crida destructiva.
 \end{itemize}

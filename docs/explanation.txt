@@ -1,0 +1,36 @@
+ara anem a fer la secció 2:
+
+2. Explicació integrada a cada interfície
+Com molt ben dius, quan arribem al capítol on s'explica cada pantalla o mòdul del frontend (Desenvolupament / Interfícies), acompanyarem la part visual amb la seva integració:
+
+Pantalla de Configuració: Explicarem com demana el formulari el lock a la-core-legacy i com s'envien els canvis.
+Reproductor de Vídeo (Directe / Històric): Explicarem com l'Angular demana els segments de vídeo a la-video-engine.
+Panell d'Alarmes i Sensors: Mostrarem com l'Angular es connecta per WebSocket a la-core-notifier / la-core-alarm per rebre canvis en temps real (sense necessitat de fer polling).
+
+---
+
+t'explico per sobre i tu m'ajudes. vaig pantalla per pantalla i et dic.
+
+login:
+core-legacy comprova les credencials que s'envien per https per plain text, retorna success o error, dades de lusuari, i els grants. fa gestio de varios intents (maxim 5), etc.
+
+home page:
+es connecta websocket amb core notifier que avisa d'errors i alertes (pagina errors) i de si el sistema s'esta actualitzant o rebooting (et porta a la pagina d'actualitzacio). a part per la informacio del NVR i usuari el core-legacy proporciona la informacio en un xml (config_data.xml).
+
+configuracio del sistema:
+tota la informacio ve en jsons del core-legacy. i hi ha un sistema dissenyat amb esquemes per a renderitzar i automatitzar les pagines. es fa patch als canvis, i en algun cas put.
+
+web proxy: pagina simple que es parla amb el core-legacy
+
+
+pagina de video en directe: la web obre websockets amb el core legacy que parla amb el video engine. funciona amb metode webrtc i hls, pero va una mica millor webrtc, llavors aquest es el principal. el hls esta com a protocol secundari per si falla. tambe hi ha els botons d'entrades i sortides, aixo funciona amb websocket connectat al core notifier que envia constantment canvis en els estats de les entrades i sortides. un usuari pot canviar lestat i sactualitza tot en temps real.
+
+la pagina de gravacions es connecta directament amb video engine. funciona amb el tipic protocol hls on es demana una playlist hls, i el frontend va demanant els trassos de video.
+
+la pagina d'alarmes funciona amb un websocket directe connectat amb el la-core-alarm. aquest es comuniquen per enviar totes les alarmes, nous canvis en temps real (com marcar alarma com a llegida, arxivar alarma, esborrar alarma), etc. el la-core-alarm parla amb el la-db-engine per gRPC. el la-db-engine hem fet un driver amb sqlite3 per guardar de manera persistent les alarmes.
+
+pagina actualitzacio de firmware: envia el fitxer dactualitzacio amb core legacy i es va fent pooling per a saber lestat actual, que es el que es mostra a la pantalla dactualitzacio. quan el gravador sesta reiniciant, sespera 15 segons i comença a fer un polling de connectivitat, un cop torna a tenir connectivitat, es torna a fer polling destat.
+
+pagina de configuracio basica: pagina simple que es parla amb el core-legacy
+pagina de logs pagina simple que es parla amb el core-legacy que rep els logs del video-engine i els renderitza o els descarrega. depenent del que digui lusuari
+documentacio: pagina simple que es parla amb el core-legacy

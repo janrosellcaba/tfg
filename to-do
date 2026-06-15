@@ -1,6 +1,3 @@
-live streaming -> WebRTC guanyador, HLS backup
-gravacions -> la-video-engine, HLS playlist, H264 V, H265 X, web server
-alarmes -> la-core-alarm, la-db-engine, persistent storage SQLite3, DBUS, gRPC, threads architecutre
 
 resum i abstract tornar a fer!
 
@@ -9,13 +6,10 @@ treure diagrama 3.1
 l'arquitectura global del sistema no està bé. figura 4.1
 revisar tema 4.
 
-pensar si poso reports (jo crec que no)
 
-la-dbengine no guarda res a bd, nomes fa de vfs, drive i ho envia per unix al video engine. fa de passarel.la.
 
 captura del wizards
 
-explicar molt mes en detall lo de gravacions (mirar be el video engine)
 
 #
 
@@ -23,9 +17,15 @@ explicar molt mes en detall lo de gravacions (mirar be el video engine)
 
 #
 
+pensar si poso reports (jo crec que no)
+live streaming -> WebRTC guanyador, HLS backup
+gravacions -> la-video-engine, HLS playlist, H264 V, H265 X, web server
+alarmes -> la-core-alarm, la-db-engine, persistent storage SQLite3, DBUS, gRPC, threads architecutre
 tema de grants i de login (es fa un login pla).
 explicar idiomes i18n a la part de info-usr a home page
+explicar molt mes en detall lo de gravacions (mirar be el video engine)
 
+la-dbengine no guarda res a bd, nomes fa de vfs, drive i ho envia per unix al video engine. fa de passarel.la.
 averiguar tema del token
 averiguar com va el login en el corelegacy
 captures
