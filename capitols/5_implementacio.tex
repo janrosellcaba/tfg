@@ -76,6 +76,7 @@ El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de
   \includegraphics[width=0.85\textwidth]{figures/ui_login.png}
   \caption{Pantalla d'inici de sessió (Login).}
   \label{fig:ui_login}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 L'API d'autenticació del sistema s'executa com un procés en dues fases coordinat a través del punt d'accés unificat \texttt{/WebLogin}, gestionat pel microservei \textbf{la-core-legacy} i exposat a l'exterior de forma segura mitjançant el proxy invers d'NGINX sota el protocol de transport xifrat HTTPS.
@@ -194,6 +195,7 @@ La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el des
   \includegraphics[width=0.95\textwidth]{figures/ui_home.png}
   \caption{Pàgina d'inici principal de Web Core View.}
   \label{fig:ui_home}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Des d'aquesta pantalla centralitzada, l'usuari pot navegar de manera asíncrona mitjançant el menú de mosaic o utilitzar els controls globals de la capçalera de l'aplicació per accedir a les diferents eines operatives.
@@ -219,6 +221,7 @@ A la part superior dreta de l'aplicació, dins de la barra de capçalera persist
   \includegraphics[width=0.45\textwidth]{figures/ui_home_user.png}
   \caption{Panell d'informació de l'estat del videogravador (esquerra) i d'usuari (dreta).}
   \label{fig:ui_home_panels}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Fent clic a la icona d'informació de maquinari, es desplega un panell lateral que actua com a diagnòstic ràpid de l'estat de salut de l'NVR (Figura \ref{fig:ui_home_panels}, esquerra). Aquest panell mostra paràmetres crítics obtinguts directament del maquinari de forma asíncrona:
@@ -247,6 +250,7 @@ Accedint a través del botó del panell d'informació, l'operador és redirigit 
   \includegraphics[width=0.95\textwidth]{figures/ui_license.png}
   \caption{Pàgina de gestió de la llicència del sistema.}
   \label{fig:ui_license}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Sistema unificat d'alertes en temps real i canal de notificacions}
@@ -257,6 +261,7 @@ Un element clau de la capçalera és la icona de la campana de notificacions (Fi
   \includegraphics[width=0.95\textwidth]{figures/ui_errors.png}
   \caption{Sistema de notificacions i errors emergents.}
   \label{fig:ui_errors}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Per aconseguir-ho, l'aplicació implementa una subscripció asíncrona persistent mitjançant el servei de notificacions d'errors unificat (\texttt{AlertService}). Aquest servei manté una connexió constant via WebSocket Segur amb el microservei \textbf{la-core-notifier}. Quan es produeix un esdeveniment a l'NVR, aquest és publicat al bus intern de Linux \textbf{D-Bus}. El servei de notificacions llegeix el senyal, el converteix en un missatge estructurat amb el format \texttt{ERRORS\_NOTIFY} i el transmet immediatament cap al frontend per fer aparèixer un globus de notificació (\textit{badge}) amb el nombre d'alertes pendents sobre la icona de la campana.
@@ -282,6 +287,7 @@ Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usu
   \includegraphics[width=0.95\textwidth]{figures/ui_system1.png}
   \caption{Pantalla de configuració principal del sistema generada dinàmicament.}
   \label{fig:ui_system1}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Mitjançant aquesta validació en cascada, el client d'Angular consulta de manera proactiva la capa de recursos i l'esquema de dades bruts abans de dibuixar la vista. Si l'operador intenta forçar una petició d'escriptura invàlida, el servidor la rebutja immediatament amb un error \texttt{HTTP 422 Unprocessable Entity}.
@@ -294,6 +300,7 @@ Internament, per garantir un temps d'accés $O(1)$ i l'eficiència en sistemes d
   \includegraphics[width=0.95\textwidth]{figures/ui_system2.png}
   \caption{Detall de l'edició de paràmetres de xarxa i interfícies.}
   \label{fig:ui_system2}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Durant les operacions de lectura (\texttt{GET}), l'API del servidor realitza una operació d'hidratació de dades (\textit{Merge}):
@@ -319,6 +326,7 @@ El client web actua com un intèrpret asíncron de les definicions d'esquema exp
   \includegraphics[width=0.95\textwidth]{figures/ui_system3.png}
   \caption{Desplegables (\textit{selects}) i botons commutadors (\textit{toggles}).}
   \label{fig:ui_system3}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Validació Dinàmica a ConfigInputComponent}
@@ -445,6 +453,7 @@ Atès que, per motius de seguretat, algunes càmeres IP estan connectades a port
   \includegraphics[width=0.95\textwidth]{figures/ui_proxy.png}
   \caption{Eina de Web Proxy per a l'accés a càmeres aïllades en subxarxes internes.}
   \label{fig:ui_proxy}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Mitjançant aquesta pantalla senzilla (Figura \ref{fig:ui_proxy}), l'administrador pot introduir la IP local de la càmera i el port. El \textit{frontend} es comunica amb \textbf{la-core-legacy} per ordenar la creació d'un túnel invers intern, permetent l'accés al portal web natiu de la càmera des de dins de l'aplicació \textit{Web Core View}.
@@ -457,6 +466,7 @@ La visualització de vídeo en directe representa el component més crític de l
   \includegraphics[width=0.95\textwidth]{figures/ui_cameras.png}
   \caption{Mosaic de visualització de vídeo en directe.}
   \label{fig:ui_cameras}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix en dues capes diferenciades coordinades pel microservei \textbf{la-video-engine}:
@@ -466,7 +476,7 @@ Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix 
   \item \textbf{Servidor de Mitjans WebRTC (MediaMTX):} Els fotogrames de vídeo capturats i empaquetats per GStreamer es canalitzen internament en un pipeline d'escriptura cap al servidor multimèdia d'alt rendiment \textbf{MediaMTX} (actuant com a servidor centralitzat de WebRTC i WHEP). Aquest servei gestiona la negociació SDP (\textit{Session Description Protocol}), el xifratge de paquets SRTP sobre transport UDP, i serveix el vídeo amb una latència punta a punta inferior a 300 ms natius en qualsevol navegador web actual, recolzant-se en la targeta gràfica (GPU) del dispositiu del client per a la descodificació fina.
 \end{enumerate}
 
-Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE,, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
+Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
 
 \subsection{La Interfície de Càmeres i el Disseny de Mosaic}
 A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$, $2\times2$ i $4\times4$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
@@ -478,6 +488,7 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
   \includegraphics[width=0.5\textwidth]{figures/activity_video_connection.png}
   \caption{Diagrama d'activitat de la lògica de connexió i reconnexió de vídeo.}
   \label{fig:activity_video_connection}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Negociació SDP i Establiment del Canal de Streaming}
@@ -506,6 +517,7 @@ Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figur
   \includegraphics[width=0.7\textwidth]{figures/seq_video_streaming.png}
   \caption{Diagrama de seqüència de l'establiment de streaming de vídeo (SDP).}
   \label{fig:seq_video_streaming}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Orquestració de Vídeo amb el Patró Strategy}
@@ -563,6 +575,7 @@ En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una sol
   \includegraphics[width=0.95\textwidth]{figures/ui_recordings.png}
   \caption{Vista del reproductor de vídeo històric i component interactiu Timeline.}
   \label{fig:ui_recordings}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Emmagatzematge de Vídeo: el Sistema de Fitxers Propietari FS2}
@@ -654,6 +667,7 @@ Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el 
   \includegraphics[width=0.3\textwidth]{figures/alarms_data_flow.png}
   \caption{Topologia del canal de dades, persistència i difusió asíncrona d'alarmes.}
   \label{fig:alarms_data_flow}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Adquisició de Senyals i Cues Threads-Safe de Processament}
@@ -734,6 +748,7 @@ A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva
   \includegraphics[width=0.95\textwidth]{figures/ui_alarms.png}
   \caption{Taula de monitoratge d'alarmes en temps real i botons d'assentiment.}
   \label{fig:ui_alarms}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \begin{figure}[!htbp]
@@ -741,6 +756,7 @@ A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva
   \includegraphics[width=0.55\textwidth]{figures/state_alarm.png}
   \caption{Diagrama d'estats del cicle de vida de les alarmes.}
   \label{fig:state_alarm}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 L'operador pot interaccionar amb qualsevol dels registres per tal d'assentir-los (\textit{Acknowledgment}) fent clic sobre el botó \textit{Ack} al final de la fila. Aquesta ordre viatja cap a la cua de comandes de \texttt{la-core-alarm} mitjançant el missatge de WebSocket següent:
@@ -770,6 +786,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
   \includegraphics[width=0.95\textwidth]{figures/ui_update.png}
   \caption{Mòdul d'actualització per seleccionar arxius de firmware.}
   \label{fig:ui_update}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \begin{enumerate}
@@ -792,6 +809,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
   \includegraphics[width=0.48\textwidth]{figures/ui_updating2.png}
   \caption{Barra de progrés reactiva i fases d'escriptura (\textit{flashing}).}
   \label{fig:ui_updating_prog}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \begin{figure}[htbp]
@@ -799,6 +817,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
   \includegraphics[width=0.95\textwidth]{figures/ui_updating3.png}
   \caption{Pantalla de reinici automàtic amb sondeig de reconnectivitat.}
   \label{fig:ui_updating_reboot}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Mòdul d'Accions Globals: Còpies de Seguretat i Restauració de Fàbrica}
@@ -809,6 +828,7 @@ El panell d'accions de configuració unifica les comandes administratives destru
   \includegraphics[width=0.95\textwidth]{figures/ui_configuration.png}
   \caption{Accions globals de manteniment: Backup, Restore i Reset de Fàbrica.}
   \label{fig:ui_configuration_actions}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 \begin{itemize}
@@ -825,6 +845,7 @@ El visor de registres (Figura \ref{fig:ui_log}) s'ha programat per complir de ma
   \includegraphics[width=0.95\textwidth]{figures/ui_log.png}
   \caption{Visor de registres i auditories amb filtres temporals i descàrrega.}
   \label{fig:ui_log}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Per poder treballar amb volums de dades molt grans que poden superar les 500.000 files de successos per setmana, s'ha dissenyat un mètode de visualització optimitzat en dues capes que evita el col·lapse de la memòria RAM del navegador de l'usuari:
@@ -841,6 +862,7 @@ En entorns industrials o de màxima seguretat, és habitual que els gravadors NV
   \includegraphics[width=0.95\textwidth]{figures/ui_documentation.png}
   \caption{Secció de suport tècnic per la descàrrega directa dels manuals en PDF.}
   \label{fig:ui_documentation}
+  \small Font: Elaboració pròpia.
 \end{figure}
 
 Per resoldre aquesta limitació operativa, la secció de Documentació (Figura \ref{fig:ui_documentation}) s'ha programat per funcionar de manera completament unificada i autosuficient. Tots els manuals d'usuari i fitxes tècniques estan integrats i empaquetats directament en la memòria de l'aplicació de l'equip. En fer clic sobre el botó de descàrrega del fitxer d'ajuda, el frontend envia una ordre cap al servei d'arxiu lògic de \texttt{la-core-legacy} per extreure el fitxer comprimit format \texttt{support\_file.tar.gz} del disc local i descarregar-lo al PC de l'instal·lador, oferint una eina d'ajuda autònoma i sense dependències de serveis externs de xarxa.
