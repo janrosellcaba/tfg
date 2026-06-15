@@ -79,15 +79,20 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
   \small
   \begin{tabular}{@{}llllc@{}}
     \toprule
-    \textbf{ID}    & \textbf{Tasca}        & \textbf{Dependència} & \textbf{Recursos}                     & \textbf{Hores} \\ \midrule
-    GF1            & Formació Angular 19   & -                    & Programador, PC                       & 40             \\
-    AC1            & Login                 & GF1                  & Programador, Analista, PC             & 20             \\
-    AC2            & Home Page             & AC1                  & Programador, Analista, PC             & 20             \\
-    AV1            & Core Alarm (WSS)      & AC3                  & Programador, Analista, PM, PC         & 50             \\
-    AV3            & Càmeres Directe       & AC2                  & Programador, Analista, PM, PC, NVR    & 50             \\
-    GV2            & System Config Avançat & MC2                  & Programador, Analista, PM, PC         & 60             \\
-    FM2            & Memòria TFG           & -                    & PM, Analista, Programador, Tester, PC & 80             \\ \midrule
-    \textbf{TOTAL} &                       &                      &                                       & \textbf{540}   \\ \bottomrule
+    \textbf{ID}    & \textbf{Tasca}              & \textbf{Dep.} & \textbf{Recursos}                     & \textbf{Hores} \\ \midrule
+    GF1            & Formació Angular 19         & ---           & Programador, PC                       & 40             \\ \midrule
+    AC1            & Login                       & GF1           & Programador, Analista, PC             & 20             \\
+    AC2            & Home Page                   & AC1           & Programador, Analista, PC             & 20             \\
+    AC3            & WebSocket Core + Keep-alive & AC1           & Programador, Analista, PC             & 20             \\ \midrule
+    MC1            & Firmware i Llicències       & AC2           & Programador, Analista, PC, NVR        & 40             \\
+    MC2            & Motor BD + Logs             & MC1           & Programador, Analista, PC             & 30             \\ \midrule
+    AV1            & Core Alarm (WSS)            & AC3           & Programador, Analista, PM, PC         & 50             \\
+    AV2            & Gestió I/O Temps Real       & AV1           & Programador, Analista, PC             & 20             \\
+    AV3            & Càmeres Directe (WebRTC)    & AC2           & Programador, Analista, PM, PC, NVR    & 50             \\ \midrule
+    GV1            & Reproducció Gravacions (HLS)& AV3           & Programador, Analista, PM, PC, NVR    & 110            \\
+    GV2            & System Config Schema-driven & MC2           & Programador, Analista, PM, PC         & 60             \\ \midrule
+    FM2            & Memòria TFG                 & ---           & PM, Analista, Programador, Tester, PC & 80             \\ \midrule
+    \textbf{TOTAL} &                             &               &                                       & \textbf{540}   \\ \bottomrule
   \end{tabular}
   \par\smallskip
   \small Font: Elaboració pròpia.
@@ -165,15 +170,39 @@ L'estimació econòmica s'ha realitzat assumint rols professionals i preus de me
   \end{tabular}
 \end{table}
 
+\subsection{Amortització del maquinari}
+\label{sec:amortitzacio}
+El càlcul de l'amortització del maquinari s'ha realitzat considerant la part proporcional dels actius físics utilitzats durant la durada del projecte (\textbf{5 mesos}), aplicant el mètode d'amortització lineal:
+
+\begin{table}[htbp]
+  \centering
+  \caption{Càlcul de l'amortització del maquinari del projecte.}
+  \label{tab:amortitzacio}
+  \small
+  \begin{tabular}{@{}lccccc@{}}
+    \toprule
+    \textbf{Actiu} & \textbf{Valor (€)} & \textbf{Vida útil} & \textbf{Amort./mes (€)} & \textbf{Mesos} & \textbf{Total (€)} \\ \midrule
+    Portàtil ASUS Expertbook i7 & 1.440,00 & 4 anys & 30,00 & 5 & 150,00 \\
+    NVR Lanaccess (ús parcial 20\%) & 3.600,00 & 5 anys & 60,00 × 20\% & 5 & 60,00 \\
+    \midrule
+    \textbf{TOTAL} & & & & & \textbf{210,00} \\
+    \bottomrule
+  \end{tabular}
+  \par\smallskip
+  \small Font: Elaboració pròpia.
+\end{table}
+
+L'NVR de proves és un actiu propietat de Lanaccess Telecom. S'ha imputat únicament un 20\% del seu cost mensual, corresponent a la proporció del temps en què l'equip ha estat dedicat exclusivament a les proves del projecte (en la resta del temps s'utilitza per a tasques de producció generals del departament).
+
 \subsection{Costos totals i resum econòmic}
 Considerant tots els conceptes analitzats en la planificació econòmica, el pressupost global del projecte es pot resumir de la següent manera:
 \begin{itemize}
   \item \textbf{Cost de Recursos Humans (CPA):} 13.567,50~\euro{}.
-  \item \textbf{Amortització del maquinari:} 210,00~\euro{}.
+  \item \textbf{Amortització del maquinari:} 210,00~\euro{} (detall a la Taula~\ref{tab:amortitzacio}).
   \item \textbf{Costos indirectes (despeses generals d'oficina):} 1.150,00~\euro{}.
   \item \textbf{Marge de contingència (10 \%):} 1.492,75~\euro{} (reserva preventiva calculada sobre la suma total de despeses).
 \end{itemize}
-D'aquesta manera, el pressupost final estimat del projecte ascendeix a \textbf{16.810,40~\euro{}}.
+D'aquesta manera, el pressupost final estimat del projecte ascendeix a \textbf{16.420,25~\euro{}}.
 
 \subsection{Control de gestió i seguiment de desviacions}
 Per garantir que el projecte no pateixi sobrecostos inassumibles o retards estructurals crítics en la fita final, s'ha dissenyat un sistema de control de gestió basat en mètriques de rendiment. El Cap de Projecte en fa el seguiment setmanalment, mesurant l'evolució del treball mitjançant el càlcul d'indicadors de desviació acumulats.
@@ -264,9 +293,9 @@ La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per 
 
 A causa de les desviacions de desenvolupament indicades anteriorment, s'ha hagut de destinar més temps d'enginyeria als rols d'\textbf{Analista} ($+20\text{ h}$) i \textbf{Programador} ($+35\text{ h}$), cosa que ha provocat un lleuger desviament brut del personal de \textbf{+101,25~\euro{}}. 
 
-Aquest sobrecost s'ha aconseguit absorbir de forma directa mitjançant l'ús de la partida preventiva del \textbf{Marge de Contingència (10 \%)}, que estava pressupostada inicialment en \textbf{1.492,75~\euro{}}. Un cop alliberats els fons restants d'aquesta partida i consolidada la resta de costos immutables (amortitzacions de maquinari a \textbf{210,00~\euro{}} i costos indirectes d'oficina mantinguts en \textbf{1.150,00~\euro{}}), el pressupost total final executat s'ha tancat en \textbf{15.028,75~\euro{}} (enfront dels 16.810,40~\euro{} inicialment estimats incloent el total del marge sense consumir).
+Aquest sobrecost s'ha aconseguit absorbir de forma directa mitjançant l'ús de la partida preventiva del \textbf{Marge de Contingència (10 \%)}, que estava pressupostada inicialment en \textbf{1.492,75~\euro{}}. Un cop alliberats els fons restants d'aquesta partida i consolidada la resta de costos immutables (amortitzacions de maquinari a \textbf{210,00~\euro{}} i costos indirectes d'oficina mantinguts en \textbf{1.150,00~\euro{}}), el pressupost total final executat s'ha tancat en \textbf{15.028,75~\euro{}} (enfront dels 16.420,25~\euro{} inicialment estimats incloent el total del marge sense consumir).
 
-D'aquesta manera, el projecte es tanca amb un estalvi net de \textbf{1.681,65~\euro{}} respecte a l'estimació de despesa màxima prevista pel negoci, demostrant una eficiència econòmica òptima.
+D'aquesta manera, el projecte es tanca amb un estalvi net de \textbf{1.391,50~\euro{}} respecte a l'estimació de despesa màxima prevista pel negoci, demostrant una eficiència econòmica òptima.
 
 \section{Anàlisi de sostenibilitat i implicacions ètiques}
 L'avaluació global del projecte requereix analitzar-ne l'impacte des de quatre dimensions fonamentals:

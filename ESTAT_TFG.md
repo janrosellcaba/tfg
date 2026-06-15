@@ -14,7 +14,7 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 | Capítol | Títol | Estat | Notes |
 |---|---|---|---|
 | 1 | Introducció i Context | ✅ COMPLET | Problema, estat de l'art, justificació alternatives, objectius |
-| 2 | Gestió del Projecte | ✅ COMPLET | Kanban, Gantt, pressupost real (15.128,75€), sostenibilitat |
+| 2 | Gestió del Projecte | ✅ COMPLET | Kanban, Gantt, pressupost real (15.028,75€), sostenibilitat |
 | 3 | Especificació de Requisits | ✅ COMPLET | User stories, RF/RNF, casos d'ús, marc normatiu (RGPD) |
 | 4 | Arquitectura i Disseny | ✅ COMPLET | Microserveis, NGINX, Schema-driven, model de dades |
 | 5 | Implementació | ✅ COMPLET | Login, Home, Config, WebRTC, HLS, Alarmes, Manteniment |
