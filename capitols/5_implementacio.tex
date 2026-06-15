@@ -321,6 +321,45 @@ El client web actua com un intèrpret asíncron de les definicions d'esquema exp
   \item \texttt{\_type: "resource\_list" / "resource\_flag"}: Modifica la llista d'opcions connectant dinàmicament el selector amb les instàncies del maquinari real obtingut prèviament d'una consulta a \texttt{/resources}.
 \end{itemize}
 
+El Llistat~\ref{lst:schema_json} mostra un exemple real de l'estructura JSON que el \textit{backend} envia al \textit{frontend} per a la configuració d'una càmera IP, il·lustrant la convenció de prefixos \texttt{\_} que evita col·lisió amb propietats reals del maquinari:
+
+\begin{lstlisting}[language=JavaScript, caption={Exemple d'esquema JSON de metadades per a la configuració d'una càmera IP.}, label={lst:schema_json}]
+{
+  "camera.{id}.name": {
+    "_type": "string",
+    "_description": "Nom assignat a la camara",
+    "_maxLength": 64,
+    "_default": "Camera"
+  },
+  "camera.{id}.enabled": {
+    "_type": "boolean",
+    "_description": "Activa o desactiva la camara al sistema",
+    "_default": true
+  },
+  "camera.{id}.stream.codec": {
+    "_type": "list",
+    "_allowedValues": ["H264", "H265"],
+    "_description": "Codec de compressio del flux de video principal",
+    "_default": "H264"
+  },
+  "camera.{id}.stream.fps": {
+    "_type": "integer",
+    "_min": 1,
+    "_max": 60,
+    "_description": "Fotogrames per segon del flux de video",
+    "_default": 25
+  },
+  "camera.{id}.stream.resolution": {
+    "_type": "list",
+    "_allowedValues": ["1080p", "720p", "4K"],
+    "_description": "Resolucio de captura del sensor de la camara",
+    "_default": "1080p"
+  }
+}
+\end{lstlisting}
+
+L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solapin amb propietats reals del dispositiu. El component \texttt{ConfigInputComponent} llegeix el camp \texttt{\_type} de cada entrada per decidir quin element de la interfície renderitzar: un commutador per a \texttt{"boolean"}, un selector per a \texttt{"list"} usant \texttt{\_allowedValues}, o un camp numèric amb rang per a \texttt{"integer"} usant \texttt{\_min} i \texttt{\_max}.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/ui_system3.png}
