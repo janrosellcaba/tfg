@@ -6,7 +6,65 @@ En aquest capítol es detalla el procés de construcció del sistema \textit{Web
 \section{Entorn de desenvolupament i tecnologies}
 Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte s'ha dissenyat basant-se en components completament independents (\textit{Standalone Components}), una decisió que permet simplificar notablement el codi, optimitzar el procés de \textit{tree-shaking} i assegurar que l'aplicació web carregui d'una manera molt més ràpida al navegador mitjançant la descàrrega sota demanda (\textit{lazy loading}).
 
-Pel que fa als estils, s'ha utilitzat \textbf{SCSS modular}. S'han definit variables globals per mantenir la consistència visual i s'ha aplicat l'estratègia de detecció de canvis \texttt{OnPush} per garantir que la interfície només es refresqui quan realment hi hagi canvis d'estat significatius, millorant enormement el rendiment de la CPU al dispositiu de client.
+\section{Disseny de la Capa d'Estils i Consistència Visual}
+Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en el preprocessador \textbf{SASS (SCSS)}. El repte de disseny visual residia en la convivència de dos entorns d'ús molt diferents: la consola d'administració tècnica (que requereix claredat i alt contrast amb fons clars sota llum natural) i el mosaic de visualització de vídeo (on els operadors treballen 24/7 en entorns foscos de centres de control i requereixen fons gairebé negres per evitar la fatiga visual).
+
+\subsection{Modularització SASS i Arquitectura de Variables}
+La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SASS (Llistat \ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:
+
+\begin{lstlisting}[language=SQL, label={lst:scss_variables}, caption={Fragment del fitxer de definició de variables d'estil SASS.}]
+// Paleta unificada d'identitat corporativa i estat semàntic
+$int-dark-blue: #223a75;
+$int-dark-gray: #5e5e5f;
+$int-dark-gray2: #444245;
+
+// Variables específiques per a l'entorn fosc de vídeo (Càmeres / Alarmes)
+$int-cam-bg: #1d2431;
+$int-cam-dark-blue: #151921;
+$int-cam-dark-blue2: #171c27;
+$int-cam-turquoise: #70dce8;
+$int-cam-text: #cccccc;
+
+// Estats d'alerta i connectivitat de dispositius
+$int-connectivity-green: #25da75;
+$int-connectivity-yellow: #ffd223;
+$int-connectivity-red: #da2525;
+$int-connectivity-gray: #CCCCCC;
+\end{lstlisting}
+
+Aquest desacoblament permet aplicar de manera homogènia els temes de color. Per exemple, els components d'I/O o d'estat de connexió utilitzen aquestes variables semàntiques (\texttt{\$int-connectivity-green}, etc.) per garantir que un mateix canvi d'estat es visualitzi de manera idèntica a qualsevol panell de l'aplicació web.
+
+\subsection{Encapsulació de l'Estil i Rendiment Gràfic}
+Per defecte, l'arquitectura d'Angular utilitza l'emulació d'encapsulació de l'estat del DOM (\texttt{ViewEncapsulation.Emulated}). Això garanteix que les regles SCSS de cada component estiguin aïllades i no afectin la resta de vistes. Tanmateix, s'han trobat escenaris excepcionals on s'ha hagut de forçar la injecció global d'estils mitjançant l'operador regulat \texttt{::ng-deep} (com ara en sobreescriure el disseny dels panells de pestanyes d'Angular Material o els components del visor de terminals \textit{Xterm}).
+
+Per maximitzar el rendiment i evitar sobrecarregar el processador del client (especialment crític en dispositius de control amb pantalles múltiples), s'ha seguit una regla d'escriptura estricta per a les microanimacions del DOM (com les transicions dels panells o la rotació d'icones de càrrega):
+\begin{itemize}
+  \item Es prohibeix modificar propietats d'esquema de renderitzat tradicional que forcin el navegador a recalcular les dimensions dels elements (com \texttt{width}, \texttt{height}, \texttt{margin} o \texttt{top}).
+        \text{S'utilitzen exclusivament transicions basades en el motor d'acceleració de la GPU} mitjançant les propietats CSS \texttt{transform} (ex: \texttt{translateY}, \texttt{scale}) i \texttt{opacity}. Això manté una ràtio de fotogrames estable de 60 FPS fins i tot amb múltiples fluxos de vídeo WebRTC actius.
+\end{itemize}
+
+\subsection{Adaptabilitat de Disseny (Breakpoints i Responsivitat)}
+Per donar resposta al requisit de compatibilitat multi-terminal (des de tauletes de manteniment de 1024px d'amplada de tècnics de camp, fins a monitors de definició 4K de centres de control), s'ha implementat un disseny totalment adaptatiu utilitzant regles flexibles de **Flexbox** i **CSS Grid**.
+
+S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substituint-les per unitats de mesura relatives basades en el tamany de font del document (\texttt{rem}) i de l'espai d'execució de la pantalla (\texttt{vh}, \texttt{vw}, \texttt{\%}). Les variacions d'esquema més dràstiques es controlen mitjançant consultes de mitjans (@media queries) enfocades als llindars de resolució següents:
+
+\begin{lstlisting}[language=SQL, caption={Exemple de Media Query responsiva per a la graella de mosaics del tauler principal.}]
+.section h2 {
+  width: 1020px;
+
+  @media (max-width: 1349px) {
+    width: 810px;
+  }
+  @media (max-width: 1139px) {
+    width: 600px;
+  }
+  @media (max-width: 929px) {
+    width: 390px;
+  }
+}
+\end{lstlisting}
+
+Aquest disseny elàstic permet que els components crítics (com el visor d'alarmes o el llistat lateral de càmeres) es reubiquin, s'escalin o es repleguin automàticament per oferir un espai de treball òptim i ergonòmic en qualsevol dispositiu de l'operador.
 
 \section{Autenticació, Gestió de Permisos i Cicle de Vida del Core}
 El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de sessió (Figura \ref{fig:ui_login}). A diferència d'altres plataformes de gestió web, en tractar-se d'un sistema \textit{embedded} de seguretat crítica, el flux de treball s'ha dissenyat per minimitzar el consum de recursos al microcontrolador local sense comprometre el control d'accessos ni la robustesa de la sessió.
@@ -72,7 +130,7 @@ El component de \textit{login} invoca el mètode \texttt{onInitPage()} de l'inje
 Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. Aquests es divideixen en un diccionari del costat de client que s'utilitza per mapar les funcionalitats i ocultar o mostrar elements del DOM en temps real mitjançant l'ús de \textit{Signals}:
 
 \begin{itemize}
-  \item \textbf{configuration:} Permet accedir als menús de configuració de xarxa, rellotge, entrades/sortides físiques i virtuals, i alarmes.
+  \item \textbf{configuration:} Permet accedir aux menús de configuració de xarxa, rellotge, entrades/sortides físiques i virtuals, i alarmes.
   \item \textbf{users:} Habilita l'edició de comptes de tercers usuaris, actualització de contrasenyes i definició de permisos de perfil.
   \item \textbf{live:} Autoritza la visualització de vídeo en temps real de les càmeres IP connectades. Si s'utilitza en combinació amb el grant \textit{live-limited}, l'accés es restringeix exclusivament als canals indicats al camp \texttt{visual-cams} de la seva fitxa d'usuari.
   \item \textbf{record / download:} Habilita la consulta, reproducció històrica (\textit{playback}) i descàrrega de fragments d'enregistrament de vídeo emmagatzemats als discs durs del gravador.
@@ -111,7 +169,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 \end{lstlisting}
 
 \subsection{Subscripció Asíncrona de Temps Real i Notificacions}
-Immediatament després d'un inici de sessió reeixit i la redirecció de l'operador cap a la pàgina d'inici de l'aplicació (\texttt{/home}), s'inicialitza la comunicació bidireccional de temps real amb el microservei unificat de notificacions de l'NVR. L'aplicació obre un únic canal de comunicació persistent via WebSocket Segur (\textbf{WSS}) cap al camí d'execució \texttt{/ws/la-core-notifier/}.
+Immediatament després d'un inici de sessió reeixit i la redirecció de l'operador cap a la pàgina d'inici de l'aplicació (\texttt{/home}), s'inicialitza la comunicació bidireccional de temps real amb el microservei unificat de notificacions de l'NVR. L'aplicació obre un único canal de comunicació persistent via WebSocket Segur (\textbf{WSS}) cap al camí d'execució \texttt{/ws/la-core-notifier/}.
 
 Aquesta connexió unificada és fonamental per rebre d'una sola vegada totes les notificacions de canvis d'estats de les entrades digitals de l'equip, errors globals del maquinari i alertes de pèrdues de senyal de vídeo, evitant que els diferents components de la interfície hagin de mantenir múltiples sockets oberts cap al microprogramari.
 
@@ -136,7 +194,7 @@ La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el des
   \label{fig:ui_home}
 \end{figure}
 
-Des d'aquesta pantalla centralitzada, l'usuari pot navegar de manera asíncrona mitjançant el menú de mosaic o utilitzar els controls globals de la capçalera de l'aplicació per accedir a les diferents eines operatives.
+Des d'aquesta pantalla centralitzada, l'usuari pot navegar de manera asíncrona mitjançant el menú de mosaic o utilitzar els controls globals de la capçalera de l'aplicació per acceder a les diferents eines operatives.
 
 \subsection{Organització de Funcionalitats i Autorització Dinàmica}
 Per garantir una experiència d'usuari (UX) neta, adaptada al context de treball i lliure de sobrecàrregues cognitives, les eines del sistema s'organitzen visualment en tres grans seccions funcionals de treball:
@@ -213,7 +271,7 @@ Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usu
 
 \begin{enumerate}
   \item \textbf{Capa Teòrica (Esquema):} Defineix les regles abstractes de joc i els límits teòrics del programari de manera declarativa mitjançant fitxers YAML integrats al servei de validació de l'NVR (ex: \textit{"el sistema admet un màxim de 32 entrades"}).
-  \item \textbf{Capa Física (Recursos - \texttt{/resources}):} Exposa el maquinari realment connectat o llicenciat en l'equip en temps d'execució mi\textbf{mitjançant} un conjunt d'APIs REST complementàries (ex: \textit{"aquest equip disposa d'un mòdul físic amb 8 entrades instal·lades"}).
+  \item \textbf{Capa Física (Recursos - \texttt{/resources}):} Exposa el maquinari realment connectat o llicenciat en l'equip en temps d'execució mitjançant un conjunt d'APIs REST complementàries (ex: \textit{"aquest equip disposa d'un mòdul físic amb 8 entrades instal·lades"}).
   \item \textbf{Capa Lògica (Dades de Configuració):} Representa l'arbre de configuració real que l'operador decideix aplicar (ex: \textit{"activa la gravació quan l'entrada 3 estigui activa"}).
 \end{enumerate}
 
@@ -224,7 +282,7 @@ Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usu
   \label{fig:ui_system1}
 \end{figure}
 
-Mitjançant aquesta validació en cascada, el client d'Angular consulta de manera proactiva la capa de recursos i l'esquema de dades abans de dibuixar l'interfície. Si l'operador intenta forçar una petició d'escriptura invàlida, el servidor la rebutja immediatament amb un error \texttt{HTTP 422 Unprocessable Entity}.
+Mitjançant aquesta validació en cascada, el client d'Angular consulta de manera proactiva la capa de recursos i l'esquema de dades bruts abans de dibuixar la vista. Si l'operador intenta forçar una petició d'escriptura invàlida, el servidor la rebutja immediatament amb un error \texttt{HTTP 422 Unprocessable Entity}.
 
 \subsection{Projecció Virtual i Hidratació de Dades (Merge Logic)}
 Internament, per garantir un temps d'accés $O(1)$ i l'eficiència en sistemes de memòria flaix limitats, l'NVR emmagatzema les dades de configuració en un format pla de tipus clau-valor a través del bus del sistema (\texttt{D-Bus}). Tanmateix, per a l'API REST de cara al frontend, el servei \texttt{la-core-legacy} fa una projecció d'aquestes claus per reconstruir en temps real un arbre de dades jeràrquic i tipat en format JSON (Figura \ref{fig:ui_system2}).
@@ -239,7 +297,7 @@ Internament, per garantir un temps d'accés $O(1)$ i l'eficiència en sistemes d
 Durant les operacions de lectura (\texttt{GET}), l'API del servidor realitza una operació d'hidratació de dades (\textit{Merge}):
 \begin{enumerate}
   \item Carrega de la persistència les dades modificades per l'usuari.
-  \item Recorre l'esquema del node en paral·lel. Para cada propietat que no estigui definida en la persistència, hi injecta automàticament el seu valor per defecte (\texttt{\_default}).
+  \item Recorre l'esquema del node en paral·lel. Per a cada propietat que no estigui definida en la persistència, hi injecta automàticament el seu valor per defecte (\texttt{\_default}).
   \item Genera de manera automàtica totes les instàncies lògiques per a col·leccions fixes definides pel maquinari (ex: cam01 a cam16), evitant que l'aplicació Angular hagi d'omplir buits amb lògica condicional defensiva.
 \end{enumerate}
 
@@ -261,8 +319,8 @@ El client web actua com un intèrpret asíncron de les definicions d'esquema exp
   \label{fig:ui_system3}
 \end{figure}
 
-\subsection{Validació Dinàmica de Tipus i Formats amb Signals}
-Per garantir la integritat de les dades del costat de client i guiar l'operador abans de fer l'enviament, s'ha programat una variable reactiva calculada (\textit{computed signal}) anomenada \texttt{computedValidationError}. Aquesta avalua de forma instantània el valor escrit contra les regles declaratives de l'esquema:
+\subsection{Validació Dinàmica a ConfigInputComponent}
+Per seguir estrictament la filosofia \textit{schema-driven}, el component \texttt{ConfigInputComponent} ha estat refactoritzat per llegir de manera nativa i dinàmica les propietats d'esquema de cada node (com \texttt{\_regex}, \texttt{\_min}, \texttt{\_maxLength}) sense dependre de paràmetres rígids. S'ha unificat el tractament d'errors a través d'una variable reactiva calculada (\textit{computed signal}), que compila les expressions regulars i avalua els límits numèrics i de text.
 
 \begin{lstlisting}[language=JavaScript, caption={Lògica de validació dinàmica amb \textit{Signals} i \textit{Regex} a ConfigInputComponent.}]
 computedValidationError = computed(() => {
@@ -270,58 +328,50 @@ computedValidationError = computed(() => {
   const def = this.fieldDef();
   if (!def) return null;
 
-  // 1. Validacio de patrons d'expressio regular (ex: IP, Mascara, Domain)
   if (def._regex) {
     const rx = new RegExp(def._regex);
-    if (!rx.test(String(value))) {
-      return def._description || 'Format invalid';
-    }
+    if (!rx.test(String(value))) return def._description || 'Format invàlid';
   }
-
-  // 2. Validacio de limits numerics de rang
   if (def._type === 'integer' || def._type === 'numeric' || def._type === 'decimal') {
     const minVal = def._min !== undefined ? def._min : def._minValue;
     const maxVal = def._max !== undefined ? def._max : def._maxValue;
-    if (minVal !== undefined && value < minVal) return `Minim: ${minVal}`;
-    if (maxVal !== undefined && value > maxVal) return `Maxim: ${maxVal}`;
+    if (minVal !== undefined && value < minVal) return `Mínim: ${minVal}`;
+    if (maxVal !== undefined && value > maxVal) return `Màxim: ${maxVal}`;
   }
-
-  // 3. Validacio de longituds de text
   if (def._type === 'string') {
-    if (def._minLength && String(value).length < def._minLength) {
-      return `Minim ${def._minLength} caracters`;
-    }
-    if (def._maxLength && String(value).length > def._maxLength) {
-      return `Maxim ${def._maxLength} caracters`;
-    }
+    if (def._minLength && String(value).length < def._minLength) return `Mínim ${def._minLength} caràcters`;
+    if (def._maxLength && String(value).length > def._maxLength) return `Màxim ${def._maxLength} caràcters`;
   }
   return null;
 });
 \end{lstlisting}
 
-\subsection{Gestió de Centineles i Valors Buits}
-Un repte arquitectònic clau d'aquest model híbrido (dades jeràrquiques sobre disc pla clau-valor) és el tractament dels camps buits. En els sistemes de dades plans, enviar una cadena buida (\texttt{""}) s'interpreta normalment com una ordre per esborrar física i completament la clau de la memòria d'emmagatzematge.
+\subsection{Bloqueig de Configuració (Pessimistic Locking)}
+Abans de modificar qualsevol valor en aquestes pantalles, l'usuari ha de clicar sobre la icona del cadenat. Aquesta acció desencadena l'algorisme de \textit{Pessimistic Locking} (Figura \ref{fig:seq_config_lock}), sol·licitant l'accés d'escriptura al servei \textbf{la-core-legacy} a l'adreça \texttt{/webprotocol/device-service/properties/lock?node=config\&seed=...}.
 
-Tanmateix, a la lògica de negoci de l'NVR, una cadena buida pot ser una opció de configuració voluntària i explícita (per exemple, decidir que una alarma no realitzi cap acció, eliminant les accions per defecte \texttt{"record+relay"}). Si el servidor esborrés la clau física del disc, en el següent procés d'hidratació s'injectaria erròniament el valor per defecte del programari.
-
-Per resoldre aquest problema, s'ha implementat el centinela de dades buides \texttt{\_\_is\_empty\_}. Quan l'operador neteja un camp a l'aplicació web, l'API REST de backend intercepta la petició abans de la seva persistència, detecta la intenció de buidar la dada i escriu la cadena \texttt{\_\_is\_empty\_} sobre la clau corresponent del NVR. Durant els fluxos de lectura, el motor tradueix el centinela un altre cop a un \texttt{""} real, abstenint-se d'injectar-hi la propietat per defecte.
-
-\subsection{Control de Concurrència i Bloqueig Pesimista (Locking)}
-Per assegurar l'atominicitat de les modificacions i prevenir col·lisions d'escriptura en entorns multi-administrador o multiclient (incloses diferents pestanyes del mateix navegador), s'ha codificat un algorisme de \textbf{bloqueig pesimista} (\textit{Pessimistic Locking}) recolzat pel paràmetre \texttt{seed} de sessió.
-
-Abans d'entrar en mode edició, l'usuari ha de sol·licitar l'adquisició del cadenat. El frontend genera un identificador aleatori (\textit{seed}) que s'emmagatzema a l'espai d'execució d'aquesta pestanya (\texttt{sessionStorage}). Es demana el bloqueig al servei \texttt{la-core-legacy}:
-
-\begin{lstlisting}[language=json, caption={Resposta exitosa de l'API de bloqueig (200 OK).}]
+Si la sol·licitud és reeixida, el servidor retorna una estructura JSON que autoritza l'edició:
+\begin{lstlisting}[language=json, caption={Estructura JSON del bloqueig de configuració.}]
 {
-  "token": "aVQ3wjNZ5QIXNAGjhfGgYdpFDWoHsJW5",
+  "path": "config",
+  "token": "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
   "expiresIn": 30,
-  "path": "config"
+  "seed": "8b9f27cda0134e7f8a9bcdef01234567"
 }
 \end{lstlisting}
 
-Un cop adquirit, es dispara des d' Angular un cicle d'actualització o batec de cor (\textit{heartbeat}) que manté el cadenat actiu cada 15 segons. Per evitar que la reactivitat d'aquest temporitzador provoqui avaluacions d'estat innecessàries de l'arbre de components del navegador, s'ha configurat per executar-se fora del context de detecció de canvis de \texttt{Zone.js}:
+El camp \texttt{token} actua com a signatura per a les operacions d'escriptura posteriors, garantint que només el posseïdor pugui fer modificacions. El camp \texttt{expiresIn} defineix en segons el marge de temps abans que el cadenat expiri si el \textit{heartbeat} no el renova des del \textit{frontend} a través de la crida \texttt{acquireLock()}. Si un altre usuari el té, la pantalla es bloqueja com a "Només lectura" via \textit{Signals}.
 
-\begin{lstlisting}[language=JavaScript, caption={Optimització del cicle de vida de Zone.js per a la renovació del cadenat.}]
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{figures/seq_config_lock.png}
+  \caption{Diagrama de seqüència del procés d'adquisició i alliberament de Lock de configuració.}
+  \label{fig:seq_config_lock}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
+L'adquisició del cadenat requereix un batec de cor (\textit{heartbeat}) per mantenir el token de bloqueig active. Per no saturar la CPU del terminal disparant el cicle d'Angular, s'executa fora de \textit{Zone.js}:
+
+\begin{lstlisting}[language=JavaScript, caption={Optimització del cicle de vida de \textit{Zone.js} per renovació de \textit{tokens}.}]
 private scheduleRenewal(ms: number) {
   this.stopRenewal();
   this.zone.runOutsideAngular(() => {
@@ -332,21 +382,12 @@ private scheduleRenewal(ms: number) {
 }
 \end{lstlisting}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.9\textwidth]{figures/seq_config_lock.png}
-  \caption{Diagrama de seqüència del procés d'adquisició i alliberament de Lock de configuració.}
-  \label{fig:seq_config_lock}
-  \small Font: Elaboració pròpia.
-\end{figure}
-
-Si el recurs d'edició està ocupat, el servidor respon amb un codi \texttt{HTTP 409 Conflict} aportant el nom de l'usuari i la IP que té el bloqueig, obligant l'aplicació Angular a bloquejar la vista actual com a "Només lectura" de forma instantània (Figura \ref{fig:seq_config_lock}).
-
-\subsection{Detecció de Deltes i Gestió de Reinicis}
-En prémer el botó de desar, en lloc d'enviar tot l'arbre de configuració (el que saturaria el canal d'escriptura i el maquinari del gravador), s'executa l'algorisme recursiu de diferències programat en el frontend (\texttt{getObjectDelta}), comparant l'estat actual contra l'estat inicial original. Les modificacions s'envien mitjançant peticions parcials \texttt{PATCH}:
+\subsection{Detecció de Deltes al Desar (Save)}
+Quan l'administrador fa clic al botó de desar (\textit{Save}), en comptes d'enviar tot l'esquema sencer (que saturaria el gravador), s'executa un algorisme recursiu de diferències (\textit{delta payload}). Aquests canvis s'envien habitualment a \textbf{la-core-legacy} mitjançant peticions HTTP \texttt{PATCH}, tot i que per modificacions estructurals en algun cas s'utilitza \texttt{PUT}. L'algorisme de detecció actua de la següent manera:
 
 \begin{lstlisting}[language=JavaScript, caption={Algorisme recursiu de detecció de Deltes per a l'optimització de payloads amb normalització de primitius.}]
 export function getObjectDelta(current: any, original: any, path: string = ''): any {
+  // Normalització de tipus primitius booleans
   const normalize = (val: any) => {
     if (val === 'true') return true;
     if (val === 'false') return false;
@@ -363,14 +404,14 @@ export function getObjectDelta(current: any, original: any, path: string = ''): 
   let hasChanges = false;
 
   for (const key in normCurrent) {
-    if (key.startsWith('_')) continue; // Ignora camps estructurals de l'esquema
+    if (key.startsWith('_')) continue; // Ignora camps visuals o privats
     
     const currentVal = normCurrent[key];
     const originalVal = normOriginal ? normOriginal[key] : undefined;
 
     const diff = getObjectDelta(currentVal, originalVal, `${path}.${key}`);
     
-    // Evita la propagacio de sub-objectes buits sense canvis reals
+    // Evitar propagació d'objectes o nodes buits
     if (diff !== undefined && (typeof diff !== 'object' || Object.keys(diff).length > 0)) {
       delta[key] = diff;
       hasChanges = true;
@@ -380,10 +421,6 @@ export function getObjectDelta(current: any, original: any, path: string = ''): 
   return hasChanges ? delta : undefined;
 }
 \end{lstlisting}
-
-Un aspecte de rendiment crític gestionat pel backend és la detecció automàtica de si el canvi d'un d'aquests paràmetres requereix reiniciar l'NVR per aplicar-se (marcat amb la propietat \texttt{\_rebootRequired: true} dins del seu esquema de definició YAML).
-
-Quan s'aplica l'escriptura de dades, el validador del backend avalua si qualsevol camp de la delta conté aquesta bandera. Si és així, el servidor estableix automàticament un indicador global de "Reinicio pendent" i injecta de manera asíncrona la capçalera personalitzada \texttt{X-Reboot-Required: true} a la resposta HTTP de l'API. L'interceptor d'Angular llegeix la capçalera i actualitza l'estat de les vistes, de manera que el frontend sap de forma dinàmica i unificada quan avisar l'operador, sense necessitat de duplicar aquesta lògica de negoci complexa en el codi de la interfície de client.
 
 \section{Assistents de Configuració (Wizards)}
 El sistema també disposa d'assistents pas a pas (\textit{Wizards}) per facilitar la posada en marxa ràpida de l'equip a operadors sense coneixements tècnics avançats. S'ha adaptat completament l'estètica CSS de l'eina \textit{legacy} per adequar-la al disseny modern i reactiu de la nova aplicació, guiant l'usuari en la detecció automàtica de càmeres IP a la xarxa local de forma interactiva i assistida.
@@ -420,7 +457,7 @@ A nivell de maquinari del gravador, l'arquitectura de transmisssió de vídeo es
 Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa (la qual cosa impedeix establir el canal de vídeo per defecte d'ICE), el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
 
 \subsection{La Interfície de Càmeres i el Disseny de Mosaic}
-A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$, $2\times2$ i $4\times4$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
+A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$, $2\times2$ i $4\times4$). Cadascuna de les cel·les que formen acest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
 
 La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag and Drop}) nativa integrada amb la llista lateral de càmeres del panell esquerre. L'usuari pot arrossegar qualsevol càmera cap a una cel·la del mosaic. Aquesta acció de drop recupera la identitat del dispositiu d'entrada, demana el seu mètode d'accessibilitat i demana de forma dinàmica la càrrega del flux, seguint el cicle d'activitat descrit a la Figura \ref{fig:activity_video_connection}.
 
@@ -501,7 +538,7 @@ La reactivitat dels indicadors visuals es manté gràcies a l'obertura d'un cana
 \begin{itemize}
   \item \textbf{Supervisió de Canvis (Estat d'Entrada):} El servei escolta el flux del canal i rep el tipus d'esdeveniment \texttt{IO\_NOTIFY}. En rebre la dada, actualitza a l'instant el mètode reactiu de la llista de sensors digital, fent canviar el color de l'indicador del DOM (verd per a \textit{deactivated/idle}, vermell per a \textit{activated/on}).
   \item \textbf{Activació Manual (Estat de Sortida):} Si el perfil de l'operador disposa de permisos de control d'I/O de tipus d'escriptura actius, pot realitzar un doble clic sobre qualsevol de les sortides lògiques configurades, o obrir el menú contextual a través de la icona corresponent.
-  \item \textbf{Viatge de Dades:} Aquesta interacció de client desencadena de forma immediata una petició d'escriptura POST unificada cap al servei \textbf{la-core-legacy} sota la ruta \texttt{output-status-set.cgi}. El backend llegeix el camí, valida la intenció i commuta l'estat del relé físic a nivell del maquinari. Un cop realitzat el canvi de sortida, l'NVR llança el senyal de variació a D-Bus, que es propaga a tots els clients connectats a través de WebSocket unificat, garantint la consistència immediata de l'estat global del sistema.
+  \item \textbf{Viatge de Dades:} Aquesta interacció de client desencadena de forma immediata una petició d'escriptura POST unificada cap al servei \textbf{la-core-legacy} sota la ruta \texttt{output-status-set.cgi}. El backend llegeix el camí, valida la intenció i commuta l'estat del relé físic a nivell del maquinari. Un cop realitzat el canvi de sortida, l'NVR llança el senyal de variació a D-Bus, que es propaga a tots os clients connectats a través de WebSocket unificat, garantint la consistència immediata de l'estat global del sistema.
 \end{itemize}
 
 \section{Reproducció de Gravacions Històriques i Arquitectura de Playback}
@@ -522,7 +559,7 @@ La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi
 Quan l'operador selecciona un interval de temps a la interfície d'Angular, el client demana la llista de reproducció realitzant una crida HTTP GET cap a la ruta \texttt{/hls-play.m3u8?token=...\&start=...\&end=...}. El servidor de vídeo de l'NVR intercepta la petició mitjançant la funció unificada \texttt{cgi\_hls} i executa el següent algorisme en temps real:
 \begin{enumerate}
   \item \textbf{Cerca de fitxers d'enregistrament:} Mitjançant la biblioteca d'indexació \texttt{lanaccess::searcher}, s'interroga l'historial de gravacions associat al token per localitzar els fitxers d'enregistrament d'FS2 (*File System 2*) que contenen vídeo dins de l'interval indicat pel client.
-  \item \textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}) la capçalera unificada que conté els metadades d'índex de tots els *buffers* de vídeo que formen el fitxer físic d'enregistrament.
+  \item \textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}) la capçalera unificada que conté els metadades d'índex de tots os *buffers* de vídeo que formen el fitxer físic d'enregistrament.
   \item \textbf{Generació del fitxer de manifest m3u8:} El servidor analitza el timestamp i la durada de cadascun dels buffers de dades i genera de forma dinàmica un fitxer de llista de reproducció que s'ajusta a l'estàndard HLS de l'W3C.
   \item \textbf{Gestió de talls de vídeo (\textit{Discontinuity}):} Si l'NVR detecta que el salt temporal entre dos buffers de gravació és superior a 3.0 segons natius (a causa d'una gravació per esdeveniments interrompuda), el servidor injecta de manera automàtica les directives especials \texttt{\#EXT-X-DISCONTINUITY} i \texttt{\#EXT-X-PROGRAM-DATE-TIME}. Això és un requisit crític que informa el reproductor de la interfície d'Angular que la línia temporal s'ha trencat, evitant congelacions en el motor de descodificació de vídeo del client.
 \end{enumerate}
@@ -530,16 +567,16 @@ Quan l'operador selecciona un interval de temps a la interfície d'Angular, el c
 \subsection{El Servidor de Segmentació Dinàmica (\texttt{segment.ts})}
 Quan el reproductor d'Angular avança a través de la llista de reproducció, demana de manera recursiva i asíncrona cadascun dels segments virtuals llistats mitjançant crides a \texttt{/segment.ts?id=...\&buffer=...\&codec=...}.
 
-La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la petició d'escriptura, obrir el fitxer físic amb \texttt{fs2\_file\_read\_buffer} i carregar el bloc en memòria en un espai temporal de baix nivell unificat de 8 MB assignat per l'arena d'emmagatzematge de dades de l'equip (\texttt{Buffer8MBPlayer}). Un cop en memòria, en lloc de decodificar o transcodificar el vídeo (el que inutilitzaria la CPU del dispositiu embedded), el servidor executa un procés de **trans-muxing ràpid sota demanda**:
+La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la petició d'escriptura, obrir el fitxer físic sota \texttt{fs2\_file\_read\_buffer} i carregar el bloc en memòria en un espai temporal de baix nivell unificat de 8 MB assignat per l'arena d'emmagatzematge de dades de l'equip (\texttt{Buffer8MBPlayer}). Un cop en memòria, en lloc de decodificar o transcodificar el vídeo (el que inutilitzaria la CPU del dispositiu embedded), el servidor executa un procés de **trans-muxing ràpid sota demanda**:
 \begin{enumerate}
   \item S'inicialitza un contenidor buit de flux de transport MPEG-TS, inserint-hi de manera unificada els paquets de 188 bytes regulats per a la taula d'associació de programes (PAT) i la taula de mapa de programes (PMT).
-  \item Per a cadascun dels fotogrames emmagatzemats dins del buffer, s'insereixen de forma nativa els valors del senyal de rellotge de referència de programa (\textbf{PCR}) i els timestamps de presentació (\textbf{PTS}) ajustant les trames a una base de temps de 90 kHz d'alta precisió.
-  \item Es calcula la longitud i es preparen els paquets de la capçalera PES (\textit{Packetized Elementary Stream}) encapsulant el flux elemental multimèdia d'origen.
+  \item Per a cadascun dels fotogrames emmagatzemats dins del buffer, s'insereixen de forma nativa els valors del senyal de rellotge de referència de programa (\textbf{PCR}) i os timestamps de presentació (\textbf{PTS}) ajustant les trames a una base de temps de 90 kHz d'alta precisió.
+  \item Es calcula la longitud i es preparen os paquets de la capçalera PES (\textit{Packetized Elementary Stream}) encapsulant el flux elemental multimèdia d'origen.
   \item Es retorna el segment complet amb la capçalera de tipus MIME unificada \texttt{Content-Type: video/MP2T}.
 \end{enumerate}
 
 \subsection{Coexistència i descodificació de Còdecs H.264 i H.265 (HEVC)}
-Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació **H.265 (HEVC)** de forma paral·lela a **H.264 (AVC)**. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu processament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (*plugins*) pesats o controls ActiveX degut a restriccions de patents.
+Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació **H.265 (HEVC)** de forma paral·lela a **H.264 (AVC)**. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu procésament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (*plugins*) pesats o controls ActiveX degut a restriccions de patents.
 
 Amb el nou disseny, el motor de segmentació del backend és capaç d'empaquetar i servir ambdós formats de manera dinàmica. Tanmateix, per tal que el descodificador per maquinari de la GPU del client pugui processar un segment de vídeo H.265, necessita rebre immediatament abans de cada imatge clau (IDR) les metadades de paràmetres de seqüència, imatge i vídeo (SPS, PPS i VPS).
 
@@ -547,7 +584,7 @@ En registrar-se la crida de segment, el mètode del backend \texttt{cgi\_segment
 \begin{itemize}
   \item L'algorisme examina el buffer de vídeo desitjat. Si és de tipus H.265, extreu de manera binària les metadades de paràmetres SPS/PPS/VPS mitjançant la funció \texttt{extract\_h265\_headers\_using\_index}.
   \item Si les capçaleres es troben dins d'aquest fragment (perquè s'ha capturat una imatge clau de la càmera), s'insereixen de manera nativa immediatament després de la unitat NAL del delimitador d'accés (AUD).
-  \item Si no es troben en el buffer actual perquè és un fragment de fotogrames intermedis (imatges P/B), el servidor retrocedeix de forma lògica a l'índex del primer buffer del fitxer de gravació de la càmera per buscar les capçaleres de referència de la seqüència original de l'NVR, garantint d'aquesta manera que el descodificador del client rebi sempre un flux de vídeo complet i autònom.
+  \item Si no es troben en el buffer actual perquè és un fragment de fotogrames intermedis (imatges P/B), el servidor retrocedeix de forma lògica a l'índex del premier buffer del fitxer de gravació de la càmera per buscar les capçaleres de referència de la seqüència original de l'NVR, garantint d'aquesta manera que el descodificador del client rebi sempre un flux de vídeo complet i autònom.
 \end{itemize}
 
 \subsection{La línia de Temps Interactiva i Orquestració del Client}
@@ -557,7 +594,7 @@ El cicle de funcionament de la interfície segueix els passos següents:
 \begin{enumerate}
   \item El client demana l'índex de gravacions per a una càmera i data seleccionades. El frontend rep un llistat de metadades que indiquen els intervals de temps en què s'ha registrat vídeo a l'NVR.
   \item El component dibuixa la barra de la línia de temps en temps real utilitzant un codi de colors: verd o blau per a gravació de tipus continu, i vermell o taronja per a dades de gravació disparada per un esdeveniment d'alarma, de moviment o analítica (obtingut mitjançant consultes a l'historial del dispositiu).
-  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el *timestamp* exacte de destí i executa el mètode reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
+  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el *timestamp* exacte de destí i executa el mètace reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
 \end{enumerate}
 
 \begin{lstlisting}[language=JavaScript, label={lst:hls_load_code}, caption={Càrrega dinàmica de llista de reproducció HLS basada en franges de temps.}]
@@ -593,66 +630,13 @@ loadVideo(): void {
 \section{Sistema d'Alarmes i Comunicació Asíncrona Multi-capa}
 La gestió, notificació i persistència de dades d'incidents d'alarma constitueix un dels requisits operatius més crítics d'un sistema de videovigilància professional. Qualsevol pèrdua de dades o retard en la senyalització pot tenir conseqüències greus per a la seguretat física de les instal·lacions.
 
-En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron multi-capa extrem a extrem: des del model de subscripció reactiva al costat de client d'Angular 19, passant pels canals de comunicació full-duplex de WebSockets i el servei d'orquestració multithreading de dades en C++11, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
+En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron multi-capa extrem a extrem: de del model de subscripció reactiva al costat de client d'Angular 19, passant pels canals de comunicació full-duplex de WebSockets i el servei d'orquestració multithreading de dades en C++11, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
 
 Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el següent diagrama de blocs del recorregut que segueix una alarma des que s'origina fins que es renderitza i es confirma a la pantalla de l'operador:
 
 \begin{figure}[htbp]
   \centering
-  \small
-  \begin{verbatim}
-  +---------------------------------------------------------------------------------+
-  |                            CAPA DE MAQUINARI I SENYALS                          |
-  |  [Sensor / Camara IP] --(Hardware Interrupt)--> [D-Bus com.lanaccess.sysevents]  |
-  +---------------------------------------------------------------------------------+
-                                           |
-                                           v (Signal "ALARM_NOTIFY")
-  +---------------------------------------------------------------------------------+
-  |                           MICROSERVEI "LA-CORE-ALARM"                           |
-  |  [dbus_listen_alarms_thread]                                                    |
-  |            |                                                                    |
-  |            v (Enqueue)                                                          |
-  |      [global_alarm_queue] (SafeQueue)                                           |
-  |            |                                                                    |
-  |            v (Dequeue & Process)                                                |
-  |  [db_client_thread] --(gRPC call Execute/Query)----------------+                |
-  +----------------------------------------------------------------|----------------+
-                                                                   |
-                                                                   v (unix:// socket)
-  +----------------------------------------------------------------|----------------+
-  |                           MICROSERVEI "LA-DB-ENGINE"           |                |
-  |  [DatabaseServiceImpl] <---------------------------------------+                |
-  |            |                                                                    |
-  |            v (Prepare & Exec SQLite3)                                           |
-  |      [SQLite3 Engine]                                                           |
-  |            |                                                                    |
-  |            v (Intercept Read/Write Operations)                                  |
-  |      [Remote VFS Driver] --(Unix Domain Socket /tmp/io.sock)---+                |
-  +----------------------------------------------------------------|----------------+
-                                                                   |
-                                                                   v (IoRequest)
-  +----------------------------------------------------------------|----------------+
-  |                           MICROSERVEI "LA-VIDEO-ENGINE"        |                |
-  |  [IO Server Listener] <----------------------------------------+                |
-  |            |                                                                    |
-  |            v (Direct Block I/O Operations)                                      |
-  |      [Hardware Disk Driver] ------> [Fisic Flash/HDD Storage]                    |
-  +---------------------------------------------------------------------------------+
-                                                     |
-  +--------------------------------------------------+ (Atomic Write OK)
-  |
-  v (Enqueue as EmissionData)
-  +---------------------------------------------------------------------------------+
-  |                  NOTIFICACIÓ DE TORNADA I EMISSIÓ CAP A LA WEB                  |
-  |  [global_emission_queue]                                                        |
-  |            |                                                                    |
-  |            v                                                                    |
-  |  [ws_emit_alarms_thread] ----(JSON string over libwebsockets)----> [Proxy NGINX] |
-  |                                                                         |
-  |                                                                         v (WSS)
-  |                                                              [Frontend Angular] |
-  +---------------------------------------------------------------------------------+
-  \end{verbatim}
+  \includegraphics[width=\textwidth]{figures/alarms_data_flow.png}
   \caption{Topologia del canal de dades, persistència i difusió asíncrona d'alarmes.}
   \label{fig:alarms_data_flow}
 \end{figure}
@@ -698,7 +682,7 @@ void wait_and_pop(T& value) {
 
 El fil d'execució de persistència \texttt{db\_client\_thread} es desperta immediatament per processar l'alarma. Aquest fil actua com a client de la base de dades i realitza crides d'alt rendiment mitjançant comunicació binària **gRPC** cap al servidor local \texttt{la-db-engine}.
 
-Si el canvi és d'estat d'inici de succés (\texttt{status = "start"}), s'efectua una operació d'inserció atòmica. En canvi, si és d'acabament d'incident (\texttt{status = "end"}), l'algorisme fa primer una consulta selectiva per recuperar l'identificador històric original i actualitza la línia de base de dades del registre corresponent, assegurant la correlació exacta dels estats.
+Si el canvi és d'estat d'inici de succés (\texttt{status = "start"}), s'efectua una operació d'inserció atòmica. En canvi, si és d'acabament d'incident (\texttt{status = "end"}), l'algorisme face primer una consulta selectiva per recuperar l'identificador històric original i actualitza la línia de base de dades del registre corresponent, assegurant la correlació exacta dels estats.
 
 \subsection{Arquitectura del VFS del Motor SQLite3 i Seguretat per Sockets}
 Per assegurar l'atominicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional **SQLite3**. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
@@ -778,7 +762,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
   \item \textbf{Sondeig d'Estat (\textit{Polling} de Flashing):} Un cop completada la pujada del fitxer, l'aplicació web inicia un procés de consulta periòdica de l'estat cap a \texttt{/webprotocol/firmware\_upgrade\_state} (vegeu la Figura \ref{fig:ui_updating_prog}). L'aplicació mapeja l'estat rebut a la barra de progrés reactiva:
         \begin{itemize}
           \item \texttt{UPLOADING / WAITING:} El fitxer s'està transferint i validant internament.
-          \item \texttt{UPDATING:} El sistema està escrivint el nou binari a la partició de firmware secundària des de la memòria d'emmagatzematge temporal.
+          \item \texttt{UPDATING:} El sistema s'està escrivint el nou binari a la partició de firmware secundària des de la memòria d'emmagatzematge temporal.
           \item \texttt{REBOOTING:} S'ordena el reinici del sistema físic.
           \item \texttt{ERROR / INCONSISTENT:} El procés es cancel·la a causa de dades corrompudes o errors de xarxa, activant immediatament la lògica de retorn segur a la partició anterior (\textit{dual-boot rollback}).
         \end{itemize}
@@ -813,8 +797,8 @@ El panell d'accions de configuració unifica les comandes administratives destru
 
 \begin{itemize}
   \item \textbf{Còpia de Seguretat (Backup):} El frontend sol·licita l'exportació de la base de dades. El servidor munta un fitxer binari unificat amb extensió \texttt{.cfg}. Per motius de seguretat, les contrasenyes i dades de tipus \texttt{password} s'exclouen d'aquesta llista i es substitueixen per la clau enmascarada \texttt{\_\_reserved\_pwd\_} per evitar l'exposició d'identitats de connexió.
-  \item \textbf{Restauració de Còpia (Restore):} Permet pujar un fitxer de configuració del tipus \texttt{.cfg} compatible. S'incorpora l'opció \texttt{preserveNetwork} dissenyada per evitar que l'instal·lador o tècnic de camp perdi la llista de connexió de xarxa en entorns de xarxa remots en cas que s'hagi de carregar una configuració heretada amb un enrutament diferent.
-  \item \textbf{Restabliment de Fàbrica (Factory Reset):} Permet retornar la base de dades a l'estat d'origen. Per evitar la pèrdua accidental de dades o atacs de tipus CSRF, s'imposa un mètode securitzat en d'una sola vegada: el client demana primer un token d'autorització d'escriptura de canvis d'un sol ús (\textit{Token de seguretat}) a la-core-legacy, i només si és vàlid, es pot processar la crida destructiva.
+  \item \textbf{Restauració de Còpia (Restore):} Permet pujar un fitxer de configuració del tipus \texttt{.cfg} compatible. S'incorporar l'opció \texttt{preserveNetwork} dissenyada per evitar que l'instal·lador o tècnic de camp perdi la llista de connexió de xarxa en entorns de xarxa remots en cas que s'hagi de carregar una configuració heretada amb un enrutament diferent.
+  \item \textbf{Restabliment de Fàbrica (Factory Reset):} Permet retornar la base de dades a l'estat d'origen. Per evitar la pèrdua accidental de dades o atacs de tipus CSRF, s'imposa un mètode securitzat d'un sol ús: el client demana primer un token d'autorització d'escriptura de canvis d'un sol ús (\textit{Token de seguretat}) a la-core-legacy, i només si és vàlid, es pot processar la crida destructiva.
 \end{itemize}
 
 \subsection{Visor d'Auditoria i Registre de Successos (Logs)}
@@ -830,7 +814,7 @@ El visor de registres (Figura \ref{fig:ui_log}) s'ha programat per complir de ma
 Per poder treballar amb volums de dades molt grans que poden superar les 500.000 files de successos per setmana, s'ha dissenyat un mètode de visualització optimitzat en dues capes que evita el col·lapse de la memòria RAM del navegador de l'usuari:
 \begin{enumerate}
   \item \textbf{Sondeig de Calendari:} Abans de pintar la interfície del calendari, l'aplicació consulta a través de \texttt{commonCalendarGetDays.cgi} quins dies tenen fitxers de registre disponibles. El frontend marca exclusivament els dies actius al selector, evitant que l'operador hagi d'interrogar dates buides.
-  \item \textbf{Processat de Dades amb SheetJS:} Quan es selecciona un dia vàlid, es demana l'historial a \texttt{listlog.cgi} com un fitxer binari xifrat estructurat. En lloc de renderitzar directament milers de línies al DOM (el que provocaria el bloqueig de la interfície de l'usuari), el frontend utilitza la llibreria \texttt{XLSX} (SheetJS) per parsejar les dades a nivell de memòria d'execució. El sistema organitza les dades en una taula reactiva de descàrrega i filtre local per paraula klau, permetent una navegació extremadament fluida.
+  \item \textbf{Processat de Dades amb SheetJS:} Quan es selecciona un dia vàlid, es demana l'historial a \texttt{listlog.cgi} com un fitxer binari xifrat estructurat. En lloc de renderitzar directament milers de línies al DOM (el que provocaria el bloqueig de la interfície de l'usuari), el frontend utilitza la llibreria \texttt{XLSX} (SheetJS) per parsejar les dades a nivell de memòria d'execució. El sistema organitza les dades en una taula reactiva de descàrrega i filtre local per paraula clau, permetent una navegació extremadament fluida.
 \end{enumerate}
 
 \subsection{Mòdul d'Ajuda i Documentació Integrada (Air-Gapped Operation)}
