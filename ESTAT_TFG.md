@@ -21,18 +21,16 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 | 6 | Validació i Proves | ✅ COMPLET | Jasmine/Karma, Playwright, latències, CPU/memòria, UAT |
 | 7 | Integració de Coneixements | ✅ COMPLET | Competències FIB, assignatures relacionades |
 | 8 | Conclusions i Treball Futur | ✅ COMPLET | Assoliment d'objectius, treball futur, reflexions personals |
-| Annexos | Annexos | ⚠️ CORRECCIÓ | Annex A.1 té el format JSON incorrecte (veure §Correccions) |
+| Annexos | Annexos | ✅ COMPLET | Annex A.1 corregit (juny 2026): format JSON real amb underscores |
 
 ---
 
 ## Correccions pendents
 
-### 1. Annex A.1 — Format JSON incorrecte ⚠️
-**Problema:** L'Annex A.1 usa format JSON Schema estàndard (`"type"`, `"minimum"`, `"enum"`) però el format real que envia `la-core-legacy` és amb **underscores prefixats** (`"_type"`, `"_min"`, `"_allowedValues"`).
+### 1. Annex A.1 — Format JSON incorrecte ✅ RESOLT (juny 2026)
+~~**Problema:** L'Annex A.1 usa format JSON Schema estàndard (`"type"`, `"minimum"`, `"enum"`) però el format real que envia `la-core-legacy` és amb **underscores prefixats** (`"_type"`, `"_min"`, `"_allowedValues"`).~~
 
-**Motiu del disseny real:** Els underscores eviten col·lisió amb propietats reals del maquinari (ex: una càmera pot tenir una propietat `"type"` o `"default"` com a dada real de configuració).
-
-**Acció:** Reescriure l'Annex A.1 amb el format correcte (consistent amb el codi real de `ConfigInputComponent` i amb l'exemple del cap. 3, RF-3.1).
+**Correcció aplicada:** L'Annex A.1 ara mostra el format real: diccionari pla amb claus en notació de punts (`"camera.{id}.stream.codec"`) i metadades underscore-prefixades (`_type`, `_allowedValues`, `_min`, `_max`, `_default`, `_description`). Text explicatiu actualitzat per justificar la convenció dels underscores. Compilació verificada (100 pàgines, sense errors).
 
 ### 2. Mòdul "Reports" — eliminar del menú ⚠️
 **Problema:** La secció 5.3 (Home Page) llista "Reports" al menú de Manteniment però no té secció d'implementació corresponent.
