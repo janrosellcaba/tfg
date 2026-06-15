@@ -128,7 +128,7 @@ Aquest és el requisit funcional més complex i innovador del sistema.
   \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Per tal d'il·lustrar la capacitat del motor dinàmic (\textit{schema-driven}) de desacoblar la interfície del frontend respecte de la lògica de baix nivell del gravador, es presenta a continuació un fragment d'esquema JSON de configuració avançada real enviat pel servei de vídeo. Aquest esquema defineix els tipus de transport admesos pel maquinari de visualització d'una càmera IP física (per estructura d'enumeració) i la restricció d'adreces de multidifusió (multicast) mitjançant expressions regulars (\textit{regex}) que el motor del frontend compilarà i validarà dinàmicament.
 \end{itemize}
 
-\begin{lstlisting}[language=JavaScript, caption={Exemple d'esquema avançat JSON de metadades per a IP Video amb restriccions regex.}]
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily, breaklines=true, language=JavaScript, caption={Exemple d'esquema avançat JSON de metadades per a IP Video amb restriccions regex.}]
 {
   "media.video.{streamId}.receiver.transport": {
     "_type": "list",

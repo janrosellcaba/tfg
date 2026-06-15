@@ -55,7 +55,7 @@ En un entorn \textit{embedded} on l'aplicació web corre directament en el maqui
 
 S'han dut a terme anàlisis de rendiment utilitzant el perfilador de memòria de Chrome DevTools durant sessions de reproducció continuada de vídeo WebRTC de dues hores de durada. Els resultats indiquen:
 \begin{itemize}
-    \item \textbf{Estabilitat de memòria (Heap):} El perfil del consum de memòria presenta una forma de "dent de serra" perfectament estable, oscil·lant entre els 45~MB i els 65~MB. Cada descens o caiguda abrupta en aquest perfil de "dent de serra" representa l'actuació de l'escombrador de memòria o \textbf{Garbage Collector} (GC) del motor V8 del navegador, el qual allibera immediatament i eficientment la memòria HEAP ocupada pels elements i estructures de dades descartades. Un cop finalitzades les connexions, aquest procés allibera el 100\% dels recursos gràcies al tancament net de la \texttt{RTCPeerConnection}, l'aturada activa de totes les pistes de vídeo (\texttt{track.stop()}), i la cancel·lació estricta de les subscripcions asíncrones, demostrant una \textbf{absència total de fugues de memòria} (\textit{memory leaks}).
+    \item \textbf{Estabilitat de memòria (Heap):} El perfil del consum de memòria presenta una forma de "dent de serra" perfectament estable, oscil·lant entre els 45~MB i els 65~MB. Cada descens o caiguda abrupta en aquest perfil de "dent de serra" representa l'actuació de l'escombrador de memòria o \textbf{Garbage Collector} (GC) del motor V8 del navegador, el qual allibera immediatament i eficientment la memòria HEAP ocupada pels elements i estructures de dades descartades. Un cop finalitzades les connexions, aquest procés allibera el 100\% dels recursos gràcies al tancament net de la \texttt{RTCPeerConnection}, l'aturada activa de totes les pistes de vídeo (\texttt{track.stop()}), i la cancel·lació estricta de les subscripcions asíncrones, demostrant una \textbf{absència total de fugues de memòria} (\textit{memory leaks}). Aquesta estabilitat és atribuïble directament al mètode d'escombrat segur implementat al patró \textit{Strategy} de reproducció de vídeo (\texttt{StreamingStrategy.closeStream()}), el qual garanteix que, en destruir qualsevol cel·la del mosaic de càmeres, es tanquin activament totes les pistes de vídeo de la instància (\texttt{track.stop()}), es cancel·lin les subscripcions asíncrones pendents i es destrueixi completament el context de la \texttt{RTCPeerConnection} de la memòria d'execució del navegador.
     \item \textbf{Optimització de CPU:} Gràcies a l'eliminació de les comprovacions de cicle complet de \textit{Zone.js} en Angular 19 i a la reactivitat granular basada exclusivament en \textbf{Signals}, l'ús de la CPU en el fil d'execució del navegador s'ha reduït en un 35\% respecte a prototips previs basats en RxJS/comprovacions estàndard. Aquesta dada s'ha mesurat en un escenari de test real mitjançant un terminal de control de gamma de baix consum representatiu: un processador \textbf{Intel Core i3-8100T (4 nuclis, a 3,10~GHz)} amb 8~GB de RAM sota Windows 10 IoT. Aquesta reducció del 35\% de CPU garanteix la fluïdesa i estabilitat operacional les 24 hores del dia en entorns industrials i centres de vigilància amb maquinari limitat.
 \end{itemize}
 
@@ -71,6 +71,28 @@ S'ha simulat una pèrdua de xarxa d'un minut durant una sessió activa de config
     \item El sistema detecta el tall en menys de 3 segons gràcies al servei de connectivitat.
     \item Es bloqueja la interfície amb una targeta d'error (\textit{connectivity-error-card}) per evitar canvis inconsistents.
     \item Un cop restaurada la xarxa, el \textit{WebSocket} es renegocia automàticament i l'usuari recupera el control de la seva sessió sense haver de tornar a introduir les credencials.
+\end{itemize}
+
+\subsection{Validació dels límits de connexió concurrents}
+Per verificar el comportament del servidor web davant d'escenaris de congestió extrema i garantir la resiliència del dispositiu enfront d'atacs de denegació de servei (DoS) involuntaris o intencionals, s'han executat proves de càrrega mitjançant l'eina \textbf{ApacheBench} simulant ràfegues de connexions HTTP simultànies contra el microservei \textbf{la-core-legacy}.
+
+El servidor web inicialitza la llibreria \textit{Libmicrohttpd} amb un límit estricte de \textbf{25 connexions globals concurrents} i un sublímit de \textbf{12 connexions per adreça IP d'origen}. Els resultats de la prova han demostrat que:
+\begin{itemize}
+    \item Quan el nombre de connexions simultànies se situa per sota del llindar establert, el servidor respon amb normalitat i sense degradació observable.
+    \item Un cop superat el límit de 25 connexions concurrents, el microservei rebutja de manera segura i determinista les peticions addicionals, retornant un error de connexió controlat sense comprometre la memòria RAM ni la CPU de l'NVR.
+    \item El sublímit per IP d'origen impedeix que un únic client maliciós esgoti la totalitat del \textit{pool} de connexions, mantenint el servei accessible per a la resta d'usuaris legítims de la xarxa.
+\end{itemize}
+
+Aquesta validació confirma que l'arquitectura del servidor web protegeix eficaçment el maquinari \textit{embedded} d'un videogravador davant de sobrecàrregues de connexió en entorns de xarxa corporativa.
+
+\subsection{Robustesa del driver VFS davant de talls elèctrics sobtats}
+Un dels requisits de qualitat més crítics per a un sistema de videovigilància industrial és la integritat de les dades de configuració i d'alarmes davant d'una interrupció elèctrica sobtada. Per validar aquest requisit, es van simular talls de corrent forçats en diverses fases del cicle d'escriptura d'alarmes actives al microservei \textbf{la-db-engine}.
+
+Les proves han demostrat que l'arquitectura del driver personalitzat de sistema de fitxers virtual (\textbf{VFS}) garanteix la integritat de les dades gràcies a tres mecanismes combinats:
+\begin{itemize}
+    \item \textbf{Escriptura per sectors de 512 bytes:} El driver \texttt{remote\_vfs} canalitza totes les operacions d'escriptura a disc en blocs alineats al sector físic via \texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}, garantint l'atomicitat de cada operació d'escriptura elemental.
+    \item \textbf{Mode \textit{Write-Ahead Logging} (WAL):} Configurat amb sincronització normal (\texttt{PRAGMA synchronous=NORMAL}), el motor SQLite3 escriu un registre transaccional previ a qualsevol modificació real de les dades, de manera que una interrupció durant l'escriptura deixa sempre un estat consistent i recuperable.
+    \item \textbf{Propietats ACID verificades:} En tots els escenaris de tall elèctric simulats, el sistema es va recuperar de forma atòmica en reincorporar-se el corrent: les transaccions incompletes van ser descartades automàticament sense corrompre les dades prèviament confirmades, consolidant el compliment dels principis d'Atomicitat, Consistència, Aïllament i Durabilitat (ACID).
 \end{itemize}
 
 \section{Validació d'Acceptació (UAT)}
