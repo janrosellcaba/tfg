@@ -60,7 +60,8 @@ Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:
     Frontend (Navegador) & NGINX & HTTPS (WHEP) & Senyalització SDP per a WebRTC (pla de control) \\
     Frontend (Navegador) & \textbf{la-video-engine} & SRTP/UDP (directe) & Flux de vídeo WebRTC (pla de dades) \\
     NGINX (Proxy) & \textbf{la-core-legacy} & HTTP (Intern) & Gestió de configuració i usuaris \\
-    NGINX (Proxy) & \textbf{la-db-engine} & HTTP (Intern) & Consultes a la base de dades SQLite \\ \bottomrule
+    NGINX (Proxy) & \textbf{la-db-engine} & HTTP (Intern) & Consultes a la base de dades SQLite \\
+    \textbf{la-video-engine} / \textbf{la-core-alarm} & \textbf{la-db-engine} & D-Bus / Unix Sockets & Comunicació interna del backend (alarmes i persistència al disc) \\ \bottomrule
   \end{tabular}
   }
 \end{table}
@@ -167,7 +168,7 @@ Aquest és un punt d'inflexió respecte a les versions anteriors del programari.
 
 Dins d'aquest disseny de gestió d'estat reactiu, un dels reptes tècnics ha estat la modificació d'estructures de dades altament anidades zone-free sense trencar la detecció de canvis nativa. Angular Signals es basa en la comparació de valors per referència; per tant, mutar directament una propietat interna d'un objecte complex no dispararia la reactivitat del component. Per resoldre-ho, s'ha implementat un algorisme de manipulació profunda (\textit{deep copy} i \textit{deep access}) que clona l'objecte d'estat local completament, hi aplica la modificació en el camp editat dinàmicament (identificat pel camí de la propietat JSON de l'esquema), i finalment actualitza el Signal amb la nova referència (\texttt{configSignal.set(newConfig)}). Aquest disseny garanteix la immutabilitat de l'estat i evita defectes de renderitzat col·laterals.
 
-A diferència de les arquitectures anteriors basades en \texttt{Zone.js}, que havien de revisar tot l'arbre de components davant qualsevol esdeveniment, l'ús de \textbf{Signals} permet que l'aplicació s'apropi a un model \textit{Zone-less}. Això és especialment crític en la visualització de vídeo: el fet que arribin metadades cada 100ms sobre el bitrate no provoca que es torni a avaluar tota la interfície, sinó només l'etiqueta de text específica, alliberant cicles de CPU del terminal per dedicar-los exclusivament a la descodificació de vídeo H.265.
+A diferència de les arquitectures anteriors basades en \texttt{Zone.js}, que havien de revisar tot l'arbre de components davant qualsevol esdeveniment, l'ús de \textbf{Signals} permet que l'aplicació s'apropi a un model \textit{Zone-less} (amb l'ús puntual de \texttt{NgZone} per a operacions concretes que ho requereixen, com ara els temporitzadors del servei de \textit{keep-alive}). Això és especialment crític en la visualització de vídeo: el fet que arribin metadades cada 100ms sobre el bitrate no provoca que es torni a avaluar tota la interfície, sinó només l'etiqueta de text específica, alliberant cicles de CPU del terminal per dedicar-los exclusivament a la descodificació de vídeo H.265.
 
 \section{El Motor Schema-Driven}
 El component més innovador del sistema és el motor de configuració dinàmic. Aquest motor permet desacoblar totalment el desenvolupament del \textit{frontend} de l'evolució del \textit{firmware}.

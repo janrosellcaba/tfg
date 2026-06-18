@@ -12,7 +12,8 @@
       "Bash(pdfinfo /home/jan/uni/tfg/latex/main.pdf)",
       "Bash(biber main *)",
       "Bash(echo \"Compilació final OK: $\\(pdfinfo main.pdf)",
-      "Bash(echo \"Exit status: $?\")"
+      "Bash(echo \"Exit status: $?\")",
+      "Bash(latexmk -pdf -f -interaction=nonstopmode main.tex)"
     ],
     "additionalDirectories": [
       "/tmp"

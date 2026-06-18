@@ -141,7 +141,7 @@ Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. A
   \item \textbf{firmware:} Permet realitzar l'actualització del microprogramari del dispositiu des del panell de manteniment.
 \end{itemize}
 
-L'estat de sessió d'usuari es manté en memòria de l'aplicació sota un model de \textbf{zero-persistence} mitjançant un \textbf{Signal privat} del servei. El cost d'aquest disseny és que un refresc manual de la pàgina (\texttt{F5}) tanca la sessió de l'operador, una penalització menor d'experiència d'usuari (UX) que es considera una decisió de disseny desitjable i necessària en una aplicació de seguretat industrial.
+L'estat de sessió d'usuari es manté en memòria de l'aplicació sota un model de \textbf{zero-persistence} mitjançant un \textbf{Signal privat} del servei. El cost d'aquest disseny és que un refresc manual de la pàgina (\texttt{F5}) elimina l'\textbf{estat d'Angular emmagatzemat a la memòria del client}---és a dir, el Signal privat que conté les dades de sessió---obligant l'operador a tornar a autenticar-se. Cal precisar que la \textit{cookie} de sessió del servidor no s'invalida en aquest procés: és la pèrdua de l'estat en memòria del client el que força la redirecció al formulari d'inici de sessió. Aquesta penalització menor d'experiència d'usuari (UX) es considera una decisió de disseny desitjable i necessària en una aplicació de seguretat industrial.
 
 \begin{figure}[htbp]
   \centering
