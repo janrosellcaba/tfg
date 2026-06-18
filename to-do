@@ -7,8 +7,7 @@ l'arquitectura global del sistema no està bé. figura 4.1
 revisar tema 4.
 
 
-
-captura del wizards
+mirar lo del Carles de la IA
 
 
 #
@@ -18,6 +17,7 @@ captura del wizards
 #
 
 pensar si poso reports (jo crec que no)
+captura del wizards
 live streaming -> WebRTC guanyador, HLS backup
 gravacions -> la-video-engine, HLS playlist, H264 V, H265 X, web server
 alarmes -> la-core-alarm, la-db-engine, persistent storage SQLite3, DBUS, gRPC, threads architecutre

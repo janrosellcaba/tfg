@@ -1,7 +1,7 @@
 \chapter{Arquitectura i Disseny}
 \label{ch:arquitectura}
 
-L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de modularitat, escalabilitat i eficiència en el consum de recursos. Atès que el programari s'executa en un entorn \textit{embedded} (el videogravador), s'ha optat per una arquitectura desacoblada on el \textit{frontend} assumeix la major part de la lògica de presentació per alliberar la CPU del maquinari per a les tasques crítiques de seguretat.
+L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de modularitat, escalabilitat i eficiència en el consum de recursos. Atès que el software s'executa en un entorn \textit{embedded} (el videogravador), s'ha optat per una arquitectura desacoblada on el \textit{frontend} assumeix la major part de la lògica de presentació per alliberar la CPU del maquinari per a les tasques crítiques de seguretat.
 
 \section{Arquitectura Global del Sistema}
 
@@ -9,14 +9,19 @@ L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microse
 
 \begin{itemize}
     \item \textbf{la-core-legacy:} El cervell central, gestor de la configuració (API REST), autenticació i bloquejos (locks).
-    \item \textbf{la-video-engine:} El motor que processa el vídeo, el guarda als discos i el serveix via HLS o WebRTC.
-    \item \textbf{la-db-engine:} Funciona com un \textit{Virtual File System} (VFS) i un \textit{driver} de passarel·la que dirigeix la base de dades lògica. S'encarrega d'ordenar la persistència dels històrics d'alarmes i telemetria, delegant l'escriptura física al disc exclusivament a \textbf{la-video-engine}.
+    \item \textbf{la-video-engine:} El motor que processa el vídeo, el guarda als discos i el serveix via HLS o WebRTC. També gestiona les escriptures i lectures a disc de qualsevol informació.
+    \item \textbf{la-db-engine:} Funciona com un \textit{Virtual File System} (VFS) i un \textit{driver} de passarel·la que dirigeix la base de dades lògica. S'encarrega d'ordenar la persistència dels històrics d'alarmes de video, delegant l'escriptura física al disc exclusivament a \textbf{la-video-engine}.
     \item \textbf{la-core-notifier} i \textbf{la-core-alarm:} Les passarel·les de WebSockets que disparen les notificacions en temps real cap al frontend.
 \end{itemize}
 
-Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTP cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració, i connexions persistents de WebSockets (\textit{ws}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
+Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració, i connexions persistents de WebSockets segurs (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
 
-Internament, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza trucades \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}, el qual actua com un \textit{driver} o VFS per a la base de dades \textbf{SQLite3}. Com a orquestrador, \textbf{la-db-engine} no guarda la informació directament al disc, sinó que es comunica via \textit{sockets} de Unix amb \textbf{la-video-engine} —l'únic servei amb permisos i funcions per escriure a disc— perquè persisteixi físicament la informació de forma segura.
+% TODO: revisar això "peticions HTTPS cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració"
+
+Internament, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza crides des \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}, el qual actua com un \textit{driver} o VFS per a la base de dades \textbf{SQLite3}. Com a orquestrador, \textbf{la-db-engine} no guarda la informació directament al disc, sinó que es comunica via \textit{sockets} de Unix amb \textbf{la-video-engine} —l'únic servei amb permisos i funcions per escriure a disc— perquè persisteixi físicament la informació de forma segura.
+
+% TODO: dir que els serveis son de system-d
+% TODO: revisar si esta ben explicat lo de driver/VFS del la-db-engine
 
 \begin{figure}[htbp]
   \centering
