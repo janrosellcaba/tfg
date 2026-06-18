@@ -1,0 +1,8 @@
+stateDiagram-v2
+    [*] --> New : Esdeveniment detectat
+    New --> Read : Usuari obre l'alarma
+    Read --> Acknowledged : Usuari confirma recepció
+    Read --> Archived : Usuari arxiva directament
+    Acknowledged --> Archived : Usuari arxiva
+    Archived --> Deleted : Usuari esborra
+    Deleted --> [*]

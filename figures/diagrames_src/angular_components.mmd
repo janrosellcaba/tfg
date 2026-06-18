@@ -1,0 +1,20 @@
+graph TD
+    subgraph Browser["Navegador - Angular App"]
+        SharedComp[Shared Components]
+        MaintMod[Maintenance Module]
+        ConfigMod[Config Module]
+        CoreSvc[Core Services/Guards]
+        VideoMod[Video Module]
+    end
+
+    subgraph Backend["Backend / NVR"]
+        RESTAPI[REST API]
+        WSServer[WebSocket Server]
+        StreamSvc[Streaming Service]
+    end
+
+    ConfigMod --> RESTAPI
+    CoreSvc --> RESTAPI
+    CoreSvc --> WSServer
+    VideoMod --> WSServer
+    VideoMod --> StreamSvc

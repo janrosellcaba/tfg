@@ -1,0 +1,12 @@
+sequenceDiagram
+    actor Usuari
+    participant LoginComponent
+    participant AuthService
+    participant Backend as Backend (API)
+
+    Usuari->>LoginComponent: Introdueix credencials
+    LoginComponent->>AuthService: login(user, password)
+    AuthService->>Backend: POST /login
+    Backend-->>AuthService: 200 OK (Token/Success)
+    AuthService-->>LoginComponent: Sessió iniciada
+    LoginComponent-->>Usuari: Redirecció a Home

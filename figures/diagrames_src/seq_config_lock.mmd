@@ -1,0 +1,18 @@
+sequenceDiagram
+    actor Admin
+    participant ConfigComponent
+    participant ConfigService
+    participant Backend as Backend (API)
+
+    Admin->>ConfigComponent: Entra a pàgina de config
+    ConfigComponent->>ConfigService: acquireLock(path)
+    ConfigService->>Backend: GET /lock
+    Backend-->>ConfigService: Lock Token (Success)
+    ConfigService-->>ConfigComponent: Mode Edició Activat
+
+    Admin->>ConfigComponent: Modifica dades i prem Guardar
+    ConfigComponent->>ConfigService: saveConfig(data, token)
+    ConfigService->>Backend: POST /config (with token)
+    Backend-->>ConfigService: 200 OK
+    ConfigService-->>ConfigComponent: Cambis aplicats
+    ConfigComponent-->>Admin: Mostra missatge d'èxit

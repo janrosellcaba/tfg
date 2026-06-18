@@ -1,0 +1,12 @@
+sequenceDiagram
+    actor Usuari
+    participant CamerasComponent
+    participant VideoService
+    participant StreamingServer as Streaming Server
+
+    Usuari->>CamerasComponent: Selecciona Càmera
+    CamerasComponent->>VideoService: getStreamUrl(cameraId)
+    VideoService->>StreamingServer: Request RTSP/Websocket
+    StreamingServer-->>VideoService: Stream Data
+    VideoService-->>CamerasComponent: Render Video Frame
+    CamerasComponent-->>Usuari: Mostra vídeo en pantalla

@@ -1,0 +1,33 @@
+flowchart TD
+    Start([Inici: Selecció de Càmera])
+    DemCfg[Demanar configuració de la càmera]
+    TéURL{Té URL de Stream?}
+    ErrorNoCfg[Mostra error 'Càmera no configurada']
+    InitPlayer[Inicialitzar reproductor WebRTC/HLS]
+    TryConn[Intentar connexió al Streaming Server]
+    ConnOk{Connexió amb èxit?}
+    Render[Renderitzar frames de vídeo]
+    SenyalActiu{Senyal actiu?}
+    TryReconn[Intentar reconexió automàtica]
+    LimitSuperat{S'ha superat el límit?}
+    Wait2[Esperar 2 segons]
+    NoSignal[Mostra text 'NO SIGNAL']
+    Fi([Fi])
+
+    Start --> DemCfg
+    DemCfg --> TéURL
+    TéURL -- No --> ErrorNoCfg
+    TéURL -- Sí --> InitPlayer
+    InitPlayer --> TryConn
+    TryConn --> ConnOk
+    ConnOk -- Sí --> Render
+    ConnOk -- No --> TryReconn
+    Render --> SenyalActiu
+    SenyalActiu -- Sí --> Render
+    SenyalActiu -- No --> TryReconn
+    TryReconn --> LimitSuperat
+    LimitSuperat -- No --> Wait2
+    Wait2 --> TryConn
+    LimitSuperat -- Sí --> NoSignal
+    ErrorNoCfg --> Fi
+    NoSignal --> Fi

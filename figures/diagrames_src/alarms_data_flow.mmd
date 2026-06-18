@@ -1,0 +1,45 @@
+flowchart TD
+    subgraph HW["CAPA DE MAQUINARI I SENYALS"]
+        Sensor["Sensor / Càmera IP"]
+        DBus["D-Bus\ncom.lanaccess.sysevents"]
+        Sensor -- "Hardware Interrupt" --> DBus
+    end
+
+    subgraph ALARM["MICROSERVEI LA-CORE-ALARM"]
+        dbus_thread["dbus_listen_alarms_thread"]
+        alarm_queue["global_alarm_queue\n(SafeQueue)"]
+        db_client["db_client_thread"]
+        dbus_thread -- "Enqueue" --> alarm_queue
+        alarm_queue -- "Dequeue & Process" --> db_client
+    end
+
+    subgraph DBENG["MICROSERVEI LA-DB-ENGINE"]
+        DBSvcImpl["DatabaseServiceImpl"]
+        SQLite3Engine["SQLite3 Engine"]
+        RemoteVFS["Remote VFS Driver"]
+        DBSvcImpl -- "Prepare & Exec SQLite3" --> SQLite3Engine
+        SQLite3Engine -- "Intercept Read/Write Operations" --> RemoteVFS
+    end
+
+    subgraph VIDENG["MICROSERVEI LA-VIDEO-ENGINE"]
+        IOListener["IO Server Listener"]
+        DiskDriver["Hardware Disk Driver"]
+        Storage[(Físic Flash/HDD Storage)]
+        IOListener -- "Direct Block I/O Operations" --> DiskDriver
+        DiskDriver --> Storage
+    end
+
+    subgraph NOTIFY["NOTIFICACIÓ DE TORNADA I EMISSIÓ CAP A LA WEB"]
+        EmissionQueue["global_emission_queue"]
+        WsThread["ws_emit_alarms_thread"]
+        NGINX["Proxy NGINX"]
+        FrontendAngular["Frontend Angular"]
+        EmissionQueue --> WsThread
+        WsThread -- "JSON string over libwebsockets" --> NGINX
+        NGINX -- "WSS" --> FrontendAngular
+    end
+
+    DBus -- "Signal ALARM_NOTIFY" --> dbus_thread
+    db_client -- "gRPC call Execute/Query\n(unix:// socket)" --> DBSvcImpl
+    RemoteVFS -- "Unix Domain Socket\n/tmp/io.sock (IoRequest)" --> IOListener
+    Storage -- "Atomic Write OK\n(Enqueue as EmissionData)" --> EmissionQueue

@@ -1,0 +1,28 @@
+graph LR
+    Operador[Operador]
+    Administrador[Administrador]
+    SistemaExtern["Sistema Extern\n(NVR/Càmera)"]
+
+    subgraph System["Aplicació WebCoreView"]
+        UC1([Login / Logout])
+        UC2([Veure Vídeo en Directe])
+        UC3(["Cercar i Reproduir\nGravacions"])
+        UC4([Gestionar Alarmes])
+        UC5([Configurar Xarxa i Sistema])
+        UC6(["Gestionar Usuaris i\nPermisos"])
+        UC7([Consultar Logs i Reports])
+        UC8([Control PTZ])
+    end
+
+    Operador --> UC1
+    Operador --> UC2
+    Operador --> UC3
+    Operador --> UC4
+    Administrador --> UC1
+    Administrador --> UC4
+    Administrador --> UC5
+    Administrador --> UC6
+    Administrador --> UC7
+    Administrador --> UC8
+    SistemaExtern --> UC2
+    SistemaExtern --> UC3

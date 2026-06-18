@@ -1,0 +1,23 @@
+graph LR
+    CoreModule -..-> MainModule
+    SharedModule -..-> MainModule
+
+    subgraph MainMod["Main Module"]
+        MainModule[MainModule]
+        VideoModule[VideoModule]
+        ConfigModule[ConfigModule]
+        MaintModule[MaintModule]
+
+        MainModule --> VideoModule
+        MainModule --> ConfigModule
+        MainModule --> MaintModule
+    end
+
+    AppModule --> AuthModule
+    AppModule --> MainModule
+
+    VideoModule --> CamerasGrid[Cameras List/Grid]
+    VideoModule --> RecPlayer[Recordings Player]
+    VideoModule --> AlarmsDash[Alarms Dashboard]
+    ConfigModule --> SysNet[System/Network Settings]
+    ConfigModule --> IPConfig[IP Video Config]

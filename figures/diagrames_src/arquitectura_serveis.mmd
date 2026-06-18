@@ -1,28 +1,31 @@
 graph TD
     Usuari([Usuari])
     WCV[web core view]
+    NGX[NGINX]
     CL[core legacy]
-    DBUS{dbus}
+    DBUS{{dbus}}
     CN[core notifier]
     CA[core alarm]
     DBE[db engine]
-    SQLite[(SQLite3)]
+    DBV[video engine]
+    Disk[(Disk)]
 
     Usuari -- UI --> WCV
     WCV -- UI --> Usuari
 
-    WCV -- http --> CL
+    WCV -- https / wss --> NGX
+    NGX -- http --> CL
+    NGX -- ws --> CN
+    NGX -- ws --> CA
+    NGX -- WHEP --> DBV
+    WCV -- UDP/SRTP --> DBV
+
     CL --> DBUS
-
-    WCV -- ws --> CN
-    WCV -- ws --> CA
-
     DBUS --> CN
     DBUS --> CA
-    DBUS --> DBE
 
     CA -- gRPC --> DBE
-    CL --> DBE
+    DBE -- unix --> DBV
 
-    DBE --> SQLite
-    SQLite --> DBE
+    DBV -- FS2 --> Disk
+    Disk -- FS2 --> DBV
