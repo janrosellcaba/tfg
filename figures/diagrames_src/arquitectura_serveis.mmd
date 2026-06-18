@@ -1,0 +1,28 @@
+graph TD
+    Usuari([Usuari])
+    WCV[web core view]
+    CL[core legacy]
+    DBUS{dbus}
+    CN[core notifier]
+    CA[core alarm]
+    DBE[db engine]
+    SQLite[(SQLite3)]
+
+    Usuari -- UI --> WCV
+    WCV -- UI --> Usuari
+
+    WCV -- http --> CL
+    CL --> DBUS
+
+    WCV -- ws --> CN
+    WCV -- ws --> CA
+
+    DBUS --> CN
+    DBUS --> CA
+    DBUS --> DBE
+
+    CA -- gRPC --> DBE
+    CL --> DBE
+
+    DBE --> SQLite
+    SQLite --> DBE

@@ -1,0 +1,28 @@
+graph TD
+    subgraph WS["Estació de Treball / Operador"]
+        Browser["Navegador Web:\nChrome/Firefox"]
+    end
+
+    subgraph NVR["Dispositiu Lanaccess / NVR"]
+        Angular["Servidor Web: Angular App\n+ Proxy"]
+        Core["Core Service / Backend API"]
+        DB[(Base de Dades d'Alarmes)]
+
+        Angular -- Local Process --> Core
+        Core -- SQL Queries --> DB
+    end
+
+    subgraph Field["Dispositius de Camp"]
+        Cam1[Càmera IP 1]
+        Cam2[Càmera IP 2]
+        Sensors[Sensors I/O]
+
+        Cam1 --> Cam2
+        Cam2 --> Sensors
+    end
+
+    Browser -- "HTTP / WebSocket (JSON)" --> Angular
+
+    Core -- "RTSP / HTTP" --> Cam1
+    Core -- "RTSP / HTTP" --> Cam2
+    Core -- "Digital Interface" --> Sensors
