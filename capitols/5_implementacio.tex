@@ -6,6 +6,30 @@ En aquest capítol es detalla el procés de construcció del sistema \textit{Web
 \section{Entorn de desenvolupament i tecnologies}
 Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. L'estructura del projecte s'ha dissenyat basant-se en components completament independents (\textit{Standalone Components}), una decisió que permet simplificar notablement el codi, optimitzar el procés de \textit{tree-shaking} i assegurar que l'aplicació web carregui molt més ràpidament al navegador mitjançant la descàrrega sota demanda (\textit{lazy loading}).
 
+\subsection{Sistema de Build Embedded: Mantos-rec i Yocto}
+
+El \textit{frontend} \textit{Web Core View} no existeix de manera aïllada: s'integra com un component més d'un \textit{firmware} complet per a un dispositiu \textit{embedded}. El repositori \textbf{mantos-rec} centralitza la construcció de tot el sistema operatiu del gravador NVR, basat en el projecte \textbf{Yocto} —el \textit{framework} estàndard de la indústria per a la creació de distribucions Linux personalitzades per a maquinari específic.
+
+L'entorn Yocto de mantos-rec s'organitza en diverses capes (\textit{layers}). El directori \texttt{sources/} conté tant capes de la comunitat (\texttt{poky}, \texttt{meta-qt6}, etc.) com les específiques del fabricant del processador: \texttt{meta-imx} i \texttt{meta-freescale}, que revelen la plataforma de maquinari subjacent. El gravador corre sobre un processador \textbf{NXP i.MX}, una família de SoC (\textit{System on Chip}) ARM àmpliament usada en dispositius de seguretat i videovigilància \textit{embedded}. A banda d'aquestes, el directori \texttt{sources/meta-mantos} és la capa pròpia del projecte i s'estructura en subcarpetes per dominis funcionals:
+
+\begin{itemize}
+    \item \texttt{recipes-la/}: Conté les receptes de tots els serveis propietaris de Lanaccess: \textbf{la-core-legacy}, \textbf{la-video-engine}, \textbf{la-db-engine}, \textbf{la-core-notifier}, \textbf{la-core-alarm}, \textbf{la-launcher} i el propi \textbf{la-web-core-view}.
+    \item \texttt{recipes-httpd/}: Empaqueta la configuració de \textbf{NGINX} (el fitxer \texttt{la-core.conf}) directament a la imatge del sistema.
+    \item \texttt{recipes-kernel/}: Conté els \textit{patches} aplicats al kernel de Linux per a les necessitats específiques del maquinari de l'NVR.
+    \item \texttt{recipes-bsp/}: El \textit{Board Support Package}: configuració del gestor d'arrencada \textbf{U-Boot} i els \textit{device tree blobs} (DTB) que descriuen el maquinari al kernel a baix nivell.
+    \item \texttt{recipes-images/}: Defineix la imatge final del sistema (ex: \texttt{packagegroup-mantos-full.bb}), determinant quins paquets s'inclouen al \textit{rootfs} de producció en el fitxer \texttt{.wic}.
+\end{itemize}
+
+\subsubsection{La recepta la-web-core-view i el mecanisme de desplegament en dues fases}
+
+La integració del \textit{frontend} Angular al \textit{firmware} es gestiona mitjançant la recepta \texttt{la-web-core-view\_git.bb}, ubicada a \texttt{sources/meta-mantos/recipes-la/la-web-core-view/}. El seu cicle de vida s'articula en dues fases clarament diferenciades.
+
+\textbf{Fase de \textit{build} (en temps de compilació Yocto):} La recepta clona el repositori del projecte des del GitLab intern de Lanaccess, declara \texttt{nodejs-native} com a dependència de construcció i executa les tasques \texttt{do\_configure} i \texttt{do\_compile}, que equivalen a executar \texttt{npm install} i \texttt{npm run build}. El resultat compilat (\texttt{dist/web-core-view}) no s'instal·la directament al sistema de fitxers del dispositiu: la recepta el comprimeix en un arxiu \texttt{webfiles.tar} que desa a \texttt{/apps/la-web-core-view/var/}, acompanyat d'un fitxer \texttt{webfiles.version} per al control de versions en calent.
+
+\textbf{Fase de desplegament (en temps d'arrencada del NVR):} Gestionada per l'script \texttt{la-web-core-view-deployment.sh}, inclòs al paquet \texttt{la-launcher}. En cada arrencada, l'script compara la versió del \texttt{webfiles.tar} empaquetat amb la que hi ha a \texttt{/data/web-core-view/var/www/.version}. Si hi ha discrepància —o si és la primera arrencada del dispositiu— descomprimeix el \texttt{webfiles.tar} a la partició de dades (\texttt{/data/web-core-view/var/www/}). NGINX, configurat amb un \texttt{alias} cap a \texttt{/data/web-core-view/var/www/browser/}, els serveix immediatament.
+
+Aquest disseny té una conseqüència directa en l'agilitat del flux de treball de desenvolupament. La partició \texttt{/data/} és de lectura i escriptura, a diferència de la partició principal del sistema, que és de només lectura i immutable. Durant el desenvolupament actiu, no cal llançar un \textit{build} complet de Yocto —un procés que pot trigar hores— per validar canvis a la UI. N'hi ha prou amb compilar l'Angular localment i sincronitzar el directori \texttt{dist/} amb el NVR via \texttt{rsync} o \texttt{scp} directament a \texttt{/data/web-core-view/var/www/browser/}; una recàrrega del navegador ja mostra els canvis. Només per a les \textit{releases} de producció cal el \textit{build} complet de Yocto, que generarà el \textit{firmware} sencer (fitxer \texttt{.wic}) amb el nou \texttt{webfiles.tar} inclòs. Aquesta separació entre sistema immutable i dades modificables en calent és un patró de disseny habitual en sistemes \textit{embedded} de producció que equilibra la robustesa del sistema operatiu amb l'agilitat del desplegament de contingut.
+
 \section{Disseny de la Capa d'Estils i Consistència Visual}
 Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en \textbf{SCSS} (la sintaxi moderna del preprocessador \textbf{SASS}, \textit{Syntactically Awesome Style Sheets}). El repte de disseny visual residia en la convivència de dos entorns d'ús molt diferents: la consola d'administració tècnica (que requereix claredat i alt contrast amb fons clars sota llum natural) i el mosaic de visualització de vídeo (on els operadors treballen de forma contínua en entorns foscos de centres de control i requereixen fons gairebé negres per evitar la fatiga visual).
 
@@ -79,7 +103,7 @@ El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de
   \small Font: Elaboració pròpia.
 \end{figure}
 
-L'API d'autenticació del sistema s'executa com un procés en dues fases coordinat a través del punt d'accés unificat \texttt{/WebLogin}, gestionat pel microservei \textbf{la-core-legacy} i exposat a l'exterior de forma segura mitjançant el proxy invers d'NGINX sota el protocol de transport xifrat HTTPS.
+L'API d'autenticació del sistema s'executa com un procés en dues fases coordinat a través del punt d'accés unificat \texttt{/WebLogin}, gestionat pel microservei \textbf{la-core-legacy} i exposat a l'exterior de forma segura mitjançant el proxy invers de NGINX sota el protocol de transport xifrat HTTPS.
 
 \subsection{Fase 1: Verificació de credencials (PlainLogin)}
 El client envia les credencials introduïdes per l'operador. Tot i que viatgen en text pla dins del JSON, la confidencialitat està garantida pel xifrat de la capa de transport (HTTPS/TLS). S'efectua una petició HTTP POST a \texttt{/WebLogin} enviant el següent payload:

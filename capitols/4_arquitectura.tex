@@ -8,20 +8,21 @@ L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de mo
 L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microserveis interns coordinats dins del sistema operatiu del gravador. La plataforma interactua amb els següents serveis crítics executant-se en l'entorn \textit{embedded}:
 
 \begin{itemize}
-    \item \textbf{la-core-legacy:} El cervell central, gestor de la configuració (API REST), autenticació i bloquejos (locks).
-    \item \textbf{la-video-engine:} El motor que processa el vídeo, el guarda als discos i el serveix via HLS o WebRTC. També gestiona les escriptures i lectures a disc de qualsevol informació.
-    \item \textbf{la-db-engine:} Funciona com un \textit{Virtual File System} (VFS) i un \textit{driver} de passarel·la que dirigeix la base de dades lògica. S'encarrega d'ordenar la persistència dels històrics d'alarmes de video, delegant l'escriptura física al disc exclusivament a \textbf{la-video-engine}.
-    \item \textbf{la-core-notifier} i \textbf{la-core-alarm:} Les passarel·les de WebSockets que disparen les notificacions en temps real cap al frontend.
+    \item \textbf{la-core-legacy:} El nucli central del sistema. Gestiona la configuració del gravador (API REST), l'autenticació i autorització d'usuaris, els bloquejos de recursos (\textit{locks}) i la coordinació del cicle de vida de la resta de serveis.
+    \item \textbf{la-video-engine:} El motor de vídeo. Processa els fluxos de les càmeres IP, els grava als discos i els redistribueix cap a \textbf{MediaMTX} per a la seva servei en temps real. És l'únic servei del sistema amb privilegis d'escriptura a disc, centralitzant i controlant totes les operacions d'E/S.
+    \item \textbf{la-db-engine:} Passarel·la de persistència lògica. Implementa un \textit{Virtual File System} (VFS) personalitzat de SQLite que, en lloc d'operar sobre fitxers físics, redirigeix totes les lectures i escriptures a través de \textit{sockets} Unix cap a \textbf{la-video-engine}. Exposa una interfície \textbf{gRPC} als seus clients i no té permisos directes sobre el disc.
+    \item \textbf{la-core-notifier:} Passarel·la de WebSockets per a notificacions generals del sistema. Es subscriu al bus \textbf{D-Bus} per detectar esdeveniments de maquinari —com pèrdues de senyal de vídeo o canvis d'estat de càmera— i els retransmet immediatament al \textit{frontend} via WSS.
+    \item \textbf{la-core-alarm:} Passarel·la de WebSockets especialitzada en alarmes. Es comunica amb \textbf{la-db-engine} via \textbf{gRPC} per persistir els registres d'events, i escolta el \textbf{D-Bus} per detectar activacions de sensors i relés, transmetent-les en temps real al client.
+    \item \textbf{MediaMTX:} Servidor de mitjana de codi obert que actua com a motor de \textit{streaming} de vídeo en temps real. Rep els fluxos de les càmeres des de \textbf{la-video-engine} i els redistribueix als clients via dos protocols diferenciats: \textbf{WebRTC} (transport SRTP/UDP negociat per ICE), i \textbf{HLS} (\textit{HTTP Live Streaming}).
 \end{itemize}
 
-Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració, i connexions persistents de WebSockets segurs (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
+Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy}, i connexions de WebSockets segurs (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
 
-% TODO: revisar això "peticions HTTPS cap a \textbf{la-core-legacy} per a l'enviament i consulta d'estats de configuració"
+Internament, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza crides \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}.
 
-Internament, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza crides des \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}, el qual actua com un \textit{driver} o VFS per a la base de dades \textbf{SQLite3}. Com a orquestrador, \textbf{la-db-engine} no guarda la informació directament al disc, sinó que es comunica via \textit{sockets} de Unix amb \textbf{la-video-engine} —l'únic servei amb permisos i funcions per escriure a disc— perquè persisteixi físicament la informació de forma segura.
+\textbf{la-db-engine} intercepta la lectura i escriptura d'alarmes a disc implementant un \textit{Virtual File System} (VFS) personalitzat de SQLite: en lloc de realitzar les operacions d'E/S sobre fitxers físics, redirigeix totes les escriptures i lectures de SQLite a través de \textit{sockets} Unix cap a \textbf{la-video-engine}. D'aquesta manera, \textbf{la-db-engine} presenta una base de dades lògica als seus clients (via gRPC), però no té permisos ni responsabilitat sobre el disc. \textbf{la-video-engine} és l'únic servei amb privilegis per escriure a disc, cosa que centralitza i controla totes les operacions d'E/S del sistema.
 
-% TODO: dir que els serveis son de system-d
-% TODO: revisar si esta ben explicat lo de driver/VFS del la-db-engine
+Cal destacar que tots aquests microserveis —\textbf{la-core-legacy}, \textbf{la-video-engine}, \textbf{la-db-engine}, \textbf{la-core-notifier} i \textbf{la-core-alarm}— estan definits i gestionats com a \textbf{unitats de \textit{systemd}} al sistema operatiu del gravador. Cadascun d'ells disposa del seu propi fitxer \texttt{.service}, que defineix les dependències d'arrencada, les polítiques de reinici automàtic i els límits de recursos. Això significa que l'operador pot gestionar el cicle de vida de qualsevol servei de forma independent amb \texttt{systemctl} (per exemple, \texttt{systemctl restart la-db-engine}), i que \textit{systemd} s'encarrega de garantir que els serveis s'arrenquen en l'ordre correcte i es recuperen automàticament en cas de fallada.
 
 \begin{figure}[htbp]
   \centering
@@ -31,24 +32,22 @@ Internament, els microserveis intercanvien informació majoritàriament a travé
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\clearpage
 \subsection{Capa de comunicació i Proxy}
-Pel que fa a la xarxa externa, la interacció entre la interfície i el maquinari es consolida a través d'un \textit{Gateway} o Proxy Invers:
+
+Per comunicar la web amb els serveis de manera segura, s'interposa \textbf{NGINX} com a \textit{proxy} invers i porta d'entrada única (\textit{gateway}) al sistema. NGINX escolta als ports \texttt{60080} (HTTP) i \texttt{60443} (HTTPS/SSL), i assumeix quatre responsabilitats principals: gestiona el xifratge TLS (protocols TLSv1.2 i TLSv1.3, xifrat \texttt{EECDH+AESGCM}), aplica capçaleres de seguretat HTTP (\texttt{Strict-Transport-Security}, \texttt{X-Frame-Options: SAMEORIGIN}, \texttt{X-Content-Type-Options: nosniff}), controla l'autenticació de les rutes protegides mitjançant el mecanisme intern \texttt{auth\_request}, i enruta cada petició cap al microservei intern corresponent en funció de la ruta URL. Des del punt de vista del navegador, tots els serveis queden amagats darrere una única adreça.
+
+La configuració NGINX agrupa les rutes en quatre blocs funcionals:
 
 \begin{itemize}
-    \item \textbf{Proxy Invers (NGINX):} Actua com a porta d'enllaç única. La seva funció és gestionar el xifratge TLS, resoldre les polítiques de \textit{Cross-Origin Resource Sharing} (CORS) i redirigir les peticions cap als serveis interns corresponents.
-    \item \textbf{API REST (HTTP):} S'utilitza per a operacions \textit{stateless} i síncrones via mòdul \textbf{la-core-legacy}. Gestiona la consulta i l'enviament de paràmetres de configuració.
-    \item \textbf{Canal de Temps Real (WebSockets):} Mitjançant el protocol WSS, els mòduls \textbf{la-core-notifier} i \textbf{la-core-alarm} envien esdeveniments asíncronament. Això permet que la interfície reaccioni instantàniament a una pèrdua de vídeo o a una activació de sensor sense necessitat de fer \textit{polling} constant.
+    \item \textbf{Configuració i control (HTTPS):} La gran majoria de les rutes —\texttt{/api.rest/}, \texttt{/webprotocol/}, \texttt{/onvif/}, \texttt{/device-service/} i els nombrosos \textit{endpoints} \texttt{.cgi}— es deriven cap a \textbf{la-core-legacy} (port intern \texttt{60088}). Aquest servei centralitza la gestió de la configuració, l'autenticació i el control del sistema.
+
+    \item \textbf{Canals de temps real (WSS):} Les connexions WebSocket persistents segueixen dues rutes diferenciades: \texttt{/ws/la-core-notifier/} es deriven cap al port \texttt{60070} (\textbf{la-core-notifier}), i \texttt{/ws/la-core-alarm/} cap al port \texttt{60071} (\textbf{la-core-alarm}). Ambdós serveis envien esdeveniments en temps real al \textit{frontend} —pèrdues de vídeo, activació de relés, alarmes de sensor— sense que el client hagi de fer \textit{polling}.
+
+    \item \textbf{Vídeo en temps real:} S'ofereixen dos mecanismes de \textit{streaming} gestionats per \textbf{MediaMTX}: el camí \texttt{/stream/} (port \texttt{60889}) serveix vídeo via WebRTC, amb senyalització sobre WebSocket i transport de mitjana SRTP/UDP negociat per ICE; el camí \texttt{/hls/} (port \texttt{60888}) serveix el mateix vídeo en format HLS per a clients que no suporten o tenen dificultats amb WebRTC. 
+
+    \item \textbf{Serveis auxiliars:} El camí \texttt{/video-engine/} enruta directament cap a \textbf{la-video-engine} (port \texttt{60890}) per a operacions de control i consulta del motor de vídeo. El camí \texttt{/db-engine/} connecta amb \textbf{la-db-engine} (port \texttt{60891}) per a consultes de dades històriques. El camí \texttt{/terminal/} connecta amb el servei \textbf{ttyd} (port \texttt{7681}), que ofereix una terminal interactiva accessible directament des del navegador.
 \end{itemize}
-
-Internament, els serveis del backend embedded es comuniquen mitjançant \textbf{gRPC} \cite{grpc_up_running} per a una transferència de dades binària d'alt rendiment i utilitzen un bus de missatgeria \textbf{D-Bus} per a la coordinació d'estats a nivell de sistema operatiu. El repte de disseny rau en el fet que el navegador no pot comunicar-se directament amb els dimonis del backend (que utilitzen gRPC o D-Bus). S'ha implementat una capa de \textbf{Gateway} amb \textbf{NGINX} com a \textit{Proxy} invers, que redirigeix el trànsit segons la ruta:
-
-\begin{itemize}
-    \item Les peticions \texttt{/api/v1/config/*} es deriven a \textbf{la-core-legacy}.
-    \item Les peticions de senyalització WebRTC (protocol WHEP, camí \texttt{/video-engine/stream/\{id\}/whep}) es deriven a través de NGINX cap a \textbf{la-video-engine} (pla de control). Un cop establerta la sessió, el flux de vídeo SRTP/UDP circula directament entre el navegador i el port de \textbf{la-video-engine} negociat per ICE (ports 10000–20000), sense intermediació de NGINX (pla de dades).
-    \item Les consultes de dades històriques es canalitzen cap a \textbf{la-db-engine}.
-\end{itemize}
-
-Aquest desacoblament permet que, si en un futur es canvia el motor de base de dades o el motor de vídeo, el \textit{frontend} només hagi de canviar el \textit{contracte} de dades, no la seva arquitectura base.
 
 Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:matriu_comunicacio} es detallen els protocols i la naturalesa del trànsit entre el navegador i el gravador:
 
@@ -57,88 +56,123 @@ Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:
   \caption{Matriu de comunicació de la plataforma.}
   \label{tab:matriu_comunicacio}
   \resizebox{\textwidth}{!}{
-  \begin{tabular}{@{}llll@{}}
+  \begin{tabular}{@{}lllll@{}}
     \toprule
-    \textbf{Origen} & \textbf{Destinació} & \textbf{Protocol} & \textbf{Finalitat} \\ \midrule
-    Frontend (Navegador) & NGINX & HTTPS & Peticions REST i descàrrega de l'App \\
-    Frontend (Navegador) & NGINX & WSS & Notificacions d'alarmes en temps real \\
-    Frontend (Navegador) & NGINX & HTTPS (WHEP) & Senyalització SDP per a WebRTC (pla de control) \\
-    Frontend (Navegador) & \textbf{la-video-engine} & SRTP/UDP (directe) & Flux de vídeo WebRTC (pla de dades) \\
-    NGINX (Proxy) & \textbf{la-core-legacy} & HTTP (Intern) & Gestió de configuració i usuaris \\
-    NGINX (Proxy) & \textbf{la-db-engine} & HTTP (Intern) & Consultes a la base de dades SQLite \\
-    \textbf{la-video-engine} / \textbf{la-core-alarm} & \textbf{la-db-engine} & D-Bus / Unix Sockets & Comunicació interna del backend (alarmes i persistència al disc) \\ \bottomrule
+    \textbf{Origen} & \textbf{Destinació (Servei)} & \textbf{Ruta NGINX} & \textbf{Protocol} & \textbf{Finalitat} \\ \midrule
+    Navegador & NGINX $\rightarrow$ \textbf{la-core-legacy} & \texttt{/login/}, \texttt{/(en|es|fr)/} & HTTPS & Descàrrega de l'aplicació Angular (SPA) \\
+    Navegador & NGINX $\rightarrow$ \textbf{la-core-legacy} & \texttt{/api.rest/}, \texttt{/webprotocol/}, \texttt{*.cgi} & HTTPS & Configuració, autenticació i control del sistema \\
+    Navegador & NGINX $\rightarrow$ \textbf{la-core-notifier} & \texttt{/ws/la-core-notifier/} & WSS & Notificacions de sistema en temps real \\
+    Navegador & NGINX $\rightarrow$ \textbf{la-core-alarm} & \texttt{/ws/la-core-alarm/} & WSS & Notificacions d'alarmes en temps real \\
+    Navegador & NGINX $\rightarrow$ \textbf{MediaMTX} & \texttt{/stream/} & WSS + SRTP/UDP & Vídeo en directe via WebRTC \\
+    Navegador & NGINX $\rightarrow$ \textbf{MediaMTX} & \texttt{/hls/} & HTTPS & Vídeo en directe via HLS \\
+    Navegador & NGINX $\rightarrow$ \textbf{la-video-engine} & \texttt{/video-engine/} & HTTPS & Control i consulta del motor de vídeo \\
+    Navegador & NGINX $\rightarrow$ \textbf{la-db-engine} & \texttt{/db-engine/} & HTTPS & Consultes de dades històriques \\
+    Navegador & NGINX $\rightarrow$ \textbf{ttyd} & \texttt{/terminal/} & WSS & Terminal interactiva via navegador \\
+    % \textbf{la-core-notifier} / \textbf{la-core-alarm} & \textbf{la-db-engine} & — & gRPC / D-Bus & Comunicació interna del backend \\
+    % \textbf{la-video-engine} & \textbf{la-db-engine} & — & Unix Sockets & Persistència al disc (VFS SQLite) \\ \bottomrule
   \end{tabular}
   }
 \end{table}
 
-Per resoldre aquest desacoblament a l'hora d'enviar esdeveniments, s'ha dissenyat un mecanisme de \textbf{bridging de protocols (Protocol Bridging)} centralitzat en el servei de notificacions (\textit{Core Notifier}) del gravador. Aquest servei actua com a intermediari actiu (\textit{gateway}): es subscriu als esdeveniments de sistema (com pèrdues de vídeo o activació de relés) mitjançant el bus D-Bus i canals gRPC, tradueix aquestes estructures de baix nivell en missatges JSON lleugers i, finalment, els transmet en temps real pel canal de \textbf{WebSockets} (WSS) \cite{rfc6455} fins al client Angular. Aquest disseny garanteix que el frontend pugui respondre immediatament a qualsevol esdeveniment de seguretat, sense connexions binàries natives costoses ni sobrecàrrega de la CPU del client.
+\clearpage
+El Llistat \ref{lst:nginx_routing} mostra els blocs de configuració NGINX que implementen les rutes principals de la plataforma, extrets directament del fitxer \texttt{la-core.conf} del repositori de build \textbf{mantos-rec} (\texttt{sources/meta-mantos/recipes-httpd/nginx/nginx/la-core.conf}):
 
-\subsection{Seguretat Defensiva contra vectors d'atac OWASP}
-Com a requisit no funcional de seguretat crítica, el frontend s'ha dissenyat per mitigar de forma activa les principals vulnerabilitats del catàleg OWASP Top 10. La gestió de la sessió s'ha dissenyat per eliminar tots els vectors de robatori de credencials: les \textit{cookies} de sessió es gestionen amb els atributs \texttt{HttpOnly} i \texttt{Secure} configurats exclusivament a la capa de NGINX, de manera que resten completament inaccessibles des de qualsevol codi JavaScript del client i, per tant, immunitzades contra atacs de tipus \textit{Cross-Site Scripting} (XSS). La prevenció de \textit{Cross-Site Request Forgery} (CSRF) s'aconsegueix gràcies a la política \textit{Same-Origin} imposada per NGINX i a la naturalesa \textit{zero-persistence} del Signal privat d'estat en memòria del \textit{frontend}: un recarregament de pàgina invalida la sessió al costat del client sense necessitat de cap \textit{token} CSRF addicional.
+\begin{lstlisting}[language=bash, label={lst:nginx_routing}, caption={Fragment de la configuració NGINX (la-core.conf, repositori mantos-rec): rutes principals de la plataforma.}]
+# Aplicacio Angular (SPA) - requereix autenticacio
+location ~ ^/(en|es|fr)/ {
+    auth_request /auth.cgi;
+    error_page 401 = @error401;
+    alias /data/web-core-view/var/www/browser/;
+    try_files $uri $uri/ /login/index.html;
+}
 
-Addicionalment, a la capa de NGINX, s'ha unificat l'origen de l'aplicació i l'API REST sota un mateix servidor de recursos, cosa que permet aplicar polítiques de Same-Origin estrictes i capçaleres de seguretat Content Security Policy (CSP) per immunitzar el sistema contra injeccions Cross-Site Scripting (XSS) i intents de Clickjacking.
+# WebSocket - Notificacions generals del sistema
+location /ws/la-core-notifier/ {
+    proxy_pass http://localhost:60070/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_send_timeout 600s;
+    proxy_read_timeout 600s;
+}
 
-L'ús de NGINX com a \textit{entry point} és indispensable per a la seguretat del sistema. En centralitzar les peticions, NGINX actua de tallafoc per als serveis \textbf{la-video-engine} i \textbf{la-core-legacy}, impedint l'accés directe als ports interns. A més, permet que el token JWT generat per l'autenticació sigui vàlid per a tots els microserveis sota un mateix domini de seguretat, simplificant la gestió de capçaleres \textit{Authorization} i evitant problemes de CORS (Cross-Origin Resource Sharing) que podrien bloquejar l'streaming de vídeo.
+# WebSocket - Canal d'alarmes
+location /ws/la-core-alarm/ {
+    proxy_pass http://localhost:60071/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_send_timeout 600s;
+    proxy_read_timeout 600s;
+}
 
-\begin{lstlisting}[language=bash, caption={Configuració de seguretat NGINX per a l'entorn embedded de Web Core View.}]
-# Configuració de seguretat NGINX per a l'entorn embedded de Web Core View
-server {
-    listen 443 ssl http2;
-    server_name localhost;
+# Motor de video - control i consulta (protegit per auth)
+location /video-engine/ {
+    auth_request /auth.cgi;
+    error_page 401 = @error401;
+    proxy_http_version 1.1;
+    proxy_pass http://localhost:60890/;
+}
 
-    # Certificats SSL i xifratge TLS fort
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
-    ssl_protocols TLSv1.2 TLSv1.3;
+# Base de dades - dades historiques (protegit per auth)
+location /db-engine/ {
+    auth_request /auth.cgi;
+    error_page 401 = @error401;
+    proxy_http_version 1.1;
+    proxy_pass http://localhost:60891/;
+}
 
-    # Capçaleres de seguretat defensiva (OWASP Mitigation)
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' wss:;" always;
-    add_header X-Frame-Options "DENY" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Enrutament de l'aplicació SPA Angular (Frontend)
-    location / {
-        root /var/www/web-core-view;
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Proxy Invers cap a la-core-legacy (configuració, auth i locks)
-    location /api/v1/config/ {
-        proxy_pass http://127.0.0.1:8081;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-
-    # Proxy Invers cap a la-video-engine (senyalització WebRTC/WHEP i HLS)
-    location /video-engine/ {
-        proxy_pass http://127.0.0.1:8082;
-        proxy_set_header Host $host;
-    }
-
-    # Proxy Invers cap a la-db-engine (consultes historiques d'alarmes)
-    location /webprotocol/ {
-        proxy_pass http://127.0.0.1:8081;
-        proxy_set_header Host $host;
-    }
-
-    # Proxy Invers i Bridging per a WebSockets d'esdeveniments
-    location /ws/ {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
-    }
+# Streaming WebRTC via MediaMTX (protegit per auth)
+location /stream/ {
+    auth_request /auth.cgi;
+    error_page 401 = @error401;
+    proxy_pass http://localhost:60889/stream/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
 }
 \end{lstlisting}
 
-\subsection{Estratègia de Fallback i robustesa del canal de vídeo}
-La integració de WebRTC com a mètode de visualització de vídeo de baixa latència ($<300$~ms) requereix un mecanisme d'alta disponibilitat que respongui davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pels tallafocs de seguretat. Per a aquest propòsit, s'ha dissenyat un sistema de \textit{fallback} transparent a HLS \cite{hls_apple}.
+% Per resoldre aquest desacoblament a l'hora d'enviar esdeveniments, s'ha dissenyat un mecanisme de \textbf{bridging de protocols (Protocol Bridging)} centralitzat en el servei de notificacions (\textit{Core Notifier}) del gravador. Aquest servei actua com a intermediari actiu (\textit{gateway}): es subscriu als esdeveniments de sistema (com pèrdues de vídeo o activació de relés) mitjançant el bus D-Bus i canals gRPC, tradueix aquestes estructures de baix nivell en missatges JSON lleugers i, finalment, els transmet en temps real pel canal de \textbf{WebSockets} (WSS) \cite{rfc6455} fins al client Angular. Aquest disseny garanteix que el frontend pugui respondre immediatament a qualsevol esdeveniment de seguretat, sense connexions binàries natives costoses ni sobrecàrrega de la CPU del client.
 
-La connexió WebRTC es divideix en dos plans de comunicació independents. El \textbf{pla de control} gestiona la senyalització SDP seguint el protocol WHEP (\textit{WebRTC-HTTP Egress Protocol}) \cite{webrtc_w3c}: el navegador realitza un HTTP POST a \texttt{/video-engine/stream/\{camera\_id\}/whep}, que NGINX reenvia internament cap a \textbf{la-video-engine}, el qual retorna la descripció de sessió SDP amb les candidatures ICE. El \textbf{pla de dades}, en canvi, és un flux SRTP xifrat sobre UDP que circula directament entre el navegador i el port de \textbf{la-video-engine} acordat per ICE (rang 10000–20000); aquest trànsit no passa mai per NGINX. Aquesta separació és allò que garanteix una latència de visualització inferior a 300~ms: el vídeo no ha de travessar cap capa de proxy invers.
+\clearpage
+\subsection{Seguretat Defensiva contra vectors d'atac OWASP}
+Com a requisit no funcional de seguretat crítica, el frontend s'ha dissenyat per mitigar de forma activa les principals vulnerabilitats del catàleg OWASP Top 10. La gestió de la sessió s'ha dissenyat per eliminar tots els vectors de robatori de credencials: les \textit{cookies} de sessió es gestionen amb els atributs \texttt{HttpOnly} i \texttt{Secure} configurats exclusivament a la capa de NGINX, de manera que resten completament inaccessibles des de qualsevol codi JavaScript del client i, per tant, immunitzades contra atacs de tipus \textit{Cross-Site Scripting} (XSS). La prevenció de \textit{Cross-Site Request Forgery} (CSRF) s'aconsegueix gràcies a la política \textit{Same-Origin} imposada per NGINX i a la naturalesa \textit{zero-persistence} del Signal privat d'estat en memòria del \textit{frontend}: un recarregament de pàgina invalida la sessió al costat del client sense necessitat de cap \textit{token} CSRF addicional.
 
-El client web inicia la negociació SDP mitjançant la referència del protocol WebRTC W3C \cite{webrtc_w3c}. Si el navegador detecta que l'estat de la connexió ICE (\textit{Interactive Connectivity Establishment}) transita cap a \texttt{failed} o \texttt{disconnected} després d'un \textit{timeout} de seguretat de 5 segons, s'activa automàticament la lògica de degradació de servei. En aquest instant, es tanquen de manera neta els descriptors de WebRTC i s'inicialitza la reproducció d'un flux de vídeo HLS a través del Proxy Invers NGINX (TCP, port 443 xifrat), assegurant que l'operador continuï visualitzant la càmera sense interrupció.
+Addicionalment, a la capa de NGINX, s'ha unificat l'origen de l'aplicació i l'API REST sota un mateix servidor de recursos, cosa que permet aplicar polítiques de \textit{Same-Origin} estrictes que limiten els vectors d'injeccions \textit{Cross-Site Scripting} (XSS) i els intents de \textit{Clickjacking}.
+
+L'ús de NGINX com a \textit{entry point} és indispensable per a la seguretat del sistema. En centralitzar les peticions, NGINX actua de tallafoc per als serveis \textbf{la-video-engine} i \textbf{la-core-legacy}, impedint l'accés directe als ports interns. A més, permet que el token JWT generat per l'autenticació sigui vàlid per a tots els microserveis sota un mateix domini de seguretat, simplificant la gestió de capçaleres \textit{Authorization} i evitant problemes de CORS (Cross-Origin Resource Sharing) que podrien bloquejar l'streaming de vídeo.
+
+\begin{lstlisting}[language=bash, label={lst:nginx_security}, caption={Fragment de la configuració NGINX (la-core.conf): TLS i capçaleres de seguretat HTTP.}]
+server {
+    listen 60080;
+    listen 60443 ssl;
+
+    # Certificats TLS del dispositiu
+    ssl_certificate     /etc/ssl/certs/la-certificate.crt;
+    ssl_certificate_key /etc/ssl/private/la-certificate.key;
+
+    # Protocols i xifrats forts (OWASP TLS Cheat Sheet)
+    ssl_protocols             TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_dhparam               /etc/nginx/la-dhparam.pem;
+    ssl_ciphers               EECDH+AESGCM:EDH+AESGCM;
+    ssl_ecdh_curve            secp384r1;
+    ssl_session_timeout       10m;
+    ssl_session_cache         shared:SSL:10m;
+    ssl_session_tickets       off;
+    ssl_stapling              on;
+    ssl_stapling_verify       on;
+
+    # Capçaleres de seguretat HTTP
+    add_header Strict-Transport-Security
+               "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options        "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff"    always;
+    add_header Referrer-Policy
+               "strict-origin-when-cross-origin"   always;
+}
+\end{lstlisting}
 
 \section{Disseny del Frontend (Angular 19)}
 L'elecció d'Angular 19 no és casual; el \textit{framework} proporciona una estructura que facilita el manteniment a llarg termini de l'aplicació.
