@@ -1,20 +1,70 @@
-graph TD
-    subgraph Browser["Navegador - Angular App"]
-        SharedComp[Shared Components]
-        MaintMod[Maintenance Module]
-        ConfigMod[Config Module]
-        CoreSvc[Core Services/Guards]
-        VideoMod[Video Module]
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'background': '#ffffff',
+    'primaryColor': '#ffffff',
+    'primaryTextColor': '#000000',
+    'primaryBorderColor': '#000000',
+    'lineColor': '#000000',
+    'secondaryColor': '#ffffff',
+    'tertiaryColor': '#ffffff'
+  },
+  'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
+graph LR
+
+    subgraph Angular["Navegador — Angular 19"]
+
+        subgraph Shared["Capa Shared"]
+            SharedUI["Shared Components\nUI Kit · Pipes · Directives"]
+            Models["Models TypeScript\nCamera · Codec · Schema · Alarm"]
+        end
+
+        subgraph Core["Core Layer  —  Serveis Singleton"]
+            AuthSvc["AuthService\nAuthGuard"]
+            LockSvc["LockService"]
+            KeepSvc["KeepAliveService"]
+            NotifSvc["NotifierService"]
+            AlarmSvc["AlarmService"]
+        end
+
+        subgraph Views["Feature Views  —  Lazy Loading"]
+            VideoView["VideoView\nVideoGridComponent\nVideoPlayerComponent"]
+            ConfigView["ConfigView\nSchemaEngineComponent\nConfigInputComponent"]
+            MaintView["MaintenanceView\nCameraTableComponent\nAlarmsDashboard"]
+        end
+
+        SharedUI --> VideoView
+        SharedUI --> ConfigView
+        SharedUI --> MaintView
+
+        AuthSvc --> VideoView
+        AuthSvc --> ConfigView
+        AuthSvc --> MaintView
+        LockSvc --> ConfigView
+        NotifSvc --> VideoView
+        AlarmSvc --> MaintView
     end
 
     subgraph Backend["Backend / NVR"]
-        RESTAPI[REST API]
-        WSServer[WebSocket Server]
-        StreamSvc[Streaming Service]
+        NGINX["NGINX\nProxy invers · TLS"]
+        LA_Legacy["la-core-legacy\nREST API"]
+        LA_Notif["la-core-notifier\n/ws/la-core-notifier/"]
+        LA_Alarm["la-core-alarm\n/ws/la-core-alarm/"]
+        MMTX["MediaMTX\nWebRTC · HLS"]
+
+        NGINX --> LA_Legacy
+        NGINX --> LA_Notif
+        NGINX --> LA_Alarm
+        NGINX --> MMTX
     end
 
-    ConfigMod --> RESTAPI
-    CoreSvc --> RESTAPI
-    CoreSvc --> WSServer
-    VideoMod --> WSServer
-    VideoMod --> StreamSvc
+    AuthSvc  -->|HTTPS| NGINX
+    LockSvc  -->|HTTPS| NGINX
+    KeepSvc  -->|HTTPS| NGINX
+    ConfigView -->|HTTPS| NGINX
+    MaintView  -->|HTTPS| NGINX
+    NotifSvc -->|WSS| NGINX
+    AlarmSvc -->|WSS| NGINX
+    VideoView -->|WebRTC / HLS| NGINX

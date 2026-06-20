@@ -1,23 +1,43 @@
+%%{init: {
+ 'theme': 'base',
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
 graph LR
-    CoreModule -..-> MainModule
-    SharedModule -..-> MainModule
+   Core[Core Services & Guards] -..->|Injectats a| MainRoutes
+   Shared[Shared Components] -..->|Importats a| MainRoutes
 
-    subgraph MainMod["Main Module"]
-        MainModule[MainModule]
-        VideoModule[VideoModule]
-        ConfigModule[ConfigModule]
-        MaintModule[MaintModule]
+   subgraph Routing["App Routing (app.routes.ts)"]
+       MainRoutes[Rutes Autenticades\nauthGuard]
+       VideoSection[Rutes de Vídeo]
+       ConfigSection[Rutes de Configuració]
+       MaintSection[Rutes de Manteniment]
 
-        MainModule --> VideoModule
-        MainModule --> ConfigModule
-        MainModule --> MaintModule
-    end
+       MainRoutes --> VideoSection
+       MainRoutes --> ConfigSection
+       MainRoutes --> MaintSection
+   end
 
-    AppModule --> AuthModule
-    AppModule --> MainModule
+   AppConfig[app.config.ts\nprovideRouter] --> LoginRoute[Ruta d'Autenticació\nLoginComponent]
+   AppConfig --> MainRoutes
 
-    VideoModule --> CamerasGrid[Cameras List/Grid]
-    VideoModule --> RecPlayer[Recordings Player]
-    VideoModule --> AlarmsDash[Alarms Dashboard]
-    ConfigModule --> SysNet[System/Network Settings]
-    ConfigModule --> IPConfig[IP Video Config]
+   VideoSection --> CamerasGrid[CamerasComponent]
+   VideoSection --> RecPlayer[RecordingsComponent]
+   VideoSection --> AlarmsDash[AlarmsComponent]
+   
+   ConfigSection --> SysNet[System / Network Settings\nSystemComponent]
+   ConfigSection --> IPConfig[IP Video Config\nIpVideoCamerasComponent]
+   
+   MaintSection --> MaintStatus[StatusComponent]
+   MaintSection --> MaintFirmware[FirmwareComponent]
+
+
