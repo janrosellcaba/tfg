@@ -158,7 +158,7 @@ El component de \textit{login} invoca el mètode \texttt{onInitPage()} del serve
 }
 \end{lstlisting}
 
-Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. Aquests es divideixen en un diccionari del costat de client que s'utilitza per mapar les funcionalitats i ocultar o mostrar funcionalitats de l'usuari en temps real mitjançant l'ús de \textit{Signals}. Els principals tipus de permisos son:
+Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. Aquests es divideixen en un diccionari del costat de client que s'utilitza per mapar les funcionalitats i ocultar o mostrar funcionalitats de l'usuari en temps real mitjançant l'ús de \textit{Signals}. Els principals tipus de permisos són:
 
 \begin{itemize}
   \item \textbf{configuration:} Permet accedir als menús de configuració de xarxa, rellotge, entrades/sortides físiques i virtuals, i alarmes.
@@ -487,7 +487,7 @@ L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solap
 \subsection{Validació Dinàmica a ConfigInputComponent}
 La validació de les entrades segueix una estratègia dual que separa els casos senzills dels formats complexos per minimitzar la càrrega sobre el motor de detecció de canvis d'Angular.
 
-Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValue}) i de longitud de text (\texttt{\_maxLength}), el \textit{template} Angular vincula directament els valors de l'esquema als atributs natius de l'\texttt{<input>} HTML5. D'aquesta manera, el navegador s'encarrega de la validació sense que Angular hagi d'executar cap lògica addicional. El component gestiona el cas en que el \textit{backend} pugui enviar indistintament \texttt{\_min} o \texttt{\_minValue} mitjançant un operador ternari al propi \textit{template}:
+Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValue}) i de longitud de text (\texttt{\_maxLength}), el \textit{template} Angular vincula directament els valors de l'esquema als atributs natius de l'\texttt{<input>} HTML5. D'aquesta manera, el navegador s'encarrega de la validació sense que Angular hagi d'executar cap lògica addicional. El component gestiona el cas en què el \textit{backend} pugui enviar indistintament \texttt{\_min} o \texttt{\_minValue} mitjançant un operador ternari al propi \textit{template}:
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=HTML, caption={Vinculaci\'o de les restriccions num\`eriques de l'esquema als atributs natius de l'\textit{input} HTML5.}]
 <input type="number"
@@ -780,9 +780,9 @@ La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi
 
 Quan l'operador selecciona un interval de temps a la interfície d'Angular, el client demana la llista de reproducció realitzant una crida HTTP GET cap a la ruta \texttt{/hls-play.m3u8?token=...\&start=...\&end=...}. El servidor de vídeo de l'NVR intercepta la petició mitjançant la funció unificada \texttt{cgi\_hls} i executa el següent algorisme en temps real:
 \begin{enumerate}
-  \item \textbf{Cerca de fitxers d'enregistrament:} Mitjançant la biblioteca d'indexació \texttt{lanaccess::searcher}, s'interroga l'historial de gravacions associat al token per localitzar els fitxers d'enregistrament d'FS2 (*File System 2*) que contenen vídeo dins de l'interval indicat pel client.
+  \item \textbf{Cerca de fitxers d'enregistrament:} Mitjançant la biblioteca d'indexació \texttt{lanaccess::searcher}, s'interroga l'historial de gravacions associat al token per localitzar els fitxers d'enregistrament d'FS2 (\textit{File System 2}) que contenen vídeo dins de l'interval indicat pel client.
   \item \textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}) la capçalera unificada que conté els metadades d'índex de tots els buffers de vídeo que formen el fitxer físic d'enregistrament.
-  \item \textbf{Generació del fitxer de manifest m3u8:} El servidor analitza el timestamp i la durada de cadascun dels buffers de dades i genera de forma dinàmica un fitxer de llista de reproducció que s'ajusta a l'estàndard HLS de l'W3C.
+  \item \textbf{Generació del fitxer de manifest m3u8:} El servidor analitza el timestamp i la durada de cadascun dels buffers de dades i genera de forma dinàmica un fitxer de llista de reproducció que s'ajusta a l'estàndard HLS del W3C.
   \item \textbf{Gestió de talls de vídeo (\textit{Discontinuity}):} Si l'NVR detecta que el salt temporal entre dos buffers de gravació és superior a 3.0 segons natius (a causa d'una gravació per esdeveniments interrompuda), el servidor injecta de manera automàtica les directives especials \texttt{\#EXT-X-DISCONTINUITY} i \texttt{\#EXT-X-PROGRAM-DATE-TIME}. Això és un requisit crític que informa el reproductor de la interfície d'Angular que la línia temporal s'ha trencat, evitant congelacions en el motor de descodificació de vídeo del client.
 \end{enumerate}
 
@@ -798,7 +798,7 @@ La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la pe
 \end{enumerate}
 
 \subsection{Coexistència i descodificació de Còdecs H.264 i H.265 (HEVC)}
-Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació \textbf{H.265 (HEVC)} de forma paral·lela a \textbf{H.264 (AVC)}. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu procésament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (*plugins*) pesats o controls ActiveX degut a restriccions de patents.
+Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació \textbf{H.265 (HEVC)} de forma paral·lela a \textbf{H.264 (AVC)}. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu procésament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (\textit{plugins}) pesats o controls ActiveX degut a restriccions de patents.
 
 Amb el nou disseny, el motor de segmentació del backend és capaç d'empaquetar i servir ambdós formats de manera dinàmica. Tanmateix, per tal que el descodificador per maquinari de la GPU del client pugui processar un segment de vídeo H.265, necessita rebre immediatament abans de cada imatge clau (IDR) les metadades de paràmetres de seqüència, imatge i vídeo (SPS, PPS i VPS).
 
@@ -806,7 +806,7 @@ En registrar-se la crida de segment, el mètode del backend \texttt{cgi\_segment
 \begin{itemize}
   \item L'algorisme examina el buffer de vídeo desitjat. Si és de tipus H.265, extreu de manera binària les metadades de paràmetres SPS/PPS/VPS mitjançant la funció \texttt{extract\_h265\_headers\_using\_index}.
   \item Si les capçaleres es troben dins d'aquest fragment (perquè s'ha capturat una imatge clau de la càmera), s'insereixen de manera nativa immediatament després de la unitat NAL del delimitador d'accés (AUD).
-  \item Si no es troben en el buffer actual perquè és un fragment de fotogrames intermedis (imatges P/B), el servidor retrocedeix de forma lògica a l'índex del premier buffer del fitxer de gravació de la càmera per buscar les capçaleres de referència de la seqüència original de l'NVR, garantint d'aquesta manera que el descodificador del client rebi sempre un flux de vídeo complet i autònom.
+  \item Si no es troben en el buffer actual perquè és un fragment de fotogrames intermedis (imatges P/B), el servidor retrocedeix de forma lògica a l'índex del primer buffer del fitxer de gravació de la càmera per buscar les capçaleres de referència de la seqüència original de l'NVR, garantint d'aquesta manera que el descodificador del client rebi sempre un flux de vídeo complet i autònom.
 \end{itemize}
 
 \subsection{La línia de Temps Interactiva i Orquestració del Client}
@@ -816,7 +816,7 @@ El cicle de funcionament de la interfície segueix els passos següents:
 \begin{enumerate}
   \item El client demana l'índex de gravacions per a una càmera i data seleccionades. El frontend rep un llistat de metadades que indiquen els intervals de temps en què s'ha registrat vídeo a l'NVR.
   \item El component dibuixa la barra de la línia de temps en temps real utilitzant un codi de colors: verd o blau per a gravació de tipus continu, i vermell o taronja per a dades de gravació disparada per un esdeveniment d'alarma, de moviment o analítica (obtingut mitjançant consultes a l'historial del dispositiu).
-  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el *timestamp* exacte de destí i executa el mètode reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
+  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el \textit{timestamp} exacte de destí i executa el mètode reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
 \end{enumerate}
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:hls_load_code}, caption={Càrrega dinàmica de llista de reproducció HLS basada en franges de temps.}]
@@ -909,17 +909,17 @@ El fil d'execució de persistència \texttt{db\_client\_thread} es desperta imme
 Si el canvi és d'estat d'inici de succés (\texttt{status = "start"}), s'efectua una operació d'inserció atòmica. En canvi, si és d'acabament d'incident (\texttt{status = "end"}), l'algorisme face primer una consulta selectiva per recuperar l'identificador històric original i actualitza la línia de base de dades del registre corresponent, assegurant la correlació exacta dels estats.
 
 \subsection{Arquitectura del VFS del Motor SQLite3 i Seguretat per Sockets}
-Per assegurar l'atominicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional \textbf{SQLite3}. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
+Per assegurar l'atomicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional \textbf{SQLite3}. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
 
 \begin{enumerate}
   \item \textbf{Aïllament de Processos (\textit{Sandbox}):} El microservei d'orquestració de dades \texttt{la-db-engine} actua com a gestor de la base de dades sqlite i del servei gRPC, però s'executa com un procés separat d'usuari restringit, de manera que no disposa de permisos d'escriptura sobre el disc físic de gravació.
-  \item \textbf{El Driver VFS Personalitzat (\texttt{remote\_vfs}):} Dins del codi de \texttt{la-db-engine}, s'ha dissenyat i registrat un controlador de fitxers virtuals o **Virtual File System (VFS)** personalitzat de SQLite3. Aquest driver intercepta qualsevol operació de baix nivell de lectura (\texttt{remote\_read}) o escriptura física a disc (\texttt{remote\_write}) llançada per l'esquema relacional de la base de dades.
-  \item \textbf{Canalització per UNIX Domain Socket:} En lloc de fer crides al sistema de fitxers local, el driver de VFS intercepta la petició, construeix una estructura estructurada \texttt{IoRequest} amb l'offset, la mida de bloc i les dades reals, i la transmet a través d'un canal IPC de tipus **Unix Domain Socket** cap al microservei \textbf{la-video-engine} (situat al punt de muntatge de seguretat unificat \texttt{/tmp/io.sock}).
-  \item \textbf{Escriptura i Consistència en Disc Físic:} El motor de vídeo rep la trama, verifica l'offset físic a la partició relacional del disc i s'encarrega d'executar l'operació d'escriptura de manera atòmica i transparent per al motor de base de dades. Per protegir el desgast físic del disc dur flaix (NAND/NOR) i evitar colls d'ampolla en entorns d'alta concurrència d'accessos, s'ha configurat el motor amb la línia estructurada de major rendiment: **Write-Ahead Logging (WAL)** de SQLite3, normalitzant els commits mitjançant sincronització normal (\texttt{PRAGMA synchronous=NORMAL}).
+  \item \textbf{El Driver VFS Personalitzat (\texttt{remote\_vfs}):} Dins del codi de \texttt{la-db-engine}, s'ha dissenyat i registrat un controlador de fitxers virtuals o \textbf{Virtual File System (VFS)} personalitzat de SQLite3. Aquest driver intercepta qualsevol operació de baix nivell de lectura (\texttt{remote\_read}) o escriptura física a disc (\texttt{remote\_write}) llançada per l'esquema relacional de la base de dades.
+  \item \textbf{Canalització per UNIX Domain Socket:} En lloc de fer crides al sistema de fitxers local, el driver de VFS intercepta la petició, construeix una estructura estructurada \texttt{IoRequest} amb l'offset, la mida de bloc i les dades reals, i la transmet a través d'un canal IPC de tipus \textbf{Unix Domain Socket} cap al microservei \textbf{la-video-engine} (situat al punt de muntatge de seguretat unificat \texttt{/tmp/io.sock}).
+  \item \textbf{Escriptura i Consistència en Disc Físic:} El motor de vídeo rep la trama, verifica l'offset físic a la partició relacional del disc i s'encarrega d'executar l'operació d'escriptura de manera atòmica i transparent per al motor de base de dades. Per protegir el desgast físic del disc dur flaix (NAND/NOR) i evitar colls d'ampolla en entorns d'alta concurrència d'accessos, s'ha configurat el motor amb la línia estructurada de major rendiment: \textbf{Write-Ahead Logging (WAL)} de SQLite3, normalitzant els commits mitjançant sincronització normal (\texttt{PRAGMA synchronous=NORMAL}).
 \end{enumerate}
 
 \subsection{Protecció i Poda de dades Activa via Triggers de SQLite3}
-Com que el videogravador de seguretat opera de manera ininterrompuda (24/7), el volum d'alarmes i logs emmagatzemats podria provocar un desgast excessiu de la memòria de disc flaix o alentir les cerques. Durant la fase d'inicialització de la base de dades, el motor \texttt{DatabaseManager} actualitza un disparador automàtic relacional o **Trigger** dins del fitxer de la base de dades que s'executa després de cada inserció de nova alarma:
+Com que el videogravador de seguretat opera de manera ininterrompuda (24/7), el volum d'alarmes i logs emmagatzemats podria provocar un desgast excessiu de la memòria de disc flaix o alentir les cerques. Durant la fase d'inicialització de la base de dades, el motor \texttt{DatabaseManager} actualitza un disparador automàtic relacional o \textbf{Trigger} dins del fitxer de la base de dades que s'executa després de cada inserció de nova alarma:
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=SQL, caption={Trigger de base de dades per a la poda automatica del registre d'alarmes.}]
 CREATE TRIGGER limit_alarms_trigger
