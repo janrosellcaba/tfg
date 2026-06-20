@@ -1,12 +1,38 @@
+%%{init: {
+ 'theme': 'base',
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
 sequenceDiagram
     actor Usuari
-    participant LoginComponent
-    participant AuthService
-    participant Backend as Backend (API)
+    participant LC as LoginComponent
+    participant AS as AuthService
+    participant BE as Backend (/WebLogin)
 
-    Usuari->>LoginComponent: Introdueix credencials
-    LoginComponent->>AuthService: login(user, password)
-    AuthService->>Backend: POST /login
-    Backend-->>AuthService: 200 OK (Token/Success)
-    AuthService-->>LoginComponent: Sessió iniciada
-    LoginComponent-->>Usuari: Redirecció a Home
+    Usuari->>LC: Introdueix credencials
+    LC->>AS: login(user, password)
+
+    Note over AS,BE: Fase 1 — Verificació de credencials
+    AS->>BE: POST /WebLogin {call: "PlainLogin"}
+    alt Credencials correctes
+        BE-->>AS: {LoginResponse: "success"}
+    else Credencials incorrectes
+        BE-->>AS: {LoginResponse: "unauthorized", RetryCount: N}
+        AS-->>LC: Error — intents restants
+        LC-->>Usuari: Missatge d'error
+    end
+
+    Note over AS,BE: Fase 2 — Establiment de sessió
+    AS->>BE: POST /WebLogin {call: "SessionLogin"}
+    BE-->>AS: Cookie de sessió (HttpOnly + Secure)
+    AS-->>LC: Sessió iniciada
+    LC-->>Usuari: Redirecció a Home

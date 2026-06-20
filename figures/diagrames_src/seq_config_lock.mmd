@@ -1,18 +1,46 @@
+%%{init: {
+ 'theme': 'base',
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
 sequenceDiagram
     actor Admin
-    participant ConfigComponent
-    participant ConfigService
-    participant Backend as Backend (API)
+    participant CC as ConfigComponent
+    participant CS as ConfigService
+    participant BE as Backend (la-core-legacy)
 
-    Admin->>ConfigComponent: Entra a pàgina de config
-    ConfigComponent->>ConfigService: acquireLock(path)
-    ConfigService->>Backend: GET /lock
-    Backend-->>ConfigService: Lock Token (Success)
-    ConfigService-->>ConfigComponent: Mode Edició Activat
+    Admin->>CC: Clica la icona del cadenat
+    CC->>CS: acquireLock(node, seed)
+    CS->>BE: POST /properties/lock?node=config
 
-    Admin->>ConfigComponent: Modifica dades i prem Guardar
-    ConfigComponent->>ConfigService: saveConfig(data, token)
-    ConfigService->>Backend: POST /config (with token)
-    Backend-->>ConfigService: 200 OK
-    ConfigService-->>ConfigComponent: Cambis aplicats
-    ConfigComponent-->>Admin: Mostra missatge d'èxit
+    alt Lock disponible
+        BE-->>CS: {token, expiresIn: 30, seed}
+        CS-->>CC: Mode edició activat
+        CC-->>Admin: Camps habilitats per a edició
+
+        Note over CS,BE: Heartbeat: renovació automàtica cada expiresIn/2 s (fora de Zone.js)
+
+        Admin->>CC: Modifica valors i prem Save
+        CC->>CS: saveConfig(delta, token)
+        CS->>BE: PATCH /config_data (amb token)
+        BE-->>CS: 200 OK
+        CC-->>Admin: Canvis desats correctament
+
+        Admin->>CC: Surt de la pàgina
+        CS->>BE: Alliberament del lock
+        BE-->>CS: OK
+
+    else Lock ocupat (altra sessió activa)
+        BE-->>CS: 423 Locked
+        CS-->>CC: Mode només lectura
+        CC-->>Admin: Camps bloquejats (read-only)
+    end

@@ -27,6 +27,10 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 
 ## Correccions pendents
 
+### 5. Temperatura CPU i Wizards — Cap. 5 ✅ RESOLT (juny 2026)
+- **Temperatura CPU eliminada:** La línia que afirmava que el panell d'info mostrava la temperatura del processador ha estat eliminada (no estava implementada a `InfoVrComponent`).
+- **Wizards matisat:** S'ha afegit una frase explicant que la ruta del mòdul està temporalment desactivada a `app.routes.ts` a l'espera de validació amb les APIs de descoberta ONVIF del backend.
+
 ### 1. Annex A.1 — Format JSON incorrecte ✅ RESOLT (juny 2026)
 ~~**Problema:** L'Annex A.1 usa format JSON Schema estàndard (`"type"`, `"minimum"`, `"enum"`) però el format real que envia `la-core-legacy` és amb **underscores prefixats** (`"_type"`, `"_min"`, `"_allowedValues"`).~~
 
