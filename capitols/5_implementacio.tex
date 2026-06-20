@@ -346,7 +346,7 @@ Un element clau de la capçalera és la icona de la campana de notificacions (Fi
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_errors.png}
+  \includegraphics[width=0.95\textwidth]{figures/interficies/errors.png}
   \caption{Sistema de notificacions i errors emergents.}
   \label{fig:ui_errors}
   \small Font: Elaboració pròpia.
@@ -647,7 +647,7 @@ La visualització de vídeo en directe representa el component més crític de l
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_cameras.png}
+  \includegraphics[width=0.95\textwidth]{figures/interficies/cameras.png}
   \caption{Mosaic de visualització de vídeo en directe.}
   \label{fig:ui_cameras}
   \small Font: Elaboració pròpia.
@@ -663,51 +663,52 @@ Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix 
 Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
 
 \subsection{La Interfície de Càmeres i el Disseny de Mosaic}
-A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$, $2\times2$ i $4\times4$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
+A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$ i $2\times2$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
 
 La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag and Drop}) nativa integrada amb la llista lateral de càmeres del panell esquerre. L'usuari pot arrossegar qualsevol càmera cap a una cel·la del mosaic. Aquesta acció de drop recupera la identitat del dispositiu d'entrada, demana el seu mètode d'accessibilitat i demana de forma dinàmica la càrrega del flux, seguint el cicle d'activitat descrit a la Figura \ref{fig:activity_video_connection}.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.5\textwidth]{figures/activity_video_connection.png}
+  \includegraphics[width=0.5\textwidth]{figures/diagrames/activity_video_connection.png}
   \caption{Diagrama d'activitat de la lògica de connexió i reconnexió de vídeo.}
   \label{fig:activity_video_connection}
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\subsection{Negociació SDP i Establiment del Canal de Streaming}
-Si la xarxa del client disposa dels canals lliures de comunicació, el frontend i el servidor MediaMTX inicien la negociació SDP mitjançant el protocol d'egress de mitjans unificat \textbf{WHEP} (\textit{WebRTC HTTP Egress Protocol}):
+\clearpage
+% \subsection{Negociació SDP i Establiment del Canal de Streaming}
+% Si la xarxa del client disposa dels canals lliures de comunicació, el frontend i el servidor MediaMTX inicien la negociació SDP mitjançant el protocol d'egress de mitjans unificat \textbf{WHEP} (\textit{WebRTC HTTP Egress Protocol}):
 
-\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica simplificada de la PeerConnection per WebRTC.}]
-async startStreaming(cameraId: string) {
-  const pc = new RTCPeerConnection(this.config);
+% \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica simplificada de la PeerConnection per WebRTC.}]
+% async startStreaming(cameraId: string) {
+%   const pc = new RTCPeerConnection(this.config);
   
-  // Generacio de l'oferta local de presentacio
-  const offer = await pc.createOffer();
-  await pc.setLocalDescription(offer);
+%   // Generacio de l'oferta local de presentacio
+%   const offer = await pc.createOffer();
+%   await pc.setLocalDescription(offer);
   
-  // Enviament al servidor MediaMTX a traves de la-video-engine
-  this.videoService.sendOffer(cameraId, offer).subscribe(answer => {
-    // Aplicacio de la resposta del servidor (Answer) per establir el canal
-    pc.setRemoteDescription(answer);
-  });
-}
-\end{lstlisting}
+%   // Enviament al servidor MediaMTX a traves de la-video-engine
+%   this.videoService.sendOffer(cameraId, offer).subscribe(answer => {
+%     // Aplicacio de la resposta del servidor (Answer) per establir el canal
+%     pc.setRemoteDescription(answer);
+%   });
+% }
+% \end{lstlisting}
 
-Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figura \ref{fig:seq_video_streaming} defineix quins còdecs d'escriptura (H.264 o H.265) i resolucions utilitzarà l'enllaç abans d'iniciar el transport segur dels paquets sobre canals UDP.
+% Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figura \ref{fig:seq_video_streaming} defineix quins còdecs d'escriptura (H.264 o H.265) i resolucions utilitzarà l'enllaç abans d'iniciar el transport segur dels paquets sobre canals UDP.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.7\textwidth]{figures/seq_video_streaming.png}
-  \caption{Diagrama de seqüència de l'establiment de streaming de vídeo (SDP).}
-  \label{fig:seq_video_streaming}
-  \small Font: Elaboració pròpia.
-\end{figure}
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.7\textwidth]{figures/seq_video_streaming.png}
+%   \caption{Diagrama de seqüència de l'establiment de streaming de vídeo (SDP).}
+%   \label{fig:seq_video_streaming}
+%   \small Font: Elaboració pròpia.
+% \end{figure}
 
 \subsection{Orquestració de Vídeo amb el Patró Strategy}
-Per estructurar el reproductor multifluj, s'ha aplicat el patró de disseny de programari \textbf{Strategy} d'Angular. Aquest disseny desacobla completament el component visual de la graella de les APIs i llibreries de tercers implicades en la descodificació. Es defineix la interfície comuna \texttt{StreamingStrategy} que actua com a contracte o interfície abstracta unificada:
+Per desacoblar el component visual del protocol de transport concret, s'ha aplicat el patró de disseny \textbf{Strategy}: tant \texttt{WebRTCService} com \texttt{HlsService} implementen la mateixa interfície \texttt{StreamingStrategy}, de manera que el component de la graella no sap ni necessita saber quin protocol està usant:
 
-\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Interfície comuna \texttt{StreamingStrategy}.}]
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Interfície comuna \texttt{StreamingStrategy}: contracte que han de complir les implementacions WebRTC i HLS.}]
 export interface StreamingStrategy {
   connectionState: Signal<'connecting' | 'connected' | 'error' | 'idle'>;
   errorMessage: Signal<string | null>;
@@ -716,54 +717,63 @@ export interface StreamingStrategy {
 }
 \end{lstlisting}
 
-Un \textit{InjectionToken} personalitzat allotjat a la declaració del component injecta dinàmicament l'estratègia correcta (ja sigui el servei WebRTC o la via de redundància HLS) en funció de les capacitats obtingudes del mètode de streaming triat:
+Angular injecta automàticament la implementació correcta en funció del protocol actiu, de manera que el canvi de WebRTC a HLS (o a l'inrevés) no requereix cap modificació al component de visualització.
 
-\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Proveïdor per a la injecció dinàmica de l'estratègia de vídeo al \texttt{GridVideoPlayerComponent}.}]
-export const STREAMING_STRATEGY_TOKEN = new InjectionToken<StreamingStrategy>('StreamingStrategy');
+\subsection{Gestió en Temps Real de les Entrades i Sortides Digitals}
+De forma complementària al panell de visualització de càmeres, la vista principal disposa d'un panell lateral dret interactiu de control d'entrades i sortides lògiques (I/O), el \texttt{CamerasIoPanelComponent}. Entrades i sortides es representen amb la mateixa interfície de dades unificada, \texttt{IoItem}:
 
-@Component({
-  selector: 'app-grid-video-player',
-  // ...
-  providers: [
-    {
-      provide: STREAMING_STRATEGY_TOKEN,
-      useFactory: () => {
-        const method = getStreamingMethod();
-        return method === 'hls' ? inject(HlsService) : inject(WebRTCService);
-      }
-    }
-  ]
-})
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Model unificat \texttt{IoItem} per a entrades i sortides digitals.}]
+export interface IoItem {
+  id: string;       // Identificador físic (ex: "1", "RELAY_1")
+  idr: string;      // Adreçament intern
+  name: string;     // Nom llegible ("Porta Principal")
+  show: string;     // "yes" / "no" -- permet ocultar-lo a la UI
+  topic: string;    // "io/input", "io/virtual_input", "io/output"
+  data: string;     // Estat en cru: 'idle', 'on', 'activated', 'deactivated'
+  capabilities: ('activable' | 'none' | 'toggle')[];
+}
 \end{lstlisting}
 
-Gràcies a l'arquitectura del patró de disseny *Strategy*, el component de visualització és capaç d'intercanviar protocols de transport de manera totalment asíncrona i transparent per a l'usuari en temps d'execució.
+\textbf{Subscripció i recepció d'estats en temps real.} En obrir el panell, el component s'inscriu al WebSocket enviant un missatge \texttt{filter\_update} per rebre els tòpics \texttt{['device/notification', 'io']}. Quan l'estat elèctric d'un dispositiu canvia al \textit{backend}, \textbf{la-core-notifier} emet un esdeveniment \texttt{IO\_NOTIFY} amb el payload:
 
-\subsection{Gestió en Temps Real de les Entrades i Sortides Digitals (I/O)}
-De forma complementària al panell de visualització de les càmeres de seguretat, la vista principal disposa d'un panell lateral interactiu de control d'entrades i sortides lògiques (I/O), anomenat \texttt{CamerasIoPanelComponent}. Aquest panell permet realitzar la supervisió d'accessos en temps real i accionar relés de manera manual des d'una interfície unificada.
+\begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Payload de l'esdeveniment \texttt{IO\_NOTIFY} rebut via WebSocket.}]
+{
+  "event": "IO_NOTIFY",
+  "payload": [{ "id": "1", "idr": "1", "data": "on", "topic": "io/input" }]
+}
+\end{lstlisting}
 
-La reactivitat dels indicadors visuals es manté gràcies a l'obertura d'un canal d'esdeveniments unificat via WebSocket d'alta velocitat connectat directament al microservei \textbf{la-core-notifier}. L'arquitectura utilitza l'esquema següent per a la gestió interactiva d'aquests recursos:
+El \texttt{UserService} intercepta l'esdeveniment i delega al \texttt{VideoService.updateData()}, que localitza l'element per \texttt{id} i \texttt{topic} i actualitza el Signal corresponent. Angular re-renderitza únicament l'indicador afectat sense recarregar la pàgina.
 
-\begin{itemize}
-  \item \textbf{Supervisió de Canvis (Estat d'Entrada):} El servei escolta el flux del canal i rep el tipus d'esdeveniment \texttt{IO\_NOTIFY}. En rebre la dada, actualitza a l'instant el mètode reactiu de la llista de sensors digital, fent canviar el color de l'indicador del DOM (verd per a \textit{deactivated/idle}, vermell per a \textit{activated/on}).
-  \item \textbf{Activació Manual (Estat de Sortida):} Si el perfil de l'operador disposa de permisos de control d'I/O de tipus d'escriptura actius, pot realitzar un doble clic sobre qualsevol de les sortides lògiques configurades, o obrir el menú contextual a través de la icona corresponent.
-  \item \textbf{Viatge de Dades:} Aquesta interacció de client desencadena de forma immediata una petició d'escriptura POST unificada cap al servei \textbf{la-core-legacy} sota la ruta \texttt{output-status-set.cgi}. El backend llegeix el camí, valida la intenció i commuta l'estat del relé físic a nivell del maquinari. Un cop realitzat el canvi de sortida, l'NVR llança el senyal de variació a D-Bus, que es propaga a tots els clients connectats a través de WebSocket unificat, garantint la consistència immediata de l'estat global del sistema.
-\end{itemize}
+\textbf{Activació manual d'una sortida.} Si l'operador fa doble clic sobre una sortida, el component comprova que l'element tingui la capacitat \texttt{'activable'} al seu array de \texttt{capabilities}; si no la té, l'acció es descarta silenciosament. En cas que es disposi del permís, es calcula l'estat invers i s'envia la petició al \textit{backend}:
 
-\section{Reproducció de Gravacions Històriques i Arquitectura de Playback}
-La cerca, consulta i reproducció de gravacions històriques constitueix una de les funcionalitats més complexes i crítiques del dispositiu, ja que requereix que l'operador pugui navegar de manera asíncrona i aleatòria (*seek*) per milers d'hores de gravació de càmeres IP d'alta resolució des de qualsevol navegador web sense instal·lar cap connector o extensió (*Plugin-free*).
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Petici\'o d'activaci\'o d'una sortida via \texttt{output-status-set.cgi}.}]
+sendActivateO(id: string, data: string) {
+  const uri = `/webprotocol/output-status-set.cgi?id=${id}&option=${data}`;
+  return this.httpClient.get(uri, { responseType: 'text' }).subscribe();
+}
+\end{lstlisting}
 
-En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una solució integrada extrem a extrem: des del servei de segmentació de vídeo i l'indexador de metadades en C++ al servidor web embedded de \textbf{la-video-engine}, fins a l'arquitectura de control de l'interfície gràfica d'usuari (UI) de tipus *Timeline* desenvolupada en Angular 19 (Figura \ref{fig:ui_recordings}).
+Destaca l'ús del verb \textbf{GET} amb tots els paràmetres a la \textit{query string}, sense cos JSON, seguint la convenció de l'\textit{endpoint} CGI heretat. La seguretat final recau en el \textit{backend}: si el compte de sessió no té autorització, el servidor retorna \texttt{403 Forbidden} i l'acció queda anul·lada.
+
+\textbf{Convenció visual dels indicadors.} Cada element pot trobar-se en tres estats visuals: actiu, inactiu o desconnectat. Contràriament a la convenció habitual, el sistema de CCTV utilitza el \textbf{vermell per indicar activitat} (alarma en curs, relé tancat) i el \textbf{verd per indicar repòs} (\textit{idle}, \textit{deactivated}), ja que en seguretat física l'estat "tranquil" és el desitjat. Un símbol d'interrogació gris indica una entrada desconnectada o amb estat desconegut.
+
+\section{Reproducció de Gravacions}
+La cerca, consulta i reproducció de gravacions històriques constitueix una de les funcionalitats més complexes i crítiques del dispositiu, ja que requereix que l'operador pugui navegar per milers d'hores de gravació de càmeres IP d'alta resolució des de qualsevol navegador web sense instal·lar cap connector o extensió (\textit{Plugin-free}).
+
+En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una solució integrada extrem a extrem: des de la capa de backend de \textbf{la-video-engine} ---que s'encarrega de l'emmagatzematge, la segmentació i el servei HLS--- fins al component \textit{Timeline} d'Angular~19 que l'operador utilitza des del navegador (Figura \ref{fig:ui_recordings}).
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_recordings.png}
+  \includegraphics[width=0.95\textwidth]{figures/interficies/recordings.png}
   \caption{Vista del reproductor de vídeo històric i component interactiu Timeline.}
   \label{fig:ui_recordings}
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\clearpage
 \subsection{Emmagatzematge de Vídeo: el Sistema de Fitxers Propietari FS2}
-Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional, sinó en \textbf{FS2} (\textit{File System 2}), un sistema d'emmagatzematge propietari de Lanaccess que opera directament sobre la partició \textit{raw} del disc dur de l'NVR, sense intermediació del sistema de fitxers del nucli Linux (ext4). FS2 escriu els fotogrames de vídeo en espais contigus de mida fixa a nivell de blocs físics, cosa que elimina la fragmentació, redueix la latència d'escriptura i garanteix atomicitat en cas de tall elèctric sobtat: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada. L'accés de lectura als fitxers FS2 es realitza a través de la funció \texttt{fs2\_file\_read\_buffer}, que recupera blocs alineats al sector de disc (512 bytes) via \texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)} per maximitzar el rendiment de DMA i minimitzar les còpies de memòria durant el trans-muxing.
+Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional, sinó en \textbf{FS2} (\textit{File System 2}), un sistema d'emmagatzematge propietari de Lanaccess que opera directament sobre la partició \textit{raw} del disc dur de l'NVR, sense intermediació del sistema de fitxers del nucli Linux (ext4). FS2 escriu els fotogrames de vídeo en espais contigus de mida fixa a nivell de blocs físics, cosa que elimina la fragmentació, redueix la latència d'escriptura i garanteix atomicitat en cas de tall elèctric sobtat: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada. Tot aquest accés de baix nivell queda encapsulat dins de \textbf{la-video-engine}: el frontend mai interactua directament amb FS2, sinó que consumeix les dades ja processades a través de l'API HTTP que el motor exposa.
 
 \subsection{El Servidor de llistes de reproducció HLS (\texttt{hls-play.m3u8})}
 La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi obert \textbf{HLS (HTTP Live Streaming)}, el qual fragmenta la transmissió en fluxos d'arxius curts de pocs segons per evitar l'enviament de fitxers de gravació massius que col·lapsarien l'ample de banda i la memòria de l'equip de xarxa.
@@ -839,21 +849,22 @@ loadVideo(): void {
 }
 \end{lstlisting}
 
-\section{Sistema d'Alarmes i Comunicació Asíncrona Multi-capa}
-La gestió, notificació i persistència de dades d'incidents d'alarma constitueix un dels requisits operatius més crítics d'un sistema de videovigilància professional. Qualsevol pèrdua de dades o retard en la senyalització pot tenir conseqüències greus per a la seguretat física de les instal·lacions.
+\section{Sistema d'Alarmes}
+La gestió, notificació i persistència de dades d'incidents d'alarma constitueix un dels \textbf{requisits operatius més crítics} d'un sistema de videovigilància professional. Qualsevol pèrdua de dades o retard en la senyalització pot tenir conseqüències greus per a la seguretat física de les instal·lacions.
 
-En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron multi-capa extrem a extrem: des del model de subscripció reactiva al costat de client d'Angular 19, passant pels canals de comunicació full-duplex de WebSockets i el servei d'orquestració multithreading de dades en C++11, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
+En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron \textit{multi-capa extrem a extrem}: des del model de subscripció reactiva al costat de client d'Angular~19, passant pels canals de comunicació \textit{full-duplex} de WebSockets i el servei d'orquestració \textit{multithreading} en C++, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
 
 Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el següent diagrama de blocs del recorregut que segueix una alarma des que s'origina fins que es renderitza i es confirma a la pantalla de l'operador:
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.3\textwidth]{figures/alarms_data_flow.png}
+  \includegraphics[width=0.3\textwidth]{figures/diagrames/alarms_data_flow.png}
   \caption{Topologia del canal de dades, persistència i difusió asíncrona d'alarmes.}
   \label{fig:alarms_data_flow}
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\clearpage
 \subsection{Adquisició de Senyals i Cues Threads-Safe de Processament}
 El punt d'entrada de qualsevol notificació al microservei \texttt{la-core-alarm} és el fil d'execució asíncron de lectura de D-Bus \texttt{dbus\_listen\_alarms\_thread} (Llistat \ref{lst:dbus_listen_code}). Aquest fil manté una connexió de sistema bloquejant per escoltar de forma passiva qualsevol senyal \texttt{ALARM\_NOTIFY} de la interfície \texttt{com.lanaccess.sysevents}.
 
@@ -929,7 +940,7 @@ A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/ui_alarms.png}
+  \includegraphics[width=0.95\textwidth]{figures/interficies/alarms.png}
   \caption{Taula de monitoratge d'alarmes en temps real i botons d'assentiment.}
   \label{fig:ui_alarms}
   \small Font: Elaboració pròpia.

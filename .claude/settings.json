@@ -13,7 +13,9 @@
       "Bash(biber main *)",
       "Bash(echo \"Compilació final OK: $\\(pdfinfo main.pdf)",
       "Bash(echo \"Exit status: $?\")",
-      "Bash(latexmk -pdf -f -interaction=nonstopmode main.tex)"
+      "Bash(latexmk -pdf -f -interaction=nonstopmode main.tex)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)"
     ],
     "additionalDirectories": [
       "/tmp"

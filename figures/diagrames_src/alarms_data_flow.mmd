@@ -1,3 +1,17 @@
+%%{init: {
+ 'theme': 'base',
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
 flowchart TD
     subgraph HW["CAPA DE MAQUINARI I SENYALS"]
         Sensor["Sensor / Càmera IP"]
@@ -9,8 +23,12 @@ flowchart TD
         dbus_thread["dbus_listen_alarms_thread"]
         alarm_queue["global_alarm_queue\n(SafeQueue)"]
         db_client["db_client_thread"]
+        EmissionQueue["global_emission_queue"]
+        WsThread["ws_emit_alarms_thread"]
         dbus_thread -- "Enqueue" --> alarm_queue
         alarm_queue -- "Dequeue & Process" --> db_client
+        db_client -- "Confirmació OK\n(Enqueue EmissionData)" --> EmissionQueue
+        EmissionQueue --> WsThread
     end
 
     subgraph DBENG["MICROSERVEI LA-DB-ENGINE"]
@@ -29,17 +47,12 @@ flowchart TD
         DiskDriver --> Storage
     end
 
-    subgraph NOTIFY["NOTIFICACIÓ DE TORNADA I EMISSIÓ CAP A LA WEB"]
-        EmissionQueue["global_emission_queue"]
-        WsThread["ws_emit_alarms_thread"]
-        NGINX["Proxy NGINX"]
-        FrontendAngular["Frontend Angular"]
-        EmissionQueue --> WsThread
-        WsThread -- "JSON string over libwebsockets" --> NGINX
-        NGINX -- "WSS" --> FrontendAngular
-    end
+    NGINX["Proxy NGINX"]
+    FrontendAngular["Frontend Angular"]
 
     DBus -- "Signal ALARM_NOTIFY" --> dbus_thread
-    db_client -- "gRPC call Execute/Query\n(unix:// socket)" --> DBSvcImpl
+    db_client -- "gRPC Execute/Query\n(unix:// socket)" --> DBSvcImpl
+    DBSvcImpl -- "gRPC Response OK" --> db_client
     RemoteVFS -- "Unix Domain Socket\n/tmp/io.sock (IoRequest)" --> IOListener
-    Storage -- "Atomic Write OK\n(Enqueue as EmissionData)" --> EmissionQueue
+    WsThread -- "JSON string over libwebsockets" --> NGINX
+    NGINX -- "WSS" --> FrontendAngular
