@@ -367,7 +367,7 @@ La distinció entre els dos comptadors és fonamental per a l'UX industrial: \te
 \textbf{Actualització optimista.} Quan l'operador obre el panell de diagnòstic (Figura~\ref{fig:ui_errors}) i desactiva el LED d'alarma d'un error concret, el frontend llança un \texttt{HTTP PUT} a \path{/webprotocol/device-service/errors/{id}}. Si el servidor confirma l'operació, l'\texttt{AlertService} no espera el pròxim missatge WebSocket: resta 1 al Signal \texttt{nAlertsPending} immediatament, de manera que el badge reflecteix el canvi. El proper \texttt{ERRORS\_NOTIFY} del servidor actua com a reconciliació i garanteix la consistència final. Aquest patró — servidor com a font de veritat absoluta, actualització local per a la immediatesa — és un exemple directe de l'arquitectura \textit{Backend-Driven} amb reactivitat Signal d'Angular 19.
 
 \section{Configuració del Sistema i Motor Dinàmic (Schema-Driven)}
-El mòdul de Configuració és el centre de control de l'NVR. Organitzat en un menú lateral jeràrquic, permet gestionar des dels paràmetres generals del sistema i els comptes d'usuari fins a la configuració individual de cada càmera IP, les entrades físiques o la xarxa (Figura~\ref{fig:config_system_users}).
+El mòdul de Configuració és el centre de control del videogravador. Organitzat en un menú lateral jeràrquic, permet gestionar des dels paràmetres generals del sistema i els comptes d'usuari fins a la configuració individual de cada càmera IP, les entrades físiques o la xarxa (Figura~\ref{fig:config_system_users}).
 
 \begin{figure}[htbp]
   \centering
@@ -377,16 +377,18 @@ El mòdul de Configuració és el centre de control de l'NVR. Organitzat en un m
   \small Font: Elaboració pròpia.
 \end{figure}
 
-El repte tècnic d'aquest mòdul és que el \textit{firmware} del NVR evoluciona constantment: nous models afegeixen seccions, canvien límits de paràmetres o incorporen opcions noves. Amb un enfocament tradicional, cada canvi requeriria actualitzar manualment els formularis del \textit{frontend}. La solució adoptada és una arquitectura \textbf{Schema-Driven}: el propi NVR envia al client les metadades que descriuen cada camp —tipus de dada, rang de valors, opcions permeses, valor per defecte— i Angular les interpreta per renderitzar la interfície de manera autònoma. El gravador actua com a \textit{Single Source of Truth} sense que el \textit{frontend} hagi d'actualitzar cap línia de codi davant d'un canvi d'esquema.
+El repte tècnic d'aquest mòdul és que el \textit{firmware} del NVR evoluciona constantment: nous models afegeixen seccions, canvien límits de paràmetres o incorporen opcions noves. Amb un enfocament tradicional, cada canvi requeriria actualitzar manualment els formularis del \textit{frontend}. La solució adoptada és una arquitectura \textbf{Schema-Driven}: el propi gravador envia al client les metadades que descriuen cada camp —tipus de dada, rang de valors, opcions permeses, valor per defecte— i Angular les interpreta per renderitzar la interfície de manera autònoma. El gravador actua com a \textit{Single Source of Truth} sense que el \textit{frontend} hagi d'actualitzar cap línia de codi davant d'un canvi d'esquema.
+Internament l'NVR emmagatzema la configuració en format pla de clau-valor via D-Bus; el servei la-core-legacy s'encarrega de reconstruir-ho com a arbre JSON jeràrquic per al frontend i d'injectar automàticament els valors per defecte de l'esquema per a les propietats no modificades per l'usuari.
 
-\subsection{El Model de Validació en Cascada (Cascaded Validation)}
+\subsection{El Model de Validació}
 Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usuari pugui programar gravacions d'una càmera o d'un sensor físicament inexistent), el sistema organitza la informació en un model de validació estructural de tres capes que es complementen de forma jeràrquica:
 
 \begin{enumerate}
-  \item \textbf{Capa Teòrica (Esquema):} Defineix les regles abstractes de joc i els límits teòrics del programari de manera declarativa mitjançant fitxers YAML integrats al servei de validació de l'NVR (ex: \textit{"el sistema admet un màxim de 32 entrades"}).
-  \item \textbf{Capa Física (Recursos - \texttt{/resources}):} Exposa el maquinari realment connectat o llicenciat en l'equip en temps d'execució mitjançant un conjunt d'APIs REST complementàries (ex: \textit{"aquest equip disposa d'un mòdul físic amb 8 entrades instal·lades"}).
+  \item \textbf{Capa Teòrica (Esquema):} Defineix les regles abstractes de joc i els límits teòrics del programari de manera declarativa mitjançant fitxers JSON integrats al servei de validació de l'NVR (ex: \textit{"el sistema admet un màxim de 32 entrades"}).
+  \item \textbf{Capa Física (Recursos - \texttt{/resources}):} Proporciona informació sobre l'estat i les capacitats actuals del dispositiu en temps d'execució. El \textit{frontend} consulta aquest \textit{endpoint} per obtenir dades que necessita per renderitzar la interfície correctament però que l'operador no pot modificar directament (ex: \textit{"l'equip té 4 càmeres instal·lades"} o \textit{"el mode de bateria actiu és extern"}).
   \item \textbf{Capa Lògica (Dades de Configuració):} Representa l'arbre de configuració real que l'operador decideix aplicar (ex: \textit{"activa la gravació quan l'entrada 3 estigui activa"}).
 \end{enumerate}
+
 
 \begin{figure}[htbp]
   \centering
@@ -396,30 +398,25 @@ Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usu
   \small Font: Elaboració pròpia.
 \end{figure}
 
-Mitjançant aquesta validació en cascada, el client d'Angular consulta de manera proactiva la capa de recursos i l'esquema de dades bruts abans de dibuixar la vista. Si l'operador intenta forçar una petició d'escriptura invàlida, el servidor la rebutja immediatament amb un error \texttt{HTTP 422 Unprocessable Entity}.
-
-\subsection{Projecció Virtual i Hidratació de Dades (Merge Logic)}
-Internament, per garantir un temps d'accés $O(1)$ i l'eficiència en sistemes de memòria flaix limitats, l'NVR emmagatzema les dades de configuració en un format pla de tipus clau-valor a través del bus del sistema (\texttt{D-Bus}). Tanmateix, per a l'API REST de cara al frontend, el servei \texttt{la-core-legacy} fa una projecció d'aquestes claus per reconstruir en temps real un arbre de dades jeràrquic i tipat en format JSON.
-
-Durant les operacions de lectura (\texttt{GET}), l'API del servidor realitza una operació d'hidratació de dades (\textit{Merge}):
-\begin{enumerate}
-  \item Carrega de la persistència les dades modificades per l'usuari.
-  \item Recorre l'esquema del node en paral·lel. Per a cada propietat que no estigui definida en la persistència, hi injecta automàticament el seu valor per defecte (\texttt{\_default}).
-  \item Genera de manera automàtica totes les instàncies lògiques per a col·leccions fixes definides pel maquinari (ex: cam01 a cam16), evitant que l'aplicació Angular hagi d'omplir buits amb lògica condicional defensiva.
-\end{enumerate}
+\clearpage
+Mitjançant aquesta validació en cascada, el client d'Angular consulta de manera proactiva la capa de recursos i l'esquema de dades bruts abans de dibuixar la vista.
+% Si l'operador intenta forçar una petició d'escriptura invàlida, el servidor la rebutja immediatament amb un error \texttt{HTTP 422 Unprocessable Entity}.
 
 \subsection{Motor Dinàmic del Frontend (Schema-Driven Rendering)}
-El client web actua com un intèrpret asíncron de les definicions d'esquema exposades per l'endpoint \texttt{/device-service/properties/schema}. El component dinàmic \texttt{ConfigInputComponent} rep la definició i renderitza de forma autònoma el component de presentació equivalent, utilitzant un flux recursiu basat en el tipus semàntic de la propietat d'esquema:
+El component \texttt{ConfigInputComponent} actua com a intèrpret de les definicions d'esquema: rep la metadada d'una propietat i selecciona l'element d'entrada adequat en funció del camp \texttt{\_type}. Independentment del tipus renderitzat, el component mostra sempre la pista \textit{"Default: \{valor\}"} sota el camp, permetent a l'operador conèixer en tot moment el valor de fàbrica definit a \texttt{\_default}.
 
 \begin{itemize}
-  \item \texttt{\_type: "boolean"}: Es renderitza mitjançant un commutador (\texttt{ToggleComponent}).
-  \item \texttt{\_type: "integer" / "numeric"}: Si té restriccions de màxims i mínims, genera un element lliscant (\texttt{SliderComponent}) o un camp numèric normalitzat.
-  \item \texttt{\_type: "list"}: Genera un selector de llista desitjada (\texttt{SelectComponent}) basat en els elements del vector \texttt{\_allowedValues}.
-  \item \texttt{\_type: "flag"}: Configura una màscara de selecció múltiple.
-  \item \texttt{\_type: "resource\_list" / "resource\_flag"}: Modifica la llista d'opcions connectant dinàmicament el selector amb les instàncies del maquinari real obtingut prèviament d'una consulta a \texttt{/resources}.
+  \item \texttt{\_type: "boolean"}: Renderitza un \textit{checkbox}. El component gestiona la coerció bidireccional entre els valors de cadena del servidor (\texttt{"true"}/\texttt{"false"}) i els booleans natius de l'HTML.
+  \item \texttt{\_type: "numeric" / "integer" / "float"}: Renderitza un camp numèric (\texttt{<input type="number">}) amb les restriccions \texttt{\_minValue} i \texttt{\_maxValue} de l'esquema aplicades com a atributs HTML natius.
+  \item \texttt{\_type: "list"}: Renderitza un selector (\texttt{<select>}) amb les opcions definides al vector \texttt{\_allowedValues}. Si el component pare ha proporcionat un prefix de traducció, les etiquetes es localitzen via \texttt{ngx-translate}.
+  \item \texttt{\_type: "flag"}: Renderitza un \textit{checkbox} amb suport per a l'opció d'inversió lògica (\texttt{invert}), útil per a senyals de tipus normalment tancat (NC) en entrades digitals.
+  \item \texttt{\_type: "resource\_list" / "resource\_flag"}: Equivalent a \texttt{list} i \texttt{flag}, respectivament, però el vector d'opcions no prové de l'esquema estàtic: el component pare l'ha pre-hidratat amb dades obtingudes d'una consulta prèvia a \texttt{/resources}, de manera que les opcions reflecteixen les instàncies de maquinari reals disponibles en temps d'execució.
+  \item \texttt{\_type: "password"}: Renderitza un camp de contrasenya acompanyat d'un llistat reactiu de criteris de validació (\textit{chips}). El component consulta la política de seguretat associada al camp (\texttt{\_policyLevel}) i avalua en temps real cada requisit —longitud mínima, majúscules, minúscules, dígits i símbols— mitjançant \textit{Signals} d'Angular, sense cap petició addicional al servidor.
+  \item \texttt{\_type: "ipaddr" / "ipmask" / "multicast\_ip" / "ipaddr\_or\_dns"}: Renderitza un camp de text amb validació reactiva de format. Si l'operador introdueix un valor que no compleix el patró, es mostra un missatge d'error visual immediat.
+  \item \textbf{Cas per defecte:} Si el tipus no coincideix amb cap dels anteriors, es renderitza un camp de text genèric amb el límit \texttt{\_maxLength} de l'esquema, dimensionat per acomodar continguts extensos com ara certificats o claus criptogràfiques.
 \end{itemize}
 
-La Figura~\ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el diàleg de creació d'un compte d'usuari nou mostra en temps real els requisits de contrasenya no complerts (longitud mínima, presència de número, minúscula i majúscula) en forma de xips de validació. Cada xip desapareix en el moment en què el camp satisfà el criteri corresponent, sense cap petició al servidor.
+La Figura \ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el diàleg de creació d'un compte d'usuari nou mostra en temps real els requisits de contrasenya no complerts (longitud mínima, presència de número, minúscula i majúscula) en forma de xips de validació. Cada xip desapareix en el moment en què el camp satisfà el criteri corresponent, sense cap petició al servidor.
 
 \begin{figure}[htbp]
   \centering
@@ -429,74 +426,106 @@ La Figura~\ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el
   \small Font: Elaboració pròpia.
 \end{figure}
 
-El Llistat~\ref{lst:schema_json} mostra un exemple real de l'estructura JSON que el \textit{backend} envia al \textit{frontend} per a la configuració d'una càmera IP, il·lustrant la convenció de prefixos \texttt{\_} que evita col·lisió amb propietats reals del maquinari:
+\clearpage
+El Llistat \ref{lst:schema_json} mostra un fragment real de l'esquema JSON que el \textit{backend} retorna per al node de càmeres IP (\texttt{config.video.cam}). L'esquema és un arbre JSON jeràrquic on la clau \texttt{\{camId\}} actua com a plantilla de col·lecció; el camp \texttt{\_rule} defineix el rang d'instàncies vàlides (índexs 0--151, amb farciment de tres dígits), i \texttt{la-core-legacy} expandeix aquesta plantilla en temps real per generar una entrada per a cada càmera instal·lada a l'equip. La convenció de prefixos \texttt{\_} separa les metadades de les propietats reals del dispositiu:
 
-\begin{lstlisting}[language=JavaScript, caption={Exemple d'esquema JSON de metadades per a la configuració d'una càmera IP.}, label={lst:schema_json}]
+\begin{lstlisting}[language=JavaScript, caption={Fragment real de l'esquema JSON del node \texttt{config.video.cam}, que inclou la plantilla de col·lecci\'o i cinc tipus de propietat diferents.}, label={lst:schema_json}]
 {
-  "camera.{id}.name": {
-    "_type": "string",
-    "_description": "Nom assignat a la camara",
-    "_maxLength": 64,
-    "_default": "Camera"
-  },
-  "camera.{id}.enabled": {
-    "_type": "boolean",
-    "_description": "Activa o desactiva la camara al sistema",
-    "_default": true
-  },
-  "camera.{id}.stream.codec": {
-    "_type": "list",
-    "_allowedValues": ["H264", "H265"],
-    "_description": "Codec de compressio del flux de video principal",
-    "_default": "H264"
-  },
-  "camera.{id}.stream.fps": {
-    "_type": "integer",
-    "_min": 1,
-    "_max": 60,
-    "_description": "Fotogrames per segon del flux de video",
-    "_default": 25
-  },
-  "camera.{id}.stream.resolution": {
-    "_type": "list",
-    "_allowedValues": ["1080p", "720p", "4K"],
-    "_description": "Resolucio de captura del sensor de la camara",
-    "_default": "1080p"
+  "config.video.cam": {
+    "{camId}": {
+      "_rule": {
+        "indexFrom": 0, "indexTo": 151,
+        "padding": 3, "fixed": true
+      },
+      "base": {
+        "disabled": {
+          "_type": "boolean",
+          "_description": "Camera Disabled",
+          "_default": "false",
+          "_allowedValues": ["false", "true"]
+        },
+        "ipcamera": {
+          "class": {
+            "_type": "list",
+            "_description": "IP Camera Class",
+            "_default": "ONVIF",
+            "_allowedValues": ["VIVOTEK", "ONVIF", "AXIS-H264", "RTSP"]
+          },
+          "connection": {
+            "address": {
+              "_type": "ipaddr",
+              "_description": "IP Address",
+              "_default": "0.0.0.0"
+            },
+            "port": {
+              "config": {
+                "_type": "numeric",
+                "_description": "Config Port",
+                "_default": 80,
+                "_minValue": 1,
+                "_maxValue": 65535
+              }
+            }
+          },
+          "account": {
+            "password": {
+              "_type": "password",
+              "_description": "Camera Password",
+              "_maxLength": 24,
+              "_policyLevel": 0
+            }
+          }
+        }
+      }
+    }
   }
 }
 \end{lstlisting}
 
-L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solapin amb propietats reals del dispositiu. El component \texttt{ConfigInputComponent} llegeix el camp \texttt{\_type} de cada entrada per decidir quin element de la interfície renderitzar: un commutador per a \texttt{"boolean"}, un selector per a \texttt{"list"} usant \texttt{\_allowedValues}, o un camp numèric amb rang per a \texttt{"integer"} usant \texttt{\_min} i \texttt{\_max}.
+L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solapin amb propietats reals del dispositiu. El component \texttt{ConfigInputComponent} llegeix el camp \texttt{\_type} de cada entrada per decidir quin element de la interfície renderitzar: un commutador per a \texttt{"boolean"}, un selector per a \texttt{"list"} usant \texttt{\_allowedValues}, o un camp numèric amb rang per a \texttt{"numeric"} usant \texttt{\_minValue} i \texttt{\_maxValue}.
 
 \subsection{Validació Dinàmica a ConfigInputComponent}
-Per seguir estrictament la filosofia \textit{schema-driven}, el component \texttt{ConfigInputComponent} ha estat refactoritzat per llegir de manera nativa i dinàmica les propietats d'esquema de cada node (com \texttt{\_regex}, \texttt{\_min}, \texttt{\_maxLength}) sense dependre de paràmetres rígids. S'ha unificat el tractament d'errors a través d'una variable reactiva calculada (\textit{computed signal}), que compila les expressions regulars i avalua els límits numèrics i de text.
+La validació de les entrades segueix una estratègia dual que separa els casos senzills dels formats complexos per minimitzar la càrrega sobre el motor de detecció de canvis d'Angular.
 
-\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica de validació dinàmica amb \textit{Signals} i \textit{Regex} a ConfigInputComponent.}]
-computedValidationError = computed(() => {
-  const value = this.inputValue();
-  const def = this.fieldDef();
-  if (!def) return null;
+Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValue}) i de longitud de text (\texttt{\_maxLength}), el \textit{template} Angular vincula directament els valors de l'esquema als atributs natius de l'\texttt{<input>} HTML5. D'aquesta manera, el navegador s'encarrega de la validació sense que Angular hagi d'executar cap lògica addicional. El component gestiona el cas en que el \textit{backend} pugui enviar indistintament \texttt{\_min} o \texttt{\_minValue} mitjançant un operador ternari al propi \textit{template}:
 
-  if (def._regex) {
-    const rx = new RegExp(def._regex);
-    if (!rx.test(String(value))) return def._description || 'Format invàlid';
-  }
-  if (def._type === 'integer' || def._type === 'numeric' || def._type === 'decimal') {
-    const minVal = def._min !== undefined ? def._min : def._minValue;
-    const maxVal = def._max !== undefined ? def._max : def._maxValue;
-    if (minVal !== undefined && value < minVal) return `Mínim: ${minVal}`;
-    if (maxVal !== undefined && value > maxVal) return `Màxim: ${maxVal}`;
-  }
-  if (def._type === 'string') {
-    if (def._minLength && String(value).length < def._minLength) return `Mínim ${def._minLength} caràcters`;
-    if (def._maxLength && String(value).length > def._maxLength) return `Màxim ${def._maxLength} caràcters`;
-  }
-  return null;
+\begin{lstlisting}[basicstyle=\footnotesize, language=HTML, caption={Vinculaci\'o de les restriccions num\`eriques de l'esquema als atributs natius de l'\textit{input} HTML5.}]
+<input type="number"
+  [min]="def._min !== undefined ? def._min : def._minValue"
+  [max]="def._max !== undefined ? def._max : def._maxValue">
+\end{lstlisting}
+
+Per als formats complexos (adreces IP, màscares i dominis), un \textit{Signal} calculat aplica expressions regulars i retorna el missatge d'error corresponent sense cap petició al servidor.
+
+Per a les contrasenyes, un segon \textit{Signal} independent avalua la política del camp (\texttt{\_policyLevel}) i retorna un vector de criteris que es mostren com a \textit{chips} en temps real:
+
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Signal \texttt{passwordRequirements}: avaluaci\'o reactiva dels criteris de la pol\'itica de contrasenya.}]
+passwordRequirements = computed<RequirementStatus[]>(() => {
+  const policy = this.activePolicy();
+  const val = this.inputValue() || '';
+  if (!policy) return [];
+
+  const reqs: RequirementStatus[] = [];
+  if (policy.minLength > 0)
+    reqs.push({ label: `Min ${policy.minLength}`,
+                valid: val.length >= policy.minLength });
+  if (policy.requireNumber)
+    reqs.push({ label: 'Number', valid: /\d/.test(val) });
+  if (policy.requireLowercase)
+    reqs.push({ label: 'Lower',  valid: /[a-z]/.test(val) });
+  if (policy.requireUppercase)
+    reqs.push({ label: 'Upper',  valid: /[A-Z]/.test(val) });
+  if (policy.requireSpecial)
+    reqs.push({ label: 'Symbol', valid: /[^A-Za-z0-9]/.test(val) });
+
+  return reqs;
 });
 \end{lstlisting}
 
-\subsection{Bloqueig de Configuració (Pessimistic Locking)}
-Per evitar que dos operadors sobreescriguin els mateixos paràmetres simultàniament, el sistema implementa un \textit{Pessimistic Locking}: abans de poder editar qualsevol camp, l'usuari ha de clicar la icona del cadenat. Aquesta acció envia un \texttt{POST} a \path{/device-service/properties/lock?node=config&seed=...} al servei \textbf{la-core-legacy} (Figura~\ref{fig:seq_config_lock}).
+\subsection{Bloqueig de Configuració}
+Per evitar que dos operadors sobreescriguin els mateixos paràmetres simultàniament, el sistema implementa un \textit{Pessimistic Locking}: en el moment en què un operador accedeix a la pàgina de configuració, el \textit{frontend} adquireix automàticament el bloqueig enviant un \texttt{POST} a \path{/device-service/properties/lock?node=config&seed=...} sense que l'usuari hagi de fer cap acció manual (Figura~\ref{fig:seq_config_lock}).
+
+El paràmetre \texttt{seed} és un identificador únic generat per Angular i persistit a \textit{localStorage} per a cada pestanya del navegador. El seu propòsit és evitar interferències entre pestanyes del mateix dispositiu: si un operador obre la pàgina de configuració en una segona pestanya, el servidor detecta que el \texttt{seed} és diferent del que té el lock i retorna un error \texttt{423 Locked}. D'aquesta manera, el sistema garanteix que en tot moment només hi hagi una única pestanya amb permisos d'escriptura actius.
 
 Si el lock està disponible, el servidor retorna un token d'autorització amb un temps de vida (\texttt{expiresIn}):
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, caption={Estructura JSON del bloqueig de configuració.}]
@@ -508,7 +537,7 @@ Si el lock està disponible, el servidor retorna un token d'autorització amb un
 }
 \end{lstlisting}
 
-El \texttt{token} actua com a signatura obligatòria per a totes les operacions d'escriptura posteriors; qualsevol \texttt{PATCH} sense token vàlid és rebutjat pel servidor. Si una altra sessió ja té el lock, el backend retorna un error \texttt{423 Locked} i el frontend commuta automàticament la vista a mode de "Només lectura" via un Signal, sense necessitat de recàrrega.
+El \texttt{token} actua com a signatura obligatòria per a totes les operacions d'escriptura posteriors; qualsevol \texttt{PUT} sense token vàlid és rebutjat pel servidor. Si una altra sessió o pestanya ja té el lock, el \textit{backend} retorna \texttt{423 Locked} i el \textit{frontend} commuta automàticament a mode de només lectura via un Signal: l'operador pot consultar tots els paràmetres actuals però no pot modificar cap camp fins que el lock quedi alliberat.
 
 \begin{figure}[htbp]
   \centering
@@ -519,68 +548,53 @@ El \texttt{token} actua com a signatura obligatòria per a totes les operacions 
 \end{figure}
 
 \clearpage
-El token caduca passat \texttt{expiresIn} segons si el \textit{frontend} no el renova. Per garantir la continuïtat sense saturar el cicle de detecció de canvis d'Angular, el \texttt{ConfigService} programa la renovació fora de \textit{Zone.js}:
+El token caduca passat \texttt{expiresIn} segons si el \textit{frontend} no el renova. Per garantir la continuïtat sense saturar el cicle de detecció de canvis d'Angular, el \texttt{ConfigService} programa la renovació cada \texttt{expiresIn/2} segons.
 
-\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Optimització del cicle de vida de \textit{Zone.js} per renovació de \textit{tokens}.}]
-private scheduleRenewal(ms: number) {
-  this.stopRenewal();
-  this.zone.runOutsideAngular(() => {
-    this.renewalTimer = setTimeout(() => {
-      this.zone.run(() => this.acquireLock());
-    }, ms);
+\subsection{Desat de la Configuració}
+El desar és sempre explícit: no hi ha autosave ni \textit{debounce}. L'operador ha de prémer el botó \textit{Save Changes} per confirmar les modificacions.
+
+\textbf{Petició HTTP.} Quan l'operador prem \textit{Save}, el component crida \texttt{saveConfigNode}, que envia un \texttt{PUT} a la URL corresponent al node que s'està editant:
+
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={M\`etode \texttt{saveConfigNode}: petici\'o \texttt{PUT} al node de configuraci\'o actiu.}]
+saveConfigNode(node: string, data: any): Observable<any> {
+  return this.http.put(`/${node}`, data);
+}
+\end{lstlisting}
+
+La URL és dinàmica i depèn del node actiu en cada pàgina. Si l'operador edita la xarxa Ethernet, la crida serà \texttt{PUT /config.network.if.eth0}; si edita un usuari del sistema, \texttt{PUT /config.users.admin}. En tots els casos s'envia l'objecte sencer del node, no un delta incremental.
+
+\textbf{Injecció automàtica del token.} El token del lock no l'afegeix el component ni el servei: ho fa un interceptor HTTP global (\texttt{authInterceptor}). Qualsevol petició a una URL que contingui \texttt{/config.} és interceptada automàticament, i el token s'afegeix com a paràmetre de consulta (\texttt{?token=...}) abans d'arribar al servidor:
+
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Fragment de \texttt{authInterceptor}: injecci\'o transparent del token de lock a totes les peticions de configuraci\'o.}]
+if (token && isConfigApi && !isLockOrUnlock) {
+  modifiedReq = req.clone({
+    setParams: { token: token },
   });
 }
 \end{lstlisting}
 
-\subsection{Detecció de Deltes al Desar (Save)}
-Quan l'administrador fa clic al botó de desar (\textit{Save}), en comptes d'enviar tot l'esquema sencer (que saturaria el gravador), s'executa un algorisme recursiu de diferències (\textit{delta payload}). Aquests canvis s'envien habitualment a \textbf{la-core-legacy} mitjançant peticions HTTP \texttt{PATCH}, tot i que per modificacions estructurals en algun cas s'utilitza \texttt{PUT}. L'algorisme de detecció actua de la següent manera:
+Gràcies a aquest disseny, cap component de la interfície necessita conèixer ni gestionar el token: l'interceptor garanteix que totes les peticions d'escriptura el portin de forma transparent.
 
-\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Algorisme recursiu de detecció de Deltes per a l'optimització de payloads amb normalització de primitius.}]
-export function getObjectDelta(current: any, original: any, path: string = ''): any {
-  // Normalització de tipus primitius booleans
-  const normalize = (val: any) => {
-    if (val === 'true') return true;
-    if (val === 'false') return false;
-    return val;
-  };
+\textbf{Gestió d'errors de validació.} Si el servidor retorna un \texttt{400 Bad Request}, el component actua en tres passos: primer reverteix l'estat local a la còpia original vàlida; després mapeja els camps erronis usant la funció \texttt{parseValidationErrors}; finalment, el Signal \texttt{fieldErrors} propaga els missatges directament als inputs afectats, que es pinten en vermell sense recarregar la pàgina.
 
-  const normCurrent = normalize(current);
-  const normOriginal = normalize(original);
+\textbf{Detecció de canvis i guard de navegació.} El component manté en tot moment una còpia JSON de la configuració carregada des del servidor (\texttt{originalConfigJson}). El Signal \texttt{isDirty} compara aquesta còpia amb l'estat actual en temps real: si difereixen, el botó \textit{Save Changes} apareix a la cantonada inferior dreta de la pàgina (Figura~\ref{fig:config_cameras_save}). Quan el desar té èxit, la còpia de referència s'actualitza per netejar l'estat \textit{dirty}:
 
-  if (normCurrent === normOriginal) return undefined;
-  if (typeof normCurrent !== 'object' || normCurrent === null) return normCurrent;
-
-  const delta: any = {};
-  let hasChanges = false;
-
-  for (const key in normCurrent) {
-    if (key.startsWith('_')) continue; // Ignora camps visuals o privats
-    
-    const currentVal = normCurrent[key];
-    const originalVal = normOriginal ? normOriginal[key] : undefined;
-
-    const diff = getObjectDelta(currentVal, originalVal, `${path}.${key}`);
-    
-    // Evitar propagació d'objectes o nodes buits
-    if (diff !== undefined && (typeof diff !== 'object' || Object.keys(diff).length > 0)) {
-      delta[key] = diff;
-      hasChanges = true;
-    }
-  }
-  
-  return hasChanges ? delta : undefined;
-}
+\begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Actualitzaci\'o de la refer\`encia original despr\'es d'un desat correcte, que neteja l'indicador de canvis pendents.}]
+const jsonStr = JSON.stringify(this.config());
+this.originalConfigJson.set(jsonStr);
 \end{lstlisting}
+
+\textbf{Notificació de reinici.} Quan el servidor detecta que el \texttt{PUT} ha tocat un servei crític (com la xarxa), afegeix la capçalera HTTP \texttt{X-Reboot-Required: true} a la resposta; l'\texttt{authInterceptor} la captura i activa un Signal global que renderitza un avís a la barra lateral, des del qual l'operador pot reiniciar el dispositiu quan ho consideri oportú.
+
+Quan l'operador intenta navegar cap a una altra secció amb canvis pendents, l'aplicació intercepta la navegació mitjançant un \textit{Route Guard} (\texttt{canDeactivate}) i presenta un diàleg de confirmació (Figura~\ref{fig:config_unsaved}) amb tres opcions: desar i sortir, descartar els canvis, o romandre a la pàgina actual.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/interficies/config3.png}
-  \caption{Pàgina de configuració de càmeres IP (\textit{IP Video → Cameras}). La taula mostra fins a 10 càmeres per pàgina amb paginació. El botó \textit{Save Changes} apareix únicament quan hi ha modificacions pendents; la notificació \textit{Reboot Required} indica que els canvis desats requeriran reinici del dispositiu.}
+  \caption{Pàgina de configuració de càmeres IP (\textit{IP Video → Cameras}). El botó \textit{Save Changes} apareix únicament quan hi ha modificacions pendents; la notificació \textit{Reboot Required} indica que els canvis desats requeriran reinici del dispositiu.}
   \label{fig:config_cameras_save}
   \small Font: Elaboració pròpia.
 \end{figure}
-
-Des del punt de vista de l'UX, el botó \textit{Save Changes} només apareix a la cantonada inferior dreta de la pàgina quan l'algorisme de deltes detecta diferències entre l'estat actual i l'original (Figura~\ref{fig:config_cameras_save}). Quan l'operador intenta navegar cap a una altra secció amb canvis pendents, l'aplicació intercepta la navegació i presenta un diàleg de confirmació (Figura~\ref{fig:config_unsaved}) que ofereix tres opcions: desar i sortir, descartar els canvis, o romandre a la pàgina actual.
 
 \begin{figure}[htbp]
   \centering
