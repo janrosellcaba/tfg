@@ -24,10 +24,40 @@ La integració del \textit{frontend} al \textit{firmware} segueix un cicle de vi
 
 La clau d'aquest disseny és la separació entre una partició de sistema \textbf{immutable} i una partició \texttt{/data/} de \textbf{lectura i escriptura}. Durant el desenvolupament, n'hi ha prou amb compilar el projecte amb \texttt{ng build -{}-configuration=production} i transferir el directori \texttt{dist/} al videogravador via \texttt{scp}, seguit d'un \texttt{systemctl restart nginx} per aplicar els canvis; tot plegat en qüestió de segons, sense necessitat de recompilar tot el \textit{firmware} —un procés que pot trigar hores. Aquest patró, habitual en sistemes \textit{embedded} de producció, equilibra la robustesa del sistema operatiu amb l'agilitat del desplegament.
 
+\subsection{Configuració del Proxy Invers NGINX}
+\label{sec:nginx_config}
+
+El component de xarxa que unifica tots els microserveis de l'NVR davant del navegador és \textbf{NGINX}, que actua com a proxy invers, terminador TLS i gestor de cookies de sessió. La seva configuració —el fitxer \texttt{la-core.conf}— s'integra al \textit{firmware} mitjançant la recepta Yocto \texttt{recipes-httpd/} del repositori \textbf{mantos-rec}, que l'empaqueta directament a la imatge del sistema i el desplega a la partició immutable. Aquesta estratègia garanteix que la configuració de xarxa mai pugui ser alterada accidentalment per les particions de dades de l'usuari, i que qualsevol actualització de firmware dugui implícita una nova configuració de proxy revisada.
+
+L'arxiu \texttt{la-core.conf} defineix un únic bloc \texttt{server} que escolta als ports 60080 (HTTP) i 60443 (HTTPS), forçant la redirecció de tot el trànsit no xifrat cap a HTTPS. La taula de rutes s'articula en blocs \texttt{location} que distribueixen el trànsit entre els serveis de l'NVR:
+
+\begin{table}[htbp]
+  \centering
+  \caption{Taula de rutes del proxy invers NGINX de l'NVR (\texttt{la-core.conf}).}
+  \label{tab:nginx_routes}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    \textbf{Ruta} & \textbf{Destinació} & \textbf{Protocol} \\ \midrule
+    \texttt{/(en|es|fr)/} & Fitxers estàtics Angular (\texttt{/data/web-core-view/}) & Estàtic \\
+    \texttt{/WebLogin}, \texttt{/webprotocol/} & \texttt{la-core-legacy} (port 60088) & HTTP \textit{proxy\_pass} \\
+    \texttt{/ws/la-core-notifier/} & \texttt{la-core-notifier} (port 60070) & WebSocket (\texttt{Upgrade}) \\
+    \texttt{/ws/la-core-alarm/} & \texttt{la-core-alarm} (port 60071) & WebSocket (\texttt{Upgrade}) \\
+    \texttt{/video-engine/} & \texttt{la-video-engine} (port 60890) & HTTP \textit{proxy\_pass} \\
+    \texttt{/hls/} & Servidor de media \textit{live} HLS (port 60888) & HTTP \textit{proxy\_pass} \\
+    \texttt{/stream/} & Servidor de media \textit{live} WebRTC (port 60889) & HTTP \textit{proxy\_pass} \\ \bottomrule
+  \end{tabular}}
+  \par\smallskip
+  \small Font: Elaboració pròpia.
+\end{table}
+
+\clearpage
+Més enllà de l'enrutament, NGINX centralitza tres responsabilitats de seguretat crítiques. En primer lloc, la \textbf{terminació TLS}: tots els certificats i les claus privades resideixen a la partició immutable; el navegador sempre es comunica per HTTPS i mai té accés directe als ports interns dels microserveis. En segon lloc, la \textbf{gestió de cookies de sessió}: la directiva \texttt{proxy\_cookie\_flags} afegeix automàticament els atributs \texttt{HttpOnly} i \texttt{Secure} a totes les cookies emeses per \texttt{la-core-legacy}, impedint que qualsevol \textit{script} de la pàgina pugui llegir o modificar les credencials de sessió. En tercer lloc, la \textbf{negociació de WebSockets}: les rutes \texttt{/ws/} inclouen les capçaleres \texttt{Upgrade: websocket} i \texttt{Connection: Upgrade} necessàries perquè el navegador pugui establir canals persistents bidireccionals amb els serveis de notificació i alarmes de l'NVR.
+
 \section{Capa d'Estils i Consistència Visual}
 Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en \textbf{SCSS} (la sintaxi moderna del preprocessador \textbf{SASS}, \textit{Syntactically Awesome Style Sheets}). El principal repte de disseny residia en la coexistència, dins d'una mateixa aplicació, de dos entorns d'ús amb exigències visuals radicalment oposades: la consola d'administració tècnica, concebuda per treballar amb llum natural i que requereix fons clars i alt contrast per facilitar la lectura de paràmetres de configuració; i el mosaic de visualització de vídeo, pensat per a operadors que monitoritzen càmeres de manera contínua en sales de control amb llum reduïda, on els fons gairebé negres minimitzen la fatiga visual durant torns llargs.
 
-Resoldre aquesta dualitat amb un únic \textit{codebase} d'estils coherent va exigir una arquitectura CSS deliberada. La solució adoptada s'articula en tres eixos complementaris que s'exposen a continuació: una paleta de variables semàntiques centralitzada que actua com a única font de veritat cromàtica, un model d'encapsulació per component que garanteix l'aïllament d'estils i el rendiment gràfic, i un sistema de disseny adaptatiu basat en unitats relatives i \textit{media queries} que assegura la usabilitat en qualsevol terminal de l'operador.
+Resoldre aquesta dualitat amb un únic \textit{codebase} d'estils coherent va exigir una arquitectura CSS deliberada. La solució adoptada s'articula en tres eixos complementaris: una paleta de variables semàntiques centralitzada que actua com a única font de veritat cromàtica, un model d'encapsulació per component que garanteix l'aïllament d'estils i el rendiment gràfic, i un sistema de disseny adaptatiu basat en unitats relatives i \textit{media queries} que assegura la usabilitat en qualsevol terminal de l'operador.
 
 \subsection{Modularització SCSS}
 La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SCSS (Llistat \ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:

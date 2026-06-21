@@ -20,32 +20,19 @@ ojo amb les paraules que comencen en majuscules i les que no. establir sistema
 
 EXPLICAR COM SACTUALITZAVA LA VERSIO ANTIGAMENT
 
-SECCIO 1.6 TOCA ARA
-
 posar agraiments
-
-parlar de la nova generacio de gravadors NXT
 
 explicar en algun lloc tot el que he fet
 
-explicar clarament que es un NVR
-
-revisar punt 5 alarmes
-
 millorar títols
+
+Revisa el capítol 2 en profunditat
 
 *******************++
 
-resum i abstract tornar a fer!
-
 treure diagrama 3.1
 
-l'arquitectura global del sistema no està bé. figura 4.1
-revisar tema 4.
-
-
-mirar lo del Carles de la IA
-
+POSAR US DE LA IA EN AQUEST PROJECTE (CORREU CARLES FARRE)
 
 #
 
@@ -74,178 +61,6 @@ confidencialitat ? NO
 explicar competencies transversals i com les he assolit
 punt 7, revisar assignatures i explicar menció
 millorar la panificació segons el comentari del professor (foto 18 de maig)
-
-
-
-
-
-
-
-
-Anàlisi del Capítol 1 — Problemes, incoherències i millores
-Paràgraf d'obertura
-"cicle de vida del software" és una expressió imprecisa. El que es descriu és el cicle de vida del projecte, no del software en general. Canviar per "el cicle de vida del projecte".
------------------------------------------
-
-
-§1.1 — Context del projecte
-"El present Treball de Final de Grau" — "present" és un arcaisme de redacció formal. Millor: "Aquest Treball de Final de Grau".
-
-No s'introdueix l'acrònim NVR (Network Video Recorder) a la primera menció de "videogravadors". Serà usat extensament als capítols posteriors i cal definir-lo aquí formalment.
-
-"liderar la modernització tecnològica de l'empresa" — El verb "liderar" és massa grandiloqüent per a un TFG d'un estudiant. Millor: "contribuir a la modernització" o "modernitzar la plataforma tecnològica".
-
-"arquitectura i protocols moderns" — expressió buida, extremadament vaga. Cal especificar quins protocols (WebRTC, HLS, HTTPS, WSS) o eliminar-ho.
-
-Falta mencionar la naturalesa embedded del sistema en el context general. És una característica diferenciadora del projecte i hauria d'aparèixer ja a la primera secció.
-
------------------------------------------
-
-
-§1.2 — Identificació del problema i motivació
-Repetició innecessària del context: "aplicació web desenvolupada als anys 90 que depenia de tecnologies avui completament obsoletes, com els controls ActiveX de Microsoft" és exactament el mateix que ja s'ha dit a §1.1. Cal reformular per aportar informació nova, no repetir-la.
-
-"entre d'altres" al final de la primera frase — pràctica acadèmica dolenta. Si hi ha altres tecnologies obsoletes, cal citar-les. Si no, eliminar l'expressió.
-
-Segon punt de la llista (Rigidesa): "Els gravadors moderns posseeixen capacitats i firmwares molt diversos" — Aquí es barreja el subjecte. El problema no és que els gravadors siguin diversos, sinó que la plataforma legacy no pot adaptar-s'hi. La frase és confusa: sembla que es critica els gravadors moderns, quan el problema és la rigidesa de la plataforma antiga.
-
-"corba d'aprenentatge elevada" (tercer punt UX) — argument feble. Tots els sistemes professionals en tenen. El veritable problema és que la interfície és funcionalment inoperativa en navegadors moderns. Cal reformular centrant-se en la inaccessibilitat real.
-
-Falta la data de fi de suport a Internet Explorer (Microsoft va retirar suport a IE11 el juny de 2022). És un fet concret i citable que justificaria la urgència de la substitució amb una referència bibliogràfica.
-
-Cap citació bibliogràfica a tota la secció. S'hi fan afirmacions factuables (obsolescència d'ActiveX, restriccions de seguretat corporativa, etc.) sense cap font. Caldria almenys una referència al suport de Microsoft o a polítiques de seguretat corporativa.
-
-El pas de model multi-NVR a single-NVR no s'explica prou bé. Es diu "el model anterior estava concebut exclusivament per a grans instal·lacions" però no es descriu mínimament com funcionava (per exemple: una aplicació d'escriptori o web centralitzada, a una IP fixa, que gestionava múltiples NVRs).
-
------------------------------------------
-
-
-§1.3 — Estat de l'art
-"el mercat de la videovigilància IP està dominat per grans fabricants com Hikvision o Dahua" — Afirmació de dominació de mercat sense cap citació. Acadèmicament inacceptable sense font (informe de mercat, article, etc.).
-
-"com els antics ActiveX o extensions específiques" — Repetició de l'ActiveX per tercera vegada en el document. S'ha d'eliminar o referenciar la primera menció.
-
-Barreja de l'estat de l'art amb justificació pròpia: La frase "L'ús de WebRTC en aquest projecte és clau per eliminar la dependència de transcodificadors pesats al servidor" és una justificació de decisió pròpia de disseny, no una descripció de l'estat de l'art. Pertany a §1.4 o §1.5, no aquí.
-
-"Milestone o Genetec" — S'esmenten sense cap citació ni referència. Cal o bé citar-los amb una font (web oficial, white paper, article de revisió) o no esmentar-los.
-
-La taula comparativa (Taula 1.1) posa "Font: Elaboració pròpia" per afirmacions sobre productes de tercers ("Market Leaders" té "Plugins"). Si es fan afirmacions sobre les característiques de productes de tercers, cal citar les fonts que les verifiquen.
-
-La columna "Market Leaders" no especifica quins productes concrets representa. "Market Leaders" és ambigu: inclou Hikvision (VMS lleuger), Milestone (VMS pesat), Genetec (enterprise)? Cada un té característiques molt diferents.
-
-"Manteniment → Fàcil (Centralitzat)" per Web Core View és una contradicció: si el sistema és embedded en un únic NVR, el "manteniment centralitzat" no té sentit en el context habitual del terme. Cal clarificar a qué es refereix "centralitzat" aquí.
-
-La taula no inclou criteris rellevants com: cost, seguretat, suport de protocols de vídeo estàndard (ONVIF), escalabilitat o compatibilitat de navegadors. Amb 4 criteris és poc representativa de la realitat comparativa.
-
------------------------------------------
-
-
-§1.4 — Anàlisi d'alternatives
-"Alternativa de Framework Frontend: Angular 19 vs. React / Vue" — El punt sobre React/Vue diu "augmenta el risc de vulnerabilitats". És una afirmació molt contundent i injustificada: React/Vue s'utilitzen en entorns de seguretat molt exigents (banca, administracions). Cal reformular amb arguments positius d'Angular (estructura opinada, TypeScript natiu, testing integrat) en lloc d'atacar alternatives sense evidència.
-
-Títol de la subsecció de gestió d'estat: "Redux vs. Angular Signals" — Redux és una llibreria de l'ecosistema React, no Angular. L'equivalent natiu d'Angular és NgRx. El títol hauria de dir "NgRx vs. Angular Signals", cosa que es menciona al text però no al títol. És un error tècnic notable.
-
-La subsecció de còdecs (H.264 i H.265) és excessivament detallada per a un capítol d'introducció. Descriu mecànica d'implementació ("el dispositiu del client disposa de descodificació nativa per maquinari compatible al navegador") que pertany al capítol 5. Cal resumir el criteri de decisió i remetre al capítol 5 per als detalls.
-
-"Alternativa de configuració: Estàtica vs. Schema-driven" és la subsecció més important del projecte (és una innovació diferenciadora) i és la més curta. Cal expandir-la: explicar que el backend envia un diccionari pla de claus en notació de punts amb metadades amb underscore prefixat (_type, _allowedValues, etc.), i que el frontend renderitza automàticament els controls sense conèixer el firmware concret.
-
-No s'analitza l'alternativa de mecanisme de sessió (JWT vs. Cookies HttpOnly), que és un component crític de seguretat. El sistema finalment implementa cookies HttpOnly/Secure via NGINX, una decisió de disseny important que mereixeria un paràgraf d'alternativa aquí.
-
-No s'analitza l'alternativa de notificacions en temps real (WebSockets vs. Server-Sent Events vs. Long Polling). WebSockets s'usa per a dues finalitats crítiques (alarmes i notificacions del sistema) i la tria mereix justificació.
-
-No s'analitza l'alternativa de proxy invers (NGINX vs. alternatives com Traefik, Caddy, o accés directe). NGINX és una peça central de l'arquitectura i la seva elecció hauria d'estar justificada explícitament.
-
------------------------------------------
-
-
-§1.5 — Solució proposada i valor afegit
-"L'elecció d'aquesta versió respon a la voluntat d'utilitzar tecnologies actualitzades i de llarg suport" — Justificació acadèmicament buida. "Voluntat" no és un argument tècnic. Cal substituir per les característiques concretes d'Angular 19 que s'usen: Signals natius, zoneless rendering, @defer blocks, etc.
-
-"Control de concurrència" es descriu com "un servei de bloqueig en temps real" però no s'anomena el mecanisme (Config Lock amb expiresIn, renovació periòdica, force=true per admins). Un paràgraf d'introducció al concepte de "lock distribuït" aquí aportaria rigor.
-
-La llista no menciona la seguretat de sessions (cookies HttpOnly/Secure via NGINX inaccessibles a JavaScript) com una aportació de valor, quan és una decisió de seguretat específica i destacada.
-
-"Desplegament autònom (single-NVR)" és una repetició quasi literal del que ja s'ha dit a §1.2. A §1.5 hauria d'aportar informació nova (per exemple: quins components tècnics fan possible el desplegament embedded, el pes de l'aplicació compilada, etc.).
-
------------------------------------------
-
-
-§1.6 — Objectius del projecte
-"consola de gestió web" — El terme "consola" és ambigu i pot evocar una interfície de línia de comandes. Millor: "interfície web de gestió" o "aplicació web de gestió centralitzada".
-
-"Integrar un mòdul de visualització híbrid compatible amb WebRTC i HLS (H264/H265)" — No menciona que la gestió del servidor HLS (servei de segments al backend C++) és part del projecte. L'objectiu queda curt: sembla que és purament un problema de frontend.
-
-"Implementar la gestió d'alarmes en temps real mitjançant comunicació bidireccional" — "comunicació bidireccional" és imprecís. WebSockets és la tecnologia concreta. Cal substituir o aclarir: "mitjançant WebSockets (WSS)".
-
-"basat en esquemes metadada" (al primer objectiu específic) — Gramàtica incorrecta en català. Ha de ser "basat en esquemes de metadades" o "basat en metaesquemes".
-
-Els objectius no estan prioritzats ni categoritzats (p.ex., obligatoris vs. opcionals, o tècnics vs. funcionals). En metodologia acadèmica, és recomanable indicar quins objectius són essencials i quins desitjables.
-
-No hi ha cap objectiu explícit de seguretat (autenticació, control d'accés per rols, política Same-Origin, xifrat de sessió). La seguretat és un requisit transversal del projecte i hauria de ser un objectiu explícit.
-
------------------------------------------
-
-
-§1.7 — Abast i Obstacles
-Triple repetició del mode single-NVR: el concepte s'ha mencionat a §1.2, §1.5 i ara a §1.7. Cal consolidar en un lloc i referenciar des dels altres.
-
-La llista d'obstacles és molt escassa (3 punts). Falten obstacles reals com: heterogeneïtat de firmwares (impossibilitat d'API uniforme), restriccions de memòria i CPU del hardware embedded, suport irregular de H.265 als navegadors, dependència de l'API legacy interna (la-core-legacy) amb documentació limitada, i la impossibilitat de fer proves en producció sense hardware real.
-
-"Afecta al Projectista" — En català, el verb afectar no porta preposició davant el complement directe de persona. Hauria de ser "Afecta el Projectista", no "Afecta al Projectista" (calque del castellà).
-
-El tercer obstacle ("Seguretat i NGINX") no és un obstacle sinó una decisió d'arquitectura. Un obstacle hauria de ser un repte o risc que cal superar. La "configuració de NGINX" és una tasca, no un obstacle. Cal reformular o substituir per un repte real (com la gestió del CORS en un entorn embedded o la complexitat del trànsit SRTP/UDP directe en entorns amb NAT).
-
-Falta una subsecció "Limitacions de l'abast" que indiqui explícitament el que no cobreix el projecte (per exemple: l'arquitectura multi-NVR centralitzada no és objectiu d'aquest TFG; la implementació del backend C++ de Lanaccess és fora de l'abast del projectista).
-
------------------------------------------
-
-
-§1.8 — Actors implicats
-La llista d'actors és una enumeració plana sense context. Hauria de descriure, per a cada actor, el seu rol en el sistema, les seves necessitats i les seves interaccions amb el producte. Ara mateix és massa telegràfica.
-
-No es diferencia explícitament entre Operador i Administrador tècnic com a rols amb permisos diferenciats. Això és rellevant per al control d'accés, un component clau del sistema.
-
-L'ordre dels stakeholders no és lògic. Convencions acadèmiques i de gestió de projectes solen ordenar-los per proximitat al sistema o importància: Client/promotor (Lanaccess) → Usuaris finals → Equip de projecte → Supervisors.
-
-"Responsable únic de l'anàlisi i la implementació" — La tasca del projectista inclou també el disseny, les proves i la documentació. Cal ampliar.
-
-Problemes estructurals / coherència global
-Falta la secció "Estructura de la memòria" (roadmap del document), que és estàndard en TFGs. Ha d'explicar breument el contingut de cada capítol i guiar el lector. Sense ella, el capítol 1 no compleix la seva funció d'orientació.
-
-No hi ha cap referència creuada als capítols posteriors. Un capítol d'introducció ha de preparar el lector: "el capítol 2 descriu la gestió del projecte; el capítol 3 detalla els requisits...", etc.
-
-L'estat de l'art (§1.3) es barreja amb l'anàlisi d'alternatives (§1.4). El títol de §1.3 diu "Estat de l'art i alternatives existents" i §1.4 diu "Anàlisi d'alternatives". Tenir "alternatives" a les dues seccions és confús. §1.3 hauria de ser purament descriptiva (el que existeix al mercat) i §1.4 hauria de ser analítica (decisions pròpies del projecte).
-
-Falta mencionar el període temporal del projecte (any acadèmic, durada aproximada). Contextualment és rellevant per entendre l'abast.
-
-Cap menció a la metodologia de treball al capítol introductori. Un paràgraf breu que avanci que s'utilitza una metodologia àgil (Kanban) i que el detall és al capítol 2 és recomanable.
-
-"H.265 — algorisme de compressió d'última generació" — H.265/HEVC no és l'última generació; AV1 i VVC el superen. Cal reformular com "còdec d'alta eficiència de compressió" o "successor de H.264".
-
-Resum de severitat:
-
-Tipus	Quantitat
-Errors tècnics (Redux≠Angular, gramàtica, acrònim NVR)	~5
-Mancances acadèmiques (cites, estructura, limitacions)	~15
-Redundàncies / repeticions a eliminar	~8
-Arguments febles o imprecisos	~10
-Millores d'estructura i coherència	~15
-La prioritat alta seria: afegir la secció "Estructura de la memòria" (48), corregir "Redux" per "NgRx" (23), afegir cites a les afirmacions de mercat (14, 17), consolidar les repeticions del single-NVR (39) i separar clarament §1.3 de §1.4 (50).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

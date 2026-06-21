@@ -8,25 +8,17 @@ El projecte es desenvolupa en un entorn professional dins de l’equip d’\text
 
 Els pilars del seguiment del projecte són:
 \begin{itemize}
-  \item \textbf{Reunions de sincronització (Daily):} Sessions diàries per coordinar el progrés, identificar bloquejos i alinear el \textit{frontend} amb l'estat del \textit{firmware}.
+  \item \textbf{Reunions de sincronització (Daily):} Sessions diàries per coordinar el progrés, identificar bloquejos i alinear el desenvolupament amb l'estat del \textit{firmware}.
   \item \textbf{Seguiment acadèmic i professional:} El director del TFG supervisa l'evolució tècnica diàriament, mentre que es manté una comunicació constant amb el tutor de la universitat per garantir el rigor acadèmic.
   \item \textbf{Gestió de tasques:} Control del cicle de vida de cada funcionalitat des de la columna \textit{To Do} fins a \textit{Done}.
 \end{itemize}
 
-Respecte a l'enginyeria de software, se segueixen els estàndards següents:
+Respecte a l'enginyeria de \textit{software}, se segueixen els estàndards següents:
 \begin{itemize}
-  \item \textbf{Control de versions:} Ús de \textbf{Git} amb el model \textbf{GitFlow} (branques \textit{master}, \textit{develop} i \textit{feature}). El repositori es troba allotjat en un GitLab local.
-  \item \textbf{Stack tecnològic:} Angular 19 (Signals i Standalone Components) per al \textit{frontend} i implementacions en C++ 22 per a la comunicació de baix nivell en el \textit{backend}.
+  \item \textbf{Control de versions:} Ús de \textbf{Git} amb el model \textbf{GitFlow} (branques \textit{master}/\textit{MAIN}, \textit{develop} i \textit{feature}). El repositori es troba allotjat en un GitLab local.
+  \item \textbf{Stack tecnològic:} Angular 19 (Signals i Standalone Components) per al \textit{frontend} i implementacions en C++20 per a la comunicació de baix nivell en el \textit{backend}.
   \item \textbf{Qualitat:} Aplicació de principis SOLID \cite{solid_principles} i arquitectura modular.
 \end{itemize}
-
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.9\textwidth]{figures/stack_mindmap.png}
-  \caption{Mapa mental del stack tecnològic i d'enginyeria aplicat al projecte.}
-  \label{fig:stack_mindmap}
-  \small Font: Elaboració pròpia.
-\end{figure}
 
 \section{Planificació temporal}
 
@@ -50,7 +42,7 @@ Es defineixen els següents rols assumits pel desenvolupador al llarg del projec
 \begin{itemize}
   \item \textbf{Cap de Projecte (PM):} Responsable de la planificació temporal, coordinació amb Lanaccess i control econòmic.
   \item \textbf{Analista:} Dissenyador de l'arquitectura de capes, diagrames UML i definició de requisits.
-  \item \textbf{Programador:} Codificador del frontend en Angular 19, configuració de NGINX i integració gRPC.
+  \item \textbf{Programador:} Desenvolupador del frontend, dels microserveis embedded, de la configuració de NGINX, i de l'entorn de build amb yocto.
   \item \textbf{Tester / Validació:} Responsable del disseny de casos de prova, test de càrrega de vídeo i validació de seguretat.
 \end{itemize}
 
@@ -91,7 +83,7 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
     AV3            & Càmeres Directe (WebRTC)    & AC2           & Programador, Analista, PM, PC, NVR    & 50             \\ \midrule
     GV1            & Reproducció Gravacions (HLS)& AV3           & Programador, Analista, PM, PC, NVR    & 110            \\
     GV2            & System Config Schema-driven & MC2           & Programador, Analista, PM, PC         & 60             \\ \midrule
-    FM2            & Memòria TFG                 & ---           & PM, Analista, Programador, Tester, PC & 80             \\ \midrule
+    FM1            & Memòria TFG                 & ---           & PM, Analista, Programador, Tester, PC & 80             \\ \midrule
     \textbf{TOTAL} &                             &               &                                       & \textbf{540}   \\ \bottomrule
   \end{tabular}}
   \par\smallskip
@@ -102,9 +94,8 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{figures/gantt.png}
-  \caption{Diagrama de Gantt del projecte.}
+  \caption{Diagrama de Gantt del projecte.\\\small Font: Elaboració pròpia.}
   \label{fig:gantt}
-  \small Font: Elaboració pròpia.
 \end{figure}
 
 \subsection{Gestió del risc i desviacions reals}
@@ -115,6 +106,7 @@ Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns 
   \caption{Matriu de gestió de riscos i plans de contingència.}
   \label{tab:matriu_riscos}
   \small
+  \hbadness=10001
   \begin{tabular}{@{}lp{3.2cm}ccp{5.2cm}@{}}
     \toprule
     \textbf{Tipus} & \textbf{Risc Identificat} & \textbf{Prob.} & \textbf{Imp.} & \textbf{Pla de Contingència / Acció Correctiva} \\ \midrule
@@ -201,7 +193,7 @@ Considerant tots els conceptes analitzats en la planificació econòmica, el pre
 \begin{itemize}
   \item \textbf{Cost de Recursos Humans (CPA):} 13.567,50~\euro{}.
   \item \textbf{Amortització del maquinari:} 210,00~\euro{} (detall a la Taula~\ref{tab:amortitzacio}).
-  \item \textbf{Costos indirectes (despeses generals d'oficina):} 1.150,00~\euro{}.
+  \item \textbf{Costos indirectes (despeses generals d'oficina):} 1.150,00~\euro{}, que comprenen: electricitat i climatització proporcional (5 mesos $\times$ 40,00~\euro{}/mes = 200,00~\euro{}), connexió a internet corporativa (5 mesos $\times$ 30,00~\euro{}/mes = 150,00~\euro{}), material d'oficina i papereria (100,00~\euro{}) i proporció de llicències de programari corporatiu, incloent-hi l'eina Businessmap i l'entorn CI/CD intern (700,00~\euro{}).
   \item \textbf{Marge de contingència (10 \%):} 1.492,75~\euro{} (reserva preventiva calculada sobre la suma total de despeses).
 \end{itemize}
 D'aquesta manera, el pressupost final estimat del projecte ascendeix a \textbf{16.420,25~\euro{}}.
