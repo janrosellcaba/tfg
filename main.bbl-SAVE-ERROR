@@ -19,6 +19,68 @@
 
 \refsection{0}
   \datalist[entry]{none/global//global/global/global}
+    \entry{microsoft_ie11_eol}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=b9a8b868588ad4bc6b36c29936e26423}{%
+           family={{Microsoft Corporation}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{fullhash}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{fullhashraw}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{bibnamehash}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{authorbibnamehash}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{authornamehash}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{authorfullhash}{b9a8b868588ad4bc6b36c29936e26423}
+      \strng{authorfullhashraw}{b9a8b868588ad4bc6b36c29936e26423}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Internet Explorer 11 desktop app retirement FAQ}
+      \field{urlday}{12}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge
+      \endverb
+      \verb{url}
+      \verb https://learn.microsoft.com/en-us/lifecycle/faq/internet-explorer-microsoft-edge
+      \endverb
+    \endentry
+    \entry{ihs_video_surveillance}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=ab83ae6df0e32c18486bff6715a4594f}{%
+           family={{Omdia (formerly IHS Markit)}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{fullhash}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{fullhashraw}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{bibnamehash}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{authorbibnamehash}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{authornamehash}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{authorfullhash}{ab83ae6df0e32c18486bff6715a4594f}
+      \strng{authorfullhashraw}{ab83ae6df0e32c18486bff6715a4594f}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Video Surveillance -- World Report}
+      \field{urlday}{12}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2023}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://omdia.tech.informa.com/
+      \endverb
+      \verb{url}
+      \verb https://omdia.tech.informa.com/
+      \endverb
+    \endentry
     \entry{rfc8825}{report}{}{}
       \name{author}{3}{}{%
         {{hash=79df140c80c36407eb1f77c2b6541821}{%
@@ -48,8 +110,8 @@
       \strng{authornamehash}{d8621403a7aaa0f7449b810da81be8e4}
       \strng{authorfullhash}{d8621403a7aaa0f7449b810da81be8e4}
       \strng{authorfullhashraw}{d8621403a7aaa0f7449b810da81be8e4}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{number}{8825}
@@ -77,8 +139,8 @@
       \strng{authornamehash}{3325b015fbae57ba74629a53f1ead961}
       \strng{authorfullhash}{3325b015fbae57ba74629a53f1ead961}
       \strng{authorfullhashraw}{3325b015fbae57ba74629a53f1ead961}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{HTTP Live Streaming (HLS) Authoring Specification}
@@ -92,6 +154,68 @@
       \endverb
       \verb{url}
       \verb https://developer.apple.com/documentation/http-live-streaming
+      \endverb
+    \endentry
+    \entry{milestone_xprotect}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=8ea6c4887094f6d9266f76d67e88062e}{%
+           family={{Milestone Systems A/S}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{fullhash}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{fullhashraw}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{bibnamehash}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{authorbibnamehash}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{authornamehash}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{authorfullhash}{8ea6c4887094f6d9266f76d67e88062e}
+      \strng{authorfullhashraw}{8ea6c4887094f6d9266f76d67e88062e}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{XProtect VMS Platform}
+      \field{urlday}{12}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.milestonesys.com/products/xprotect/
+      \endverb
+      \verb{url}
+      \verb https://www.milestonesys.com/products/xprotect/
+      \endverb
+    \endentry
+    \entry{genetec_security_center}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=34697f76849171914c185e47e976d315}{%
+           family={{Genetec Inc.}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{34697f76849171914c185e47e976d315}
+      \strng{fullhash}{34697f76849171914c185e47e976d315}
+      \strng{fullhashraw}{34697f76849171914c185e47e976d315}
+      \strng{bibnamehash}{34697f76849171914c185e47e976d315}
+      \strng{authorbibnamehash}{34697f76849171914c185e47e976d315}
+      \strng{authornamehash}{34697f76849171914c185e47e976d315}
+      \strng{authorfullhash}{34697f76849171914c185e47e976d315}
+      \strng{authorfullhashraw}{34697f76849171914c185e47e976d315}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Security Center Unified Security Platform}
+      \field{urlday}{12}
+      \field{urlmonth}{5}
+      \field{urlyear}{2024}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.genetec.com/products/unified-security-center
+      \endverb
+      \verb{url}
+      \verb https://www.genetec.com/products/unified-security-center
       \endverb
     \endentry
     \entry{angular_signals}{online}{}{}
@@ -108,8 +232,8 @@
       \strng{authornamehash}{06b65c863b37fb47b326b52a216ad6ab}
       \strng{authorfullhash}{06b65c863b37fb47b326b52a216ad6ab}
       \strng{authorfullhashraw}{06b65c863b37fb47b326b52a216ad6ab}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Angular Signals Guide}
@@ -123,6 +247,120 @@
       \endverb
       \verb{url}
       \verb https://angular.dev/guide/signals
+      \endverb
+    \endentry
+    \entry{rfc7519}{report}{}{}
+      \name{author}{3}{}{%
+        {{hash=3656094aa90ce6b5927293e625dedee3}{%
+           family={Jones},
+           familyi={J\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=3ac7ec83304c92610359a406f07ad45a}{%
+           family={Bradley},
+           familyi={B\bibinitperiod},
+           given={J.},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2764fe7207c045fdc85a76e2d51203a3}{%
+           family={Sakimura},
+           familyi={S\bibinitperiod},
+           given={N.},
+           giveni={N\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IETF}%
+      }
+      \strng{namehash}{5b3ff80030418207cdd5756912287da3}
+      \strng{fullhash}{5b3ff80030418207cdd5756912287da3}
+      \strng{fullhashraw}{5b3ff80030418207cdd5756912287da3}
+      \strng{bibnamehash}{5b3ff80030418207cdd5756912287da3}
+      \strng{authorbibnamehash}{5b3ff80030418207cdd5756912287da3}
+      \strng{authornamehash}{5b3ff80030418207cdd5756912287da3}
+      \strng{authorfullhash}{5b3ff80030418207cdd5756912287da3}
+      \strng{authorfullhashraw}{5b3ff80030418207cdd5756912287da3}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{number}{7519}
+      \field{title}{JSON Web Token (JWT)}
+      \field{type}{RFC}
+      \field{year}{2015}
+      \verb{urlraw}
+      \verb https://datatracker.ietf.org/doc/html/rfc7519
+      \endverb
+      \verb{url}
+      \verb https://datatracker.ietf.org/doc/html/rfc7519
+      \endverb
+    \endentry
+    \entry{rfc6455}{report}{}{}
+      \name{author}{2}{}{%
+        {{hash=1057c0ce811151df0862cf5b26064896}{%
+           family={Fette},
+           familyi={F\bibinitperiod},
+           given={I.},
+           giveni={I\bibinitperiod}}}%
+        {{hash=2f848d58c5d28e172fbc9ab51a059f6e}{%
+           family={Melnikov},
+           familyi={M\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {IETF}%
+      }
+      \strng{namehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{fullhash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{fullhashraw}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{bibnamehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authorbibnamehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authornamehash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authorfullhash}{a384119ffa0f3414225b956a30c34bd9}
+      \strng{authorfullhashraw}{a384119ffa0f3414225b956a30c34bd9}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{number}{6455}
+      \field{title}{The WebSocket Protocol}
+      \field{type}{RFC}
+      \field{year}{2011}
+      \verb{urlraw}
+      \verb https://datatracker.ietf.org/doc/html/rfc6455
+      \endverb
+      \verb{url}
+      \verb https://datatracker.ietf.org/doc/html/rfc6455
+      \endverb
+    \endentry
+    \entry{nginx_admin}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=ee0b4236e04232f5923d6f9715ede8a0}{%
+           family={{F5 NGINX Inc.}},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{fullhash}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{fullhashraw}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{bibnamehash}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{authorbibnamehash}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{authornamehash}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{authorfullhash}{ee0b4236e04232f5923d6f9715ede8a0}
+      \strng{authorfullhashraw}{ee0b4236e04232f5923d6f9715ede8a0}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{NGINX Reverse Proxy and Load Balancing}
+      \field{urlday}{17}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+      \endverb
+      \verb{url}
+      \verb https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
       \endverb
     \endentry
     \entry{solid_principles}{online}{}{}
@@ -141,8 +379,8 @@
       \strng{authornamehash}{6f41df64eb0dc4855be70172368604c2}
       \strng{authorfullhash}{6f41df64eb0dc4855be70172368604c2}
       \strng{authorfullhashraw}{6f41df64eb0dc4855be70172368604c2}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{The Principles of Agile Design}
@@ -168,8 +406,8 @@
       \strng{authornamehash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
       \strng{authorfullhash}{c7ff7d2e96b57f0524dcf17952f8f1b4}
       \strng{authorfullhashraw}{c7ff7d2e96b57f0524dcf17952f8f1b4}
-      \field{sortinit}{5}
-      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{DOUE-L-2016-80807}
@@ -196,8 +434,8 @@
       \strng{authornamehash}{65071c37a888c7d12ded8c516e5e4a79}
       \strng{authorfullhash}{65071c37a888c7d12ded8c516e5e4a79}
       \strng{authorfullhashraw}{65071c37a888c7d12ded8c516e5e4a79}
-      \field{sortinit}{6}
-      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{note}{BOE-A-2018-16673}
@@ -208,108 +446,6 @@
       \endverb
       \verb{url}
       \verb https://www.boe.es/eli/es/lo/2018/12/05/3
-      \endverb
-    \endentry
-    \entry{grpc_up_running}{book}{}{}
-      \name{author}{2}{}{%
-        {{hash=fcde449540659c9eabdadf7a046ab008}{%
-           family={Indrasiri},
-           familyi={I\bibinitperiod},
-           given={Kasun},
-           giveni={K\bibinitperiod}}}%
-        {{hash=4c7794a4af02a3d5c3ac4cbc75dd6395}{%
-           family={Kuruppu},
-           familyi={K\bibinitperiod},
-           given={Danesh},
-           giveni={D\bibinitperiod}}}%
-      }
-      \list{publisher}{1}{%
-        {O'Reilly Media}%
-      }
-      \strng{namehash}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{fullhash}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{fullhashraw}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{bibnamehash}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{authorbibnamehash}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{authornamehash}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{authorfullhash}{61cc1d11e32fb2486edbb1af60b02041}
-      \strng{authorfullhashraw}{61cc1d11e32fb2486edbb1af60b02041}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{isbn}{978-1492058335}
-      \field{title}{gRPC: Up and Running: Building High-Performance APIs with gRPC and Protocol Buffers}
-      \field{year}{2020}
-    \endentry
-    \entry{rfc6455}{report}{}{}
-      \name{author}{2}{}{%
-        {{hash=1057c0ce811151df0862cf5b26064896}{%
-           family={Fette},
-           familyi={F\bibinitperiod},
-           given={I.},
-           giveni={I\bibinitperiod}}}%
-        {{hash=2f848d58c5d28e172fbc9ab51a059f6e}{%
-           family={Melnikov},
-           familyi={M\bibinitperiod},
-           given={A.},
-           giveni={A\bibinitperiod}}}%
-      }
-      \list{institution}{1}{%
-        {IETF}%
-      }
-      \strng{namehash}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{fullhash}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{fullhashraw}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{bibnamehash}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{authorbibnamehash}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{authornamehash}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{authorfullhash}{a384119ffa0f3414225b956a30c34bd9}
-      \strng{authorfullhashraw}{a384119ffa0f3414225b956a30c34bd9}
-      \field{sortinit}{8}
-      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{number}{6455}
-      \field{title}{The WebSocket Protocol}
-      \field{type}{RFC}
-      \field{year}{2011}
-      \verb{urlraw}
-      \verb https://datatracker.ietf.org/doc/html/rfc6455
-      \endverb
-      \verb{url}
-      \verb https://datatracker.ietf.org/doc/html/rfc6455
-      \endverb
-    \endentry
-    \entry{webrtc_w3c}{online}{}{}
-      \name{author}{1}{}{%
-        {{hash=920927923fb759d596905d6fd374d1f1}{%
-           family={{W3C WebRTC Working Group}},
-           familyi={W\bibinitperiod}}}%
-      }
-      \strng{namehash}{920927923fb759d596905d6fd374d1f1}
-      \strng{fullhash}{920927923fb759d596905d6fd374d1f1}
-      \strng{fullhashraw}{920927923fb759d596905d6fd374d1f1}
-      \strng{bibnamehash}{920927923fb759d596905d6fd374d1f1}
-      \strng{authorbibnamehash}{920927923fb759d596905d6fd374d1f1}
-      \strng{authornamehash}{920927923fb759d596905d6fd374d1f1}
-      \strng{authorfullhash}{920927923fb759d596905d6fd374d1f1}
-      \strng{authorfullhashraw}{920927923fb759d596905d6fd374d1f1}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{WebRTC 1.0: Real-Time Communication Between Browsers}
-      \field{urlday}{17}
-      \field{urlmonth}{5}
-      \field{urlyear}{2026}
-      \field{year}{2024}
-      \field{urldateera}{ce}
-      \verb{urlraw}
-      \verb https://www.w3.org/TR/webrtc/
-      \endverb
-      \verb{url}
-      \verb https://www.w3.org/TR/webrtc/
       \endverb
     \endentry
     \entry{learning_angular}{book}{}{}
@@ -390,8 +526,8 @@
       \strng{authornamehash}{a3a4dde425c214175e79ec479deea1fa}
       \strng{authorfullhash}{a3a4dde425c214175e79ec479deea1fa}
       \strng{authorfullhashraw}{a3a4dde425c214175e79ec479deea1fa}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Introduction to gRPC}

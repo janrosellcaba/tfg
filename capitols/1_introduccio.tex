@@ -53,14 +53,14 @@ La Taula~\ref{tab:comparativa_mercat} compara les dues categories de solucions d
 \section{Anàlisi d'alternatives i justificació de la solució}
 Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents camins tecnològics per als pilars fonamentals de programari, vídeo, concurrència i em\-ma\-gat\-ze\-mat\-ge del sistema:
 
-\subsection{Alternativa de Framework Frontend: Angular 19 vs. React / Vue}
+\subsection{Alternativa de Framework Frontend}
 \begin{itemize}
   \item \textbf{React / Vue:} Són llibreries extremadament populars i flexibles, usades en entorns tan exigents com la banca o l'administració pública. En ser arquitectures no opinades, requereixen integrar múltiples llibreries de tercers (ruteig, formularis, \textit{state management}) per cobrir funcionalitats que en un \textit{framework} empresarial ja venen integrades, cosa que implica un cost de manteniment i auditoria de dependències superior en un projecte de vida llarga.
-  \item \textbf{Angular 19:} És un \textit{framework} empresarial complet: proporciona ruteig, formularis reactius, injecció de dependències i un sistema de mòduls propi. Escrit nativament en TypeScript, incorpora eines de \textit{testing} integrades (Jasmine/Karma) i una estructura opinada que facilita la consistència del codi en equips.
+  \item \textbf{Angular 19:} És un \textit{framework} empresarial complet: proporciona ruteig, formularis reactius, injecció de dependències i un sistema de mòduls propi. Escrit nativament en TypeScript, incorpora eines de \textit{testing} integrades i una estructura opinada que facilita la consistència del codi en equips.
   \item \textbf{Justificació:} S'ha escollit \textbf{Angular 19} per la seva estructura opinada que redueix decisions arquitecturals arbitràries, el tipatge estàtic de TypeScript, el motor de formularis reactius nadiu, les eines de \textit{testing} integrades i, principalment, la introducció de les \textbf{Signals} \cite{angular_signals} com a mecanisme natiu i eficient de gestió de l'estat reactiu, que permet prescindir de \textit{Zone.js} i optimitza el rendiment en dispositius \textit{embedded}.
 \end{itemize}
 
-\subsection{Alternativa de vídeo: Arquitectura Híbrida WebRTC i HLS vs. RTSP / RTMP}
+\subsection{Alternativa de vídeo}
 \begin{itemize}
   \item \textbf{RTSP (Real-Time Streaming Protocol):} És el protocol de facto utilitzat internament per les càmeres IP i sistemes VMS clàssics. No obstant això, és completament incompatible de forma nativa amb els navegadors web actuals, obligant a utilitzar transcodificadors molt costosos o \textit{plugins} externs propietaris en desús.
   \item \textbf{RTMP (Real-Time Messaging Protocol):} Protocol clàssic molt lligat a la tecnologia ja obsoleta d'Adobe Flash, actualment completament desapareguda de l'ecosistema web estàndard.
@@ -72,7 +72,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
         \end{enumerate}
 \end{itemize}
 
-\subsection{Alternativa de Base de Dades per a Alarmes: SQLite3 vs. PostgreSQL / MongoDB}
+\subsection{Alternativa de Base de Dades per a Alarmes}
 \begin{itemize}
   \item \textbf{PostgreSQL / MySQL:} Són bases de dades relacionals molt potents, però funcionen com a serveis de sistema independents. Requereixen un consum elevat i constant de memòria RAM i CPU per mantenir el dimoni actiu, sent una sobrecàrrega inacceptable en dispositius embedded limitats.
   \item \textbf{MongoDB:} Base de dades documental NoSQL ideal per a grans volums de dades desestructurades, però amb una pila tecnològica pesada i requisits de recursos inassequibles per al maquinari de gravació local.
@@ -80,18 +80,18 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Justificació:} S'ha seleccionat \textbf{SQLite3} com el motor de base de dades per al registre d'alarmes i logs del dispositiu, atès que ofereix un rendiment excel·lent per a lectures i escriptures ràpides amb un consum residual de memòria ($<15$~MB), essent ideal per als gravadors NXT de Lanaccess amb recursos de memòria i CPU limitats.
 \end{itemize}
 
-\subsection{Alternativa de Còdec de Vídeo: H.264 i H.265 coexistents}
+\subsection{Alternativa de Còdec de Vídeo}
 \begin{itemize}
   \item \textbf{H.264 (AVC):} Còdec universal amb descodificació hardware garantida en el 100\% dels navegadors i dispositius. Consum d'ample de banda i d'espai de disc superior per a la mateixa qualitat d'imatge.
   \item \textbf{H.265 (HEVC):} Redueix fins a la meitat l'espai d'emmagatzematge i l'ample de banda per a la mateixa qualitat, però el seu suport web depèn de la disponibilitat de descodificació hardware al terminal client, degut a restriccions de patents.
   \item \textbf{Justificació:} S'ha optat per una \textbf{estratègia dinàmica de coexistència}: el sistema prioritza H.265 quan la càmera i el terminal client ho suporten (màxim estalvi de disc), i commuta automàticament a H.264 en cas contrari (portabilitat universal). Els detalls de la detecció de capacitats i la lògica de commutació s'expliquen al Capítol~\ref{ch:implementacio}.
 \end{itemize}
 
-\subsection{Alternativa de configuració: Estàtica vs. Schema-driven}
+\subsection{Alternativa de sistema de configuració}
 \begin{itemize}
   \item \textbf{Formularis estàtics:} Programar una pantalla per a cada menú de configuració és més ràpid a curt termini però genera un deute tècnic insostenible: cada canvi en el \textit{firmware} del videogravador NXT —un nou paràmetre, un rang vàlid diferent, un camp eliminat— obligaria a actualitzar i redistribuir el \textit{frontend}. En una plataforma amb múltiples models de hardware i \textit{firmwares} en evolució continuada, això és inviable.
-  \item \textbf{Motor Schema-driven:} El \textit{backend} envia al \textit{frontend} un diccionari pla de claus en notació de punts (p. ex., \texttt{camera.\{id\}.stream.codec}) on cada valor porta metadades amb prefix \textit{underscore}: \texttt{\_type}, \texttt{\_allowedValues}, \texttt{\_min}, \texttt{\_max}, \texttt{\_default} i \texttt{\_description}. El \textit{frontend} actua com un intèrpret universal que renderitza automàticament el control adequat —selector, camp numèric, \textit{toggle}, etc.— sense conèixer el model concret de videogravador ni la versió de \textit{firmware}.
-  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} perquè és la característica diferenciadora del projecte: permet que \textbf{Web Core View} sigui compatible amb qualsevol model futur de la família NXT de Lanaccess sense modificar ni una línia de codi del \textit{frontend}. El format real del \textit{schema} s'explica en detall a l'Annex~A.1 de la memòria.
+  \item \textbf{Motor Dinàmic:} El \textit{backend} envia al \textit{frontend} un diccionari pla de claus en notació de punts (p. ex., \texttt{camera.\{id\}.\allowbreak{}stream.codec}) on cada valor porta metadades amb prefix \textit{underscore}: \texttt{\_type}, \texttt{\_al\-lowedValues}, \texttt{\_min}, \texttt{\_max}, \texttt{\_default} i \texttt{\_description}. El \textit{frontend} actua com un intèrpret universal que renderitza automàticament el control adequat —selector, camp numèric, \textit{toggle}, etc.— sense conèixer el model concret de videogravador ni la versió de \textit{firmware}.
+  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Dinàmica} perquè és la característica diferenciadora del projecte: permet que \textbf{Web Core View} sigui compatible amb qualsevol model futur de la família NXT de Lanaccess sense modificar ni una línia de codi del \textit{frontend}. El format real del \textit{schema} s'explica en detall a l'Annex~A.1 de la memòria.
 \end{itemize}
 
 \subsection{Alternativa de gestió d'estat: NgRx vs. Angular Signals}
