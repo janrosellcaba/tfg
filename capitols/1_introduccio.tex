@@ -51,13 +51,13 @@ La Taula~\ref{tab:comparativa_mercat} compara les dues categories de solucions d
 \end{table}
 
 \section{Anàlisi d'alternatives i justificació de la solució}
-Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents camins tecnològics per als pilars fonamentals de programari, vídeo, concurrència i emmagatzematge del sistema:
+Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents camins tecnològics per als pilars fonamentals de programari, vídeo, concurrència i em\-ma\-gat\-ze\-mat\-ge del sistema:
 
 \subsection{Alternativa de Framework Frontend: Angular 19 vs. React / Vue}
 \begin{itemize}
-  \item \textbf{React / Vue:} Són llibreries extremadament populars i flexibles per a la creació d'interfícies. No obstant això, són arquitectures no opinades que requereixen la integració de múltiples llibreries de tercers per gestionar aspectes com el ruteig, formularis o seguretat. En un entorn de videovigilància professional embedded, això augmenta el risc de vulnerabilitats i encareix considerablement l'auditoria de seguretat.
-  \item \textbf{Angular 19:} És un framework empresarial complet (\textit{batteries-included}) que ofereix una estructura opinada, robusta i escrita nativament en TypeScript. Això garanteix que el codi s'organitzi de forma altament homogènia.
-  \item \textbf{Justificació:} S'ha escollit \textbf{Angular 19} pel tipatge estàtic de TypeScript, el seu motor de formularis reactius natius i, principalment, per la introducció de les \textbf{Signals} com a mecanisme natiu i eficient de gestió de l'estat reactiu, la qual cosa redueix de manera dràstica l'ús de CPU respecte a altres frameworks.
+  \item \textbf{React / Vue:} Són llibreries extremadament populars i flexibles, usades en entorns tan exigents com la banca o l'administració pública. En ser arquitectures no opinades, requereixen integrar múltiples llibreries de tercers (ruteig, formularis, \textit{state management}) per cobrir funcionalitats que en un \textit{framework} empresarial ja venen integrades, cosa que implica un cost de manteniment i auditoria de dependències superior en un projecte de vida llarga.
+  \item \textbf{Angular 19:} És un \textit{framework} empresarial complet: proporciona ruteig, formularis reactius, injecció de dependències i un sistema de mòduls propi. Escrit nativament en TypeScript, incorpora eines de \textit{testing} integrades (Jasmine/Karma) i una estructura opinada que facilita la consistència del codi en equips.
+  \item \textbf{Justificació:} S'ha escollit \textbf{Angular 19} per la seva estructura opinada que redueix decisions arquitecturals arbitràries, el tipatge estàtic de TypeScript, el motor de formularis reactius nadiu, les eines de \textit{testing} integrades i, principalment, la introducció de les \textbf{Signals} \cite{angular_signals} com a mecanisme natiu i eficient de gestió de l'estat reactiu, que permet prescindir de \textit{Zone.js} i optimitza el rendiment en dispositius \textit{embedded}.
 \end{itemize}
 
 \subsection{Alternativa de vídeo: Arquitectura Híbrida WebRTC i HLS vs. RTSP / RTMP}
@@ -80,29 +80,47 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Justificació:} S'ha seleccionat \textbf{SQLite3} com el motor de base de dades per al registre d'alarmes i logs del dispositiu, atès que ofereix un rendiment excel·lent per a lectures i escriptures ràpides amb un consum residual de memòria ($<15$~MB), essent ideal per als gravadors NXT de Lanaccess amb recursos de memòria i CPU limitats.
 \end{itemize}
 
-\subsection{Alternativa de Còdec de Vídeo: H.264 i H.265 coexistents segons Maquinari i Càmera}
+\subsection{Alternativa de Còdec de Vídeo: H.264 i H.265 coexistents}
 \begin{itemize}
-  \item \textbf{H.264 (AVC):} És el còdec de compressió més universal i robust. És suportat pel 100\% de les targetes gràfiques, dispositius mòbils i navegadors mitjançant descodificació accelerada per maquinari (GPU), garantint fluïdesa absoluta a costa d'un consum superior d'ample de banda.
-  \item \textbf{H.265 (HEVC):} Algorisme de compressió d'última generació que permet reduir a la meitat l'espai d'emmagatzematge a disc i l'ample de banda de transmissió de vídeo per a la mateixa qualitat d'imatge. No obstant això, el seu suport a la web està limitat per llicències de patents, requerint que el client disposi d'un processador modern amb descodificació nativa integrada.
-  \item \textbf{Justificació:} En lloc de descartar un dels dos còdecs, el sistema s'ha dissenyat amb una \textbf{estratègia dinàmica de coexistència}:
-        \begin{enumerate}
-          \item Es fa servir \textbf{H.265} com a còdec d'alta prioritat quan la càmera IP física ho suporta i el dispositiu del client disposa de descodificació nativa per maquinari compatible al navegador, maximitzant així l'estalvi d'espai de disc als discs durs del gravador (clau per a instal·lacions amb desenes de càmeres de gran resolució).
-          \item Es commuta de forma transparent cap a \textbf{H.264} si es detecta que la càmera és antiga o si el terminal de l'usuari és de gamma baixa i no disposa del motor de descodificació H.265 a la GPU, garantint així la portabilitat absoluta i la visualització sense retards ni sobrecàrrega de CPU.
-        \end{enumerate}
+  \item \textbf{H.264 (AVC):} Còdec universal amb descodificació hardware garantida en el 100\% dels navegadors i dispositius. Consum d'ample de banda i d'espai de disc superior per a la mateixa qualitat d'imatge.
+  \item \textbf{H.265 (HEVC):} Redueix fins a la meitat l'espai d'emmagatzematge i l'ample de banda per a la mateixa qualitat, però el seu suport web depèn de la disponibilitat de descodificació hardware al terminal client, degut a restriccions de patents.
+  \item \textbf{Justificació:} S'ha optat per una \textbf{estratègia dinàmica de coexistència}: el sistema prioritza H.265 quan la càmera i el terminal client ho suporten (màxim estalvi de disc), i commuta automàticament a H.264 en cas contrari (portabilitat universal). Els detalls de la detecció de capacitats i la lògica de commutació s'expliquen al Capítol~\ref{ch:implementacio}.
 \end{itemize}
 
 \subsection{Alternativa de configuració: Estàtica vs. Schema-driven}
 \begin{itemize}
-  \item \textbf{Formularis estàtics:} Programar una pantalla per a cada menú de configuració és més ràpid a curt termini però genera un deute tècnic insostenible, ja que cada canvi en el \textit{firmware} obligaria a actualitzar el \textit{frontend}.
-  \item \textbf{Motor Schema-driven:} El \textit{frontend} actua com un intèrpret que renderitza la interfície basant-se en un esquema JSON rebut del servidor.
-  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compatibilitat futura amb els nous models de videogravador NXT de Lanaccess sense haver de modificar el codi de l'aplicació web.
+  \item \textbf{Formularis estàtics:} Programar una pantalla per a cada menú de configuració és més ràpid a curt termini però genera un deute tècnic insostenible: cada canvi en el \textit{firmware} del videogravador NXT —un nou paràmetre, un rang vàlid diferent, un camp eliminat— obligaria a actualitzar i redistribuir el \textit{frontend}. En una plataforma amb múltiples models de hardware i \textit{firmwares} en evolució continuada, això és inviable.
+  \item \textbf{Motor Schema-driven:} El \textit{backend} envia al \textit{frontend} un diccionari pla de claus en notació de punts (p. ex., \texttt{camera.\{id\}.stream.codec}) on cada valor porta metadades amb prefix \textit{underscore}: \texttt{\_type}, \texttt{\_allowedValues}, \texttt{\_min}, \texttt{\_max}, \texttt{\_default} i \texttt{\_description}. El \textit{frontend} actua com un intèrpret universal que renderitza automàticament el control adequat —selector, camp numèric, \textit{toggle}, etc.— sense conèixer el model concret de videogravador ni la versió de \textit{firmware}.
+  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} perquè és la característica diferenciadora del projecte: permet que \textbf{Web Core View} sigui compatible amb qualsevol model futur de la família NXT de Lanaccess sense modificar ni una línia de codi del \textit{frontend}. El format real del \textit{schema} s'explica en detall a l'Annex~A.1 de la memòria.
 \end{itemize}
 
-\subsection{Alternativa de gestió d'estat: Redux vs. Angular Signals}
+\subsection{Alternativa de gestió d'estat: NgRx vs. Angular Signals}
 \begin{itemize}
-  \item \textbf{Redux/NgRx:} Solucions robustes per a aplicacions gegantines, però amb un \textit{boilerplate} elevat i un consum de recursos que pot penalitzar dispositius amb hardware limitat.
-  \item \textbf{Angular Signals:} La nova eina nativa d'Angular 19 per a la gestió de la reactivitat granular \cite{angular_signals}.
+  \item \textbf{NgRx:} Implementació del patró Redux per a l'ecosistema Angular, robusta per a aplicacions gegantines amb estats complexos compartits entre mòduls. Implica un \textit{boilerplate} elevat (accions, \textit{reducers}, efectes, selectors) i un cost d'aprenentatge notable.
+  \item \textbf{Angular Signals:} La nova eina nativa d'Angular 19 per a la gestió de la reactivitat granular \cite{angular_signals}. Permet que els components reaccionin exactament als canvis d'estat que els afecten, sense necessitat de \textit{Zone.js}.
   \item \textbf{Justificació:} S'ha seleccionat \textbf{Signals} per la seva lleugeresa i eficiència en el renderitzat. En un entorn \textit{embedded} on la CPU s'ha de prioritzar per al vídeo, la reactivitat nativa de Signals permet prescindir de les comprovacions constants de \textit{Zone.js}, optimitzant el rendiment global del sistema.
+\end{itemize}
+
+\subsection{Alternativa de mecanisme de sessió: JWT vs. Cookies HttpOnly/Secure}
+\begin{itemize}
+  \item \textbf{JWT (\textit{JSON Web Token}):} Mecanisme d'autenticació sense estat (\textit{stateless}) \cite{rfc7519} que codifica les credencials al propi \textit{token} signat. La gestió des del \textit{frontend} implica emmagatzemar el \textit{token} a \textit{LocalStorage} o \textit{SessionStorage}, fet que els exposa a atacs XSS (\textit{Cross-Site Scripting}) si hi ha una injecció de codi maliciós.
+  \item \textbf{Cookies \texttt{HttpOnly}/\texttt{Secure}:} La \textit{cookie} de sessió és gestionada exclusivament per NGINX: s'estableix al \textit{backend}, s'envia al navegador amb els atributs \texttt{HttpOnly} i \texttt{Secure}, i el JavaScript de l'aplicació no en té accés en cap moment. L'estat de sessió es manté en un Signal privat en memòria al \textit{frontend} (zero-persistència: un F5 equival a tancar sessió).
+  \item \textbf{Justificació:} S'ha optat per les \textbf{cookies \texttt{HttpOnly}/\texttt{Secure}} gestionades per NGINX perquè eliminen el vector d'atac XSS sobre les credencials: cap \textit{script} del navegador no pot llegir ni exfiltrar la \textit{cookie}. Aquesta decisió s'alinea amb les recomanacions de seguretat de l'OWASP per a aplicacions en entorns de control d'accés físic.
+\end{itemize}
+
+\subsection{Alternativa de notificacions en temps real: WebSockets vs. SSE vs. Long Polling}
+\begin{itemize}
+  \item \textbf{Long Polling:} El client fa peticions HTTP repetides fins que el servidor disposa de dades noves. Solució senzilla però ineficient: genera múltiples connexions curtes i latències variables, inadequada per a notificacions d'alarmes crítiques.
+  \item \textbf{SSE (\textit{Server-Sent Events}):} Connexió HTTP unidireccional (servidor $\rightarrow$ client), lleugera i nativa al navegador. Adequada per a \textit{feeds} de dades en un sol sentit, però no permet enviar comandes del client al servidor per la mateixa connexió.
+  \item \textbf{WebSockets (WSS):} Connexió TCP persistent i bidireccional \cite{rfc6455} que permet tant rebre notificacions \textit{push} del servidor com enviar comandes del client (p. ex., marcar una alarma com a llegida) amb latència mínima.
+  \item \textbf{Justificació:} S'ha escollit \textbf{WebSockets} per la seva naturalesa bidireccional, necessària per als dos canals del sistema: el canal global de notificacions (\texttt{/ws/la-core-no\-ti\-fier/}) i el canal d'alarmes (\texttt{/ws/la-core-alarm/}), que requereix tant rebre alertes com confirmar-ne la lectura des del client.
+\end{itemize}
+
+\subsection{Alternativa de proxy invers: NGINX vs. accés directe als microserveis}
+\begin{itemize}
+  \item \textbf{Accés directe als microserveis:} Exposar cada microservei del \textit{backend} en ports independents obliga el navegador a realitzar peticions \textit{cross-origin}, fent necessaris encapçalaments CORS complexos i impedint l'ús de cookies \texttt{HttpOnly} (que no es transmeten en peticions \textit{cross-origin} per defecte).
+  \item \textbf{NGINX com a proxy invers:} Centralitza tots els microserveis sota un únic origen (\textit{same-origin}), enrutant per prefix de ruta. Gestiona el cicle de vida de les \textit{cookies} de sessió de forma transparent i actua com a punt únic de control de seguretat (TLS, capçaleres HTTP de seguretat).
+  \item \textbf{Justificació:} S'ha escollit \textbf{NGINX} \cite{nginx_admin} per la seva maduresa i rendiment en sistemes Linux embeguts: permet centralitzar la seguretat, implementar les \textit{cookies} \texttt{HttpOnly}/\texttt{Secure} de forma consistent sense modificar cap microservei del \textit{backend}, i elimina el problema CORS de manera estructural.
 \end{itemize}
 
 \section{Solució proposada i valor afegit}
