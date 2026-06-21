@@ -1,5 +1,5 @@
 # Estat del TFG — Web Core View
-> Actualitzat: 21 juny 2026. Poliment tipogràfic cap. 4 i 5 completat.
+> Actualitzat: 21 juny 2026. Poliment tipogràfic cap. 4, 5 i 6 completat.
 
 ---
 
@@ -18,7 +18,7 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 | 3 | Especificació de Requisits | ✅ COMPLET | User stories, RF/RNF, casos d'ús, marc normatiu (RGPD) |
 | 4 | Arquitectura i Disseny | ✅ COMPLET + POLIT | Microserveis, NGINX, Schema-driven; 0 overfulls, flotants corregits (21 jun 2026) |
 | 5 | Implementació | ✅ COMPLET + POLIT | Login, Home, Config, WebRTC, HLS, Alarmes, Manteniment; 0 overfulls, 12 correccions lingüístiques, 6 clearpage eliminats (21 jun 2026) |
-| 6 | Validació i Proves | ✅ COMPLET | Jasmine/Karma, Playwright, latències, CPU/memòria, UAT |
+| 6 | Validació i Proves | ✅ COMPLET + POLIT | Jasmine/Karma, Playwright, latències, CPU/memòria, UAT; 0 overfulls, 5 correccions lingüístiques (21 jun 2026) |
 | 7 | Integració de Coneixements | ✅ COMPLET | Competències FIB, assignatures relacionades |
 | 8 | Conclusions i Treball Futur | ✅ COMPLET | Reescrit (juny 2026): balanç narratiu, 7 objectius detallats, 6 línies de treball futur (inclou Reports dinàmics i fotos a alarmes), conclusions personals ampliades |
 | Annexos | Annexos | ✅ COMPLET | Annex A.1 corregit (juny 2026): format JSON real amb underscores |
