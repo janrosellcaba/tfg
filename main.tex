@@ -106,6 +106,16 @@ This work presents the design and implementation of \textbf{Web Core View}, an e
 Este trabajo presenta el diseño y la implementación de \textbf{Web Core View}, una interfaz web de administración \textit{embedded} para la nueva generación de videograbadores NXT de Lanaccess Telecom, SA. El proyecto nace de una doble necesidad: sustituir la plataforma web de gestión \textit{legacy} de los años 90, basada en controles \textbf{ActiveX} hoy incompatibles con los navegadores modernos, por una solución accesible y segura; y disponer de una versión autónoma para un único videograbador, que se ejecuta directamente en el hardware del dispositivo, permitiendo a empresas pequeñas gestionarlo desde cualquier navegador sin infraestructura centralizada. La solución se ha construido con \textbf{Angular 19} y el nuevo paradigma de reactividad basado en \textbf{Signals}, sobre una arquitectura de \textbf{microservicios coordinados}. Las dos aportaciones técnicas principales son el motor de configuración dinámico, que desacopla la interfaz de la evolución del \textit{firmware} mediante esquemas JSON enviados por el backend, y la integración de \textbf{WebRTC} para la visualización de vídeo en directo con latencias bajas ($<$300~ms) sin necesidad de \textit{plugins}; la reproducción de grabaciones se gestiona con \textbf{HLS}. El sistema incorpora además gestión de alarmas en tiempo real, actualización de \textit{firmware} remota vía archivo \texttt{.bin} con seguimiento de estado en directo, y una capa de seguridad que gestiona las sesiones y garantiza la integridad de la aplicación ante accesos simultáneos. La interfaz, diseñada para operadores de seguridad profesionales, es reactiva y adaptativa, accesible desde tabletas de mantenimiento hasta monitores de alta resolución.
 \newpage
 
+\chapter*{Agraïments}
+L'arribada a la recta final d'aquest projecte i de l'etapa universitària no hauria estat possible sense el suport de les persones que m'han acompanyat.
+
+Vull expressar el meu agraïment al meu director, Fernando Gallego Vilaltella, i a tot l'equip del departament d'Embedded de Lanaccess Telecom, per la confiança, l'oportunitat de créixer professionalment i per permetre'm aportar valor real al producte de l'empresa. També vull agrair al meu ponent, Carles Farré Tost, el seu guiatge acadèmic des de la universitat.
+
+A nivell personal, gràcies al meu pare, Gabi, per encomanar-me la curiositat per la tecnologia i ser el meu suport tècnic a l'ombra compartint maquinari per als meus projectes. A la meva germana Berta per ser-hi sempre, i a la Clàudia per la seva paciència, comprensió i suport incondicional durant tots els mesos de desenvolupament i redacció d'aquesta memòria. 
+
+A tots vosaltres, gràcies.
+\newpage
+
 \tableofcontents
 \listoftables
 \listoffigures
