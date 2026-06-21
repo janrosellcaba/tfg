@@ -1,5 +1,5 @@
 # Estat del TFG — Web Core View
-> Actualitzat: juny 2026. Basat en auditoria completa de tots els capítols i docs/.
+> Actualitzat: 21 juny 2026. Poliment tipogràfic cap. 4 i 5 completat.
 
 ---
 
@@ -16,8 +16,8 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 | 1 | Introducció i Context | ✅ COMPLET | Problema, estat de l'art, justificació alternatives, objectius |
 | 2 | Gestió del Projecte | ✅ COMPLET | Kanban, Gantt, 585h reals (540h previstes), cost executat 16.061,50€ (pressupost màxim 16.420,25€, estalvi 358,75€), sostenibilitat |
 | 3 | Especificació de Requisits | ✅ COMPLET | User stories, RF/RNF, casos d'ús, marc normatiu (RGPD) |
-| 4 | Arquitectura i Disseny | ✅ COMPLET | Microserveis, NGINX, Schema-driven, model de dades |
-| 5 | Implementació | ✅ COMPLET | Login, Home, Config, WebRTC, HLS, Alarmes, Manteniment |
+| 4 | Arquitectura i Disseny | ✅ COMPLET + POLIT | Microserveis, NGINX, Schema-driven; 0 overfulls, flotants corregits (21 jun 2026) |
+| 5 | Implementació | ✅ COMPLET + POLIT | Login, Home, Config, WebRTC, HLS, Alarmes, Manteniment; 0 overfulls, 12 correccions lingüístiques, 6 clearpage eliminats (21 jun 2026) |
 | 6 | Validació i Proves | ✅ COMPLET | Jasmine/Karma, Playwright, latències, CPU/memòria, UAT |
 | 7 | Integració de Coneixements | ✅ COMPLET | Competències FIB, assignatures relacionades |
 | 8 | Conclusions i Treball Futur | ✅ COMPLET | Reescrit (juny 2026): balanç narratiu, 7 objectius detallats, 6 línies de treball futur (inclou Reports dinàmics i fotos a alarmes), conclusions personals ampliades |

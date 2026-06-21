@@ -17,7 +17,7 @@
 POSAR captures APLICACIÓ ANTIGA
 EXPLICAR COM SACTUALITZAVA LA VERSIO ANTIGAMENT
 
-
+MILLORAR \CAPTIONS DE LES FIGURES
 
 ojo amb les paraules que comencen en majuscules i les que no. establir sistema
 millorar títols
@@ -71,16 +71,6 @@ millorar la panificació segons el comentari del professor (foto 18 de maig)
 
 ************************
 
-/goal "Actua com un editor acadèmic professional i un expert avançat en composició tipogràfica de LaTeX. El teu objectiu és polir la qualitat del següent capítol a nivell de publicació d'enginyeria.
-
-Obre el fitxer `capitols/5_implementacio.tex`. Has d'aplicar les següents regles de manera estricta i sense excepcions:
-
-1. PRESERVACIÓ DEL CONTINGUT (REGLA D'OR): Està absolutament prohibit canviar el significat, l'argumentació, les dades o eliminar informació tècnica. El contingut és definitiu. La teva feina només és alterar l'embolcall (l'estil i el format).
-2. QUALITAT LINGÜÍSTICA: Corregeix errors ortogràfics i de sintaxi en català. Millora la fluïdesa per aconseguir un to acadèmic, objectiu i directe. Divideix les frases que siguin excessivament llargues per facilitar-ne la lectura.
-3. GESTIÓ DE FLOTANTS (Imatges i Taules): Elimina les comandes `\clearpage` o `\newpage` que estiguin actuant com a pedaços manuals per moure gràfics. En el seu lloc, optimitza les opcions de posicionament de l'entorn figure o table (ex. utilitzant `[htbp]` o `[!ht]`) perquè LaTeX calculi la posició òptima de manera natural sense deixar espais en blanc gegants.
-4. RESOLUCIÓ D'OVERFULL \hbox: Revisa exhaustivament el text per arreglar les línies que excedeixen els marges. Si hi ha comandes `\texttt{...}` o URLs massa llargues que trenquen el marge, aplica solucions com `\url{}`, punts de trencament permesos (`\-`), o reformula l'oració molt subtilment per afavorir el guionatge automàtic de LaTeX.
-
-Executa els canvis de manera acurada. En acabar, compila el document amb `latexmk -pdf main.tex` per validar que no has trencat res i comprova els logs per assegurar-te que has reduït significativament els 'Overfull \hbox' d'aquest capítol."
 
 ********************************
 
