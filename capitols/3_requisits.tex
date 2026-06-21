@@ -1,7 +1,7 @@
 \chapter{Especificació de Requisits}
 \label{ch:requisits}
 
-L'especificació de requisits és la pedra angular del projecte \textit{Web Core View}. En tractar-se d'un sistema de gestió per a dispositius de seguretat crítica, la definició de les funcionalitats no només s'ha centrat en l'experiència d'usuari (UX), sinó també en la robustesa de la comunicació asíncrona i el desacoblament entre el maquinari i la interfície.
+L'especificació de requisits constitueix la base fonamental del projecte \textit{Web Core View}. En tractar-se d'un sistema de gestió per a dispositius de seguretat crítica, la definició de les funcionalitats no només s'ha centrat en l'experiència d'usuari (UX), sinó també en la robustesa de la comunicació asíncrona i el desacoblament entre el maquinari i la interfície.
 
 En aquest capítol es detallen els actors, les històries d'usuari mitjançant la metodologia \textit{Product Backlog}, i l'especificació detallada dels requisits funcionals i no funcionals.
 
@@ -23,7 +23,7 @@ S'han definit tres actors principals, classificant-los segons el seu nivell d'in
   \item[Operador:] Usuari final que utilitza la plataforma per a la monitorització.
         \begin{itemize}
           \item Visualització de vídeo en temps real (\textit{Live}).
-          \item Navegació i exportació de gravacions històriques.
+          \item Visualització de gravacions històriques.
           \item Supervisió i silenciament d'alarmes en temps real.
         \end{itemize}
 
@@ -40,10 +40,10 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
 
 \subsection{Mòdul de Visualització i Reproducció de Vídeo}
 \begin{description}
-  \item[\textbf{US-01: Streaming d'alta fidelitat}] \hfill \\
+  \item[\textbf{US-01: Streaming d'alta qualitat}] \hfill \\
         \textbf{Com a} Operador, \textbf{vull} veure el vídeo de qualsevol càmera connectada, \textbf{per tal de} vigilar l'espai protegit en temps real.
         \begin{itemize}
-          \item \textit{Criteri 1:} La latència punta a punta (glass-to-glass) ha de ser inferior a 300ms.
+          \item \textit{Criteri 1:} La latència punta a punta ha de ser inferior a 300ms.
           \item \textit{Criteri 2:} El sistema ha de detectar automàticament si el navegador suporta WebRTC o ha de commutar a HLS.
         \end{itemize}
 
@@ -58,18 +58,6 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
         \end{itemize}
 \end{description}
 
-\subsection{Mòdul de Gestió d'Alarmes}
-\begin{description}
-  \item[\textbf{US-05: Recepció d'alarmes en temps real}] \hfill \\
-        \textbf{Com a} Supervisor, \textbf{vull} rebre notificacions d'alarmes de forma immediata, \textbf{per tal d'}actuar ràpidament davant de qualsevol incidència de seguretat.
-        \begin{itemize}
-          \item \textit{Criteri 1:} L'alarma s'ha de mostrar a la interfície web en menys d'1 segon des de la seva detecció en el maquinari.
-        \end{itemize}
-
-  \item[\textbf{US-06: Configuració de regles d'alarma}] \hfill \\
-        \textbf{Com a} Administrador, \textbf{vull} configurar i programar regles de detecció d'alarmes per a cada càmera, \textbf{per tal d'}automatitzar la detecció d'esdeveniments.
-\end{description}
-
 \subsection{Mòdul de Configuració Dinàmica i Xarxa}
 \begin{description}
   \item[\textbf{US-04: Configuració sense recàrrega de codi}] \hfill \\
@@ -78,32 +66,42 @@ S'utilitzen les \textit{User Stories} per definir el valor que cada funcionalita
           \item \textit{Criteri 1:} El frontend ha d'interpretar l'esquema JSON i renderitzar el component visual adequat de forma dinàmica (input, select, slider).
         \end{itemize}
 
-  \item[\textbf{US-07: Configuració de xarxa i IP}] \hfill \\
+  \item[\textbf{US-05: Configuració de xarxa i IP}] \hfill \\
         \textbf{Com a} Administrador, \textbf{vull} configurar els paràmetres de xarxa del dispositiu (adreça IP, màscara, ports), \textbf{per tal de} garantir la connectivitat del sistema.
 
-  \item[\textbf{US-08: Gestió d'usuaris i permisos}] \hfill \\
+  \item[\textbf{US-06: Gestió d'usuaris i permisos}] \hfill \\
         \textbf{Com a} Administrador, \textbf{vull} gestionar els perfils d'usuari i els seus permisos d'accés (grants), \textbf{per tal de} controlar quines accions i vistes pot utilitzar cadascú.
+\end{description}
+
+\subsection{Mòdul de Gestió d'Alarmes}
+\begin{description}
+  \item[\textbf{US-07: Recepció d'alarmes en temps real}] \hfill \\
+        \textbf{Com a} Operador, \textbf{vull} rebre notificacions d'alarmes de forma immediata, \textbf{per tal d'}actuar ràpidament davant de qualsevol incidència de seguretat.
+        \begin{itemize}
+          \item \textit{Criteri 1:} L'alarma s'ha de mostrar a la interfície web en menys d'1 segon des de la seva detecció en el maquinari.
+        \end{itemize}
+
+  \item[\textbf{US-08: Configuració de regles d'alarma}] \hfill \\
+        \textbf{Com a} Administrador, \textbf{vull} configurar i programar regles de detecció d'alarmes per a cada càmera, \textbf{per tal d'}automatitzar la detecció d'esdeveniments.
 \end{description}
 
 \subsection{Mòdul de Manteniment}
 \begin{description}
-  \item[\textbf{US-09: Monitoratge dels discs durs}] \hfill \\
-        \textbf{Com a} Tècnic, \textbf{vull} supervisar l'estat i la capacitat dels discs durs de gravació, \textbf{per tal d'}assegurar-me que no es perden gravacions històriques.
+  \item[\textbf{US-09: Consulta i renovació de llicència}] \hfill \\
+        \textbf{Com a} Tècnic, \textbf{vull} consultar l'estat de la llicència del dispositiu i renovar-la quan sigui necessari, \textbf{per tal de} garantir la continuïtat del servei sense interrupcions.
 
-  \item[\textbf{US-10: Descàrrega i consulta de logs}] \hfill \\
+  \item[\textbf{US-10: Actualització de firmware}] \hfill \\
+        \textbf{Com a} Tècnic, \textbf{vull} actualitzar el firmware del dispositiu des de la interfície web, \textbf{per tal de} mantenir el sistema al dia amb les darreres millores i correccions de seguretat.
+
+  \item[\textbf{US-11: Gestió de la configuració del sistema}] \hfill \\
+        \textbf{Com a} Administrador, \textbf{vull} restaurar, carregar i descarregar la configuració del dispositiu, \textbf{per tal de} facilitar còpies de seguretat, migracions i recuperació davant de fallades.
+
+  \item[\textbf{US-12: Accés a la documentació del sistema}] \hfill \\
+        \textbf{Com a} Tècnic, \textbf{vull} tenir accés a tota la documentació tècnica del sistema des de la interfície web, \textbf{per tal de} resoldre dubtes i consultar especificacions sense necessitat de recursos externs.
+
+  \item[\textbf{US-13: Descàrrega i consulta de logs}] \hfill \\
         \textbf{Com a} Tècnic, \textbf{vull} cercar i descarregar els registres d'esdeveniments del sistema, \textbf{per tal de} diagnosticar errors de funcionament o auditar l'ús de la plataforma.
 \end{description}
-
-\subsection{Flux d'Interacció (User Journey)}
-Per il·lustrar com els operadors de seguretat apliquen les històries d'usuari en la resposta a un incident real, es presenta el diagrama de User Journey (Figura \ref{fig:user_journey}).
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=0.9\textwidth, height=0.45\textheight, keepaspectratio]{figures/user_journey.png}
-  \caption{Diagrama de flux d'interacció de l'usuari (User Journey) en la resolució d'una incidència de seguretat.}
-  \label{fig:user_journey}
-  \small Font: Elaboració pròpia.
-\end{figure}
 
 \section{Requisits Funcionals (RF)}
 A continuació es detallen els requisits tècnics dividits per blocs funcionals.
@@ -111,62 +109,62 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 \subsection{RF-1: Gestió de l'Accés i Seguretat}
 \begin{itemize}
   \item \textbf{RF-1.1 Autenticació:} El sistema ha de validar les credencials contra el servei \textit{Core Legacy}.
-  \item \textbf{RF-1.2 Sessió Persistent:} Mantenir la sessió mitjançant un mecanisme de \textit{Keep-alive} que refresqui el token cada 60 segons.
-  \item \textbf{RF-1.3 Control de Concurrència (Config Lock):} El sistema ha de demanar un bloqueig d'escriptura quan un administrador entri en mode edició. Si un altre usuari intenta editar, el sistema mostrarà un avís de "Només Lectura".
+  \item \textbf{RF-1.2 Sessió Persistent:} Mantenir la sessió activa mitjançant un mecanisme de \textit{keep-alive} que refresqui la cookie de sessió cada 60 segons.
+  \item \textbf{RF-1.3 Control de Concurrència:} El sistema ha de demanar un bloqueig d'escriptura quan un administrador entri en mode edició. Si un altre usuari intenta editar, el sistema mostrarà un avís de "Només Lectura".
 \end{itemize}
 
 \subsection{RF-2: Visualització Multimèdia}
 \begin{itemize}
   \item \textbf{RF-2.1 Protocol WebRTC:} Implementació de la negociació SDP (\textit{Session Description Protocol}) per a vídeo en directe.
   \item \textbf{RF-2.2 Protocol HLS:} Generació de fragments de vídeo per a la reproducció de gravacions històriques i fallback de seguretat.
-  \item \textbf{RF-2.3 Línia de Temps Històrica (Timeline):} Interfície gràfica interactiva per a la cerca i consulta de gravacions passades amb selecció de franja horària.
+  \item \textbf{RF-2.3 Línia de Temps Històrica:} Interfície gràfica interactiva per a la cerca i consulta de gravacions passades amb selecció de franja horària.
 \end{itemize}
 
 \subsection{RF-3: Motor de Configuració Dinàmica}
-Aquest és el requisit funcional més complex i innovador del sistema.
+Aquest és el requisit funcional més complex i innovador del sistema. El seu principi fonamental és el \textit{schema-driven design}: el gravador dicta l'estructura de la interfície mitjançant esquemes JSON, de manera que el frontend es desacobla completament de la lògica de baix nivell del maquinari.
 \begin{itemize}
-  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El sistema ha de processar un fitxer JSON de definició. Per tal d'il·lustrar la capacitat del motor dinàmic (\textit{schema-driven}) de desacoblar la interfície del frontend respecte de la lògica de baix nivell del gravador, es presenta a continuació un fragment d'esquema JSON de configuració avançada real enviat pel servei de vídeo. Aquest esquema defineix els tipus de transport admesos pel maquinari de visualització d'una càmera IP física (per estructura d'enumeració) i la restricció d'adreces de multidifusió (multicast) mitjançant expressions regulars (\textit{regex}) que el motor del frontend compilarà i validarà dinàmicament.
+  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El frontend ha de processar l'esquema JSON rebut del backend i renderitzar dinàmicament el component visual adequat per a cada paràmetre (camp de text, llista desplegable, \textit{slider} numèric), aplicant les restriccions de tipus, rang i format (\textit{regex}) definides a l'esquema sense requerir canvis al codi del frontend.
+  \item \textbf{RF-3.2 Validació en temps real:} Qualsevol restricció declarada a l'esquema (\texttt{\_min}, \texttt{\_max}, \texttt{\_regex}, \texttt{\_allowedValues}) ha de ser compilada i validada pel motor del frontend abans d'enviar cap petició al backend.
 \end{itemize}
 
-\begin{lstlisting}[basicstyle=\footnotesize\ttfamily, breaklines=true, language=JavaScript, caption={Exemple d'esquema avançat JSON de metadades per a IP Video amb restriccions regex.}]
-{
-  "media.video.{streamId}.receiver.transport": {
-    "_type": "list",
-    "_allowedValues": ["unicast", "multicast", "tcp"],
-    "_description": "Tipus de transport de xarxa per a la recepció de vídeo RTSP",
-    "_default": "unicast"
-  },
-  "media.video.{streamId}.multicast.address": {
-    "_type": "string",
-    "_description": "Adreça IP de multidifusió assignada al perfil de streaming",
-    "_maxLength": 15,
-    "_regex": "^(22[4-9]|23[0-9])\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-    "_default": "0.0.0.0"
-  },
-  "media.video.{streamId}.multicast.port": {
-    "_type": "integer",
-    "_min": 1024,
-    "_max": 65535,
-    "_description": "Port de destinació per a la transmissió Multicast de dades de vídeo",
-    "_default": 30010
-  }
-}
-\end{lstlisting}
+\subsection{RF-4: Gestió d'Alarmes}
+\begin{itemize}
+  \item \textbf{RF-4.1 Recepció en temps real:} El sistema ha de rebre i mostrar les alarmes generades pel maquinari en menys d'1 segon mitjançant una connexió persistent amb el backend.
+  \item \textbf{RF-4.2 Historial i filtrat:} El sistema ha de permetre consultar l'historial d'alarmes amb capacitat de filtrat per càmera, rang horari i estat (llegida / no llegida).
+  \item \textbf{RF-4.3 Gestió de l'estat:} L'operador ha de poder marcar alarmes individuals com a llegides, arxivar-les o eliminar-les, i qualsevol d'aquestes accions ha de reflectir-se immediatament al backend.
+  \item \textbf{RF-4.4 Configuració de regles:} L'administrador ha de poder definir i programar regles de detecció d'alarmes per a cada càmera connectada.
+\end{itemize}
+
+\subsection{RF-5: Manteniment i Administració del Sistema}
+\begin{itemize}
+  \item \textbf{RF-5.1 Registre d'activitat (Log):} El sistema ha de permetre cercar i descarregar els registres d'esdeveniments del dispositiu per facilitar el diagnòstic de fallades i l'auditoria d'ús.
+  \item \textbf{RF-5.2 Actualització de firmware:} El sistema ha de gestionar el cicle complet d'actualització del firmware del gravador: pujada del binari, seguiment visual del progrés per fases i detecció automàtica de la tornada en línia del dispositiu un cop reiniciat.
+  \item \textbf{RF-5.3 Gestió de la llicència:} El sistema ha de mostrar l'estat actual de la llicència del dispositiu (data de caducitat, funcionalitats habilitades) i permetre iniciar el procés de renovació.
+  \item \textbf{RF-5.4 Gestió de la configuració general:} El sistema ha de permetre descarregar la configuració actual del dispositiu, carregar una configuració des d'un fitxer extern i restaurar els valors de fàbrica, amb confirmació explícita de l'usuari en operacions destructives.
+  \item \textbf{RF-5.5 Accés a la documentació:} El sistema ha de proporcionar accés integrat a la documentació tècnica oficial del dispositiu (manuals, notes de versió, guies de configuració) sense necessitat de recórrer a recursos externs.
+\end{itemize}
+
+\subsection{RF-6: Gestió d'Usuaris i Permisos}
+\begin{itemize}
+  \item \textbf{RF-6.1 Administració de comptes:} L'administrador ha de poder crear, modificar i eliminar comptes d'usuari del sistema.
+  \item \textbf{RF-6.2 Control d'accés basat en rols:} El sistema ha d'aplicar un model de permisos (\textit{grants}) que restringeixi l'accés a mòduls i operacions sensibles en funció del rol assignat a cada usuari.
+  \item \textbf{RF-6.3 Canvi de credencials:} El sistema ha de permetre el canvi de contrasenya des de la pròpia interfície web, amb validació de la contrasenya actual.
+\end{itemize}
 
 \section{Requisits No Funcionals (RNF)}
 Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
 
 \subsection{RNF-1: Rendiment i Eficiència}
 \begin{itemize}
-  \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, s'ha optimitzat el trànsit per evitar el \textit{polling} innecessari, substituint-lo per una arquitectura basada en esdeveniments mitjançant el servei \textbf{la-core-alarm} i WebSockets.
+  \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, s'ha optimitzat el trànsit per evitar el \textit{polling} innecessari, substituint-lo per una arquitectura basada en esdeveniments sobre dos canals WebSocket diferenciats: \textbf{la-core-notifier}, obert de forma persistent des del login per a notificacions globals del sistema, i \textbf{la-core-alarm}, actiu exclusivament a la pàgina d'alarmes per a esdeveniments de detecció en temps real.
   \item \textbf{RNF-1.2 Angular Signals:} La reactivitat de la interfície s'ha de basar en \textit{Angular Signals} per minimitzar les operacions de \textit{Zone.js} i evitar el re-renderitzat innecessari del DOM, especialment crític amb vídeos actius.
 \end{itemize}
 
 \subsection{RNF-2: Robustesa i Disponibilitat}
 \begin{itemize}
   \item \textbf{RNF-2.1 Tolerància a talls de xarxa:} El WebSocket ha d'intentar una reconnexió exponencial (re-try) en cas de pèrdua de connectivitat.
-  \item \textbf{RNF-2.2 Fallback de Vídeo:} Si el port WebRTC (UDP 10000-20000) està bloquejat per firewall, el reproductor ha de commutar a TCP-HLS en menys de 5 segons.
-  \item \textbf{RNF-2.3 Concurrència i Integritat (Pessimistic Locking):} Per garantir la consistència de les dades del sistema i evitar escriptures concurrents conflictives entre diferents usuaris administradors, s'exigeix un mecanisme de bloqueig pessimista (\textit{Pessimistic Locking}) en l'adquisició dels formularis de configuració activa. Cap usuari podrà modificar paràmetres del sistema si un altre usuari posseeix el \textit{lock} exclusiu d'aquell mòdul.
+  \item \textbf{RNF-2.2 Fallback de Vídeo:} Si el port WebRTC (UDP 10000-20000) està bloquejat per firewall, el reproductor ha de commutar a HLS en menys de 5 segons.
+  \item \textbf{RNF-2.3 Concurrència i Integritat:} Per garantir la consistència de les dades del sistema i evitar escriptures concurrents conflictives entre diferents usuaris administradors, s'exigeix un mecanisme de bloqueig pessimista (\textit{Pessimistic Locking}) en l'adquisició dels formularis de configuració activa. Cap usuari podrà modificar paràmetres del sistema si un altre usuari posseeix el \textit{lock} exclusiu d'aquell mòdul.
 \end{itemize}
 
 \subsection{RNF-3: Compatibilitat i Portabilitat}
@@ -180,12 +178,41 @@ Per aprofundir en la funcionalitat del sistema, es presenta el diagrama de casos
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.9\textwidth]{figures/use_cases.png} % Assegura't de crear aquesta carpeta i fitxer
+  \includegraphics[width=0.9\textwidth, height=0.85\textheight, keepaspectratio]{figures/diagrames/use_cases.png}
   \caption{Diagrama UML de Casos d'Ús.}
   \label{fig:diagrama_casos_us}
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\clearpage
+\subsection{UC-00: Autenticació i inici de sessió}
+L'autenticació és el flux d'entrada obligatori i prerequisit de tots els casos d'ús del sistema.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{|l|p{10cm}|}
+    \hline
+    \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-00: Autenticació i inici de sessió}                                                                                 \\ \hline
+    \textbf{Actor}                          & Administrador / Operador                                                                                                       \\ \hline
+    \textbf{Descripció}                     & L'usuari introdueix les seves credencials per obtenir accés al sistema. El backend les valida, estableix una cookie de sessió segura, i la interfície inicialitza l'estat de l'usuari.                           \\ \hline
+    \textbf{Precondicions}                  & El dispositiu NVR és accessible per xarxa. L'usuari disposa de credencials vàlides al sistema.                                 \\ \hline
+    \textbf{Flux Principal}                 &
+    1. L'usuari accedeix a l'aplicació; el sistema redirigeix a la pàgina d'inici de sessió. \newline
+    2. L'usuari introdueix nom d'usuari i contrasenya. \newline
+    3. El frontend envia les credencials al servei d'autenticació del backend. \newline
+    4. El backend valida les credencials i estableix una cookie de sessió segura, inaccessible des del codi client. \newline
+    5. La interfície inicialitza l'estat de sessió i redirigeix a la pàgina principal. \newline
+    6. S'estableix un canal de notificacions persistent que roman actiu durant tota la sessió.                                                                                     \\ \hline
+    \textbf{Flux Alternatiu}                &
+    3a. Si les credencials són incorrectes, el sistema mostra un avís d'accés denegat. L'usuari pot reintentar.                  \\ \hline
+    \textbf{Postcondició}                   & L'usuari té accés a les funcionalitats del sistema d'acord amb el seu rol. La sessió es manté activa automàticament mentre el navegador roman obert.                             \\ \hline
+  \end{tabular}
+  \caption{Especificació detallada del Cas d'Ús UC-00.}
+  \label{tab:uc_login}
+\end{table}
+
+\clearpage
 \subsection{UC-01: Gestió de l'actualització de firmware}
 Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 
@@ -200,19 +227,20 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
     \textbf{Precondicions}                  & Usuari autenticat com administrador. El gravador ha de tenir més d'un 10\% d'espai lliure a la partició de sistema.            \\ \hline
     \textbf{Flux Principal}                 &
     1. L'usuari accedeix al mòdul de Manteniment. \newline
-    2. L'usuari selecciona un fitxer \textit{.bin} local. \newline
-    3. El frontend valida l'extensió i mida del fitxer. \newline
-    4. S'inicia la pujada via POST multipart. \newline
-    5. El sistema mostra una barra de progrés real basada en els esdeveniments del backend. \newline
-    6. Un cop finalitzat, el gravador inicia el procés de \textit{flashing} i es reinicia.                                                                                   \\ \hline
+    2. L'usuari selecciona un fitxer de firmware des del seu equip local. \newline
+    3. El sistema valida el format i la mida del fitxer abans de procedir. \newline
+    4. S'inicia la transferència del fitxer al dispositiu. \newline
+    5. El sistema mostra el progrés de la transferència en temps real. \newline
+    6. Un cop finalitzada la transferència, el gravador aplica el nou firmware i es reinicia.                                                                                 \\ \hline
     \textbf{Flux Alternatiu}                &
-    5a. Si la connexió es talla durant la pujada, el frontend informa de l'error i permet reintentar des del punt de fallada si el servidor ho suporta.                      \\ \hline
-    \textbf{Postcondició}                   & L'equip es reinicia. La interfície web detecta el tall i mostra una pantalla d'espera fins que l'equip torna a estar en línia. En cas d'actualització crítica amb fallida de verificació del checksum o corrupció del binari, el backend garanteix la recuperació automàtica commutant de forma transparent a la partició de firmware previ (\textit{dual-boot rollback}) per assegurar la integritat i operativitat del dispositiu. \\ \hline
+    5a. Si la connexió es talla durant la transferència, el sistema informa de l'error i permet reintentar l'operació.          \\ \hline
+    \textbf{Postcondició}                   & El dispositiu es reinicia amb el nou firmware. La interfície mostra una pantalla d'espera fins que el dispositiu torna a estar en línia. Si l'actualització falla, el dispositiu recupera automàticament la versió anterior de firmware per garantir la continuïtat del servei.                                                    \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-01.}
   \label{tab:uc_firmware}
 \end{table}
 
+\clearpage
 \subsection{UC-02: Consulta de gravacions mitjançant Timeline}
 \begin{table}[htbp]
   \centering
@@ -221,12 +249,18 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
     \hline
     \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-02: Cerca de vídeo històric}              \\ \hline
     \textbf{Actor}                          & Operador                                             \\ \hline
+    \textbf{Descripció}                     & L'usuari accedeix al mode de reproducció (\textit{Playback}) per consultar el vídeo gravat en una data i hora concreta, navegant per una línia de temps interactiva generada a partir de l'índex de gravacions del gravador. \\ \hline
+    \textbf{Precondicions}                  & Usuari autenticat amb permisos de visualització. El gravador disposa de gravacions per a la data sol·licitada. La llicència del dispositiu permet l'accés a la reproducció d'historials. \\ \hline
     \textbf{Flux Principal}                 &
-    1. L'usuari activa el mode "Playback". \newline
-    2. El frontend sol·licita l'índex de gravacions per a una data concreta. \newline
-    3. El motor de renderitzat dibuixa una línia de temps amb colors diferents segons el tipus de gravació (contínua, per alarma). \newline
-    4. L'usuari fa clic en un punt de la línia. \newline
-    5. El reproductor HLS inicia la càrrega del fragment corresponent a aquell \textit{timestamp}. \\ \hline
+    1. L'usuari activa el mode ``Playback'' des de la vista de càmera. \newline
+    2. El frontend sol·licita al backend l'índex de gravacions per a una data concreta. \newline
+    3. La interfície mostra una línia de temps amb codificació de colors per tipus de gravació (contínua, per alarma). \newline
+    4. L'usuari fa clic en un punt de la línia de temps. \newline
+    5. El reproductor inicia la càrrega del fragment de vídeo corresponent al punt seleccionat. \\ \hline
+    \textbf{Flux Alternatiu}                &
+    2a. Si no hi ha gravacions per a la data seleccionada, el sistema informa l'usuari i la línia de temps es mostra buida. \newline
+    5a. Si el fragment sol·licitat no és accessible (corrupte o esborrat), el reproductor salta al fragment disponible més proper i n'informa l'usuari. \\ \hline
+    \textbf{Postcondició}                   & El reproductor inicia la reproducció del vídeo corresponent al punt seleccionat; l'usuari pot pausar, avançar o retrocedir lliurement. \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-02.}
 \end{table}
@@ -234,7 +268,7 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 \section{Restriccions del sistema}
 El desenvolupament s'ha de cenyir a les següents limitacions:
 \begin{itemize}
-  \item \textbf{Seguretat:} Per evitar atacs \textit{Cross-Site Scripting} (XSS) i \textit{Cross-Site Request Forgery} (CSRF), no s'utilitzen cookies llegibles per JavaScript (\texttt{document.cookie}) ni el \textit{LocalStorage} del navegador per emmagatzemar dades de sessió. La sessió es gestiona amb cookies \textit{HttpOnly} i \textit{Secure} controlades exclusivament per NGINX (inaccessibles des de codi JavaScript) i un Signal privat en memòria al \textit{frontend} de zero-persistència: un recarregament de pàgina tanca la sessió, comportament intencionat per a entorns de seguretat industrial.
+  \item \textbf{Seguretat:} Per evitar atacs \textit{Cross-Site Scripting} (XSS) i \textit{Cross-Site Request Forgery} (CSRF), no s'utilitzen cookies llegibles per JavaScript ni el \textit{LocalStorage} del navegador per emmagatzemar dades de sessió. La sessió es gestiona mitjançant cookies segures inaccessibles des del codi client, de manera que cap \textit{script} de la pàgina pot llegir ni modificar les credencials. L'estat d'autenticació al \textit{frontend} es manté únicament en memòria.
   \item \textbf{Same-Origin Policy:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
   \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}
@@ -249,10 +283,10 @@ El sistema s'adapta al \textbf{Reglament General de Protecció de Dades (RGPD - 
 \end{itemize}
 
 \subsection{Seguretat en la comunicació i Xifratge}
-Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de tipus interceptació de xarxa o \textit{Man-in-the-Middle} (MitM), s'obliga a l'ús de protocols criptogràfics segurs:
+Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de tipus interceptació de xarxa, s'obliga a l'ús de protocols criptogràfics segurs:
 \begin{itemize}
   \item Totes les peticions a l'API REST es realitzen sota el protocol de transport xifrat \textbf{HTTPS}.
-  \item La comunicació asíncrona d'alarmes es realitza mitjançant canals de \textbf{WebSockets Segurs (WSS)}.
+  \item La comunicació asíncrona d'alarmes i notificacions del sistema es realitza mitjançant canals de \textbf{WebSockets Segurs (WSS)}.
   \item La transmissió de fluxos de vídeo WebRTC utilitza xifratge d'extrem a extrem mitjançant el protocol \textbf{DTLS} per al canal de control i \textbf{SRTP} per a la seguretat en els paquets multimèdia.
 \end{itemize}
 

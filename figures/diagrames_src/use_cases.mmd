@@ -1,17 +1,35 @@
+%%{init: {
+ 'theme': 'base',
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
 graph LR
     Operador[Operador]
     Administrador[Administrador]
-    SistemaExtern["Sistema Extern\n(NVR/Càmera)"]
+    Gravador["Gravador\n(NVR)"]
 
-    subgraph System["Aplicació WebCoreView"]
+    subgraph System["Aplicació Web Core View"]
         UC1([Login / Logout])
         UC2([Veure Vídeo en Directe])
         UC3(["Cercar i Reproduir\nGravacions"])
         UC4([Gestionar Alarmes])
         UC5([Configurar Xarxa i Sistema])
         UC6(["Gestionar Usuaris i\nPermisos"])
-        UC7([Consultar Logs i Reports])
+        UC7([Consultar Logs])
         UC8([Control PTZ])
+        UC9([Gestionar Llicència])
+        UC10([Actualitzar Firmware])
+        UC11(["Gestionar Configuració\nGeneral"])
+        UC12([Accedir a Documentació])
     end
 
     Operador --> UC1
@@ -24,5 +42,10 @@ graph LR
     Administrador --> UC6
     Administrador --> UC7
     Administrador --> UC8
-    SistemaExtern --> UC2
-    SistemaExtern --> UC3
+    Administrador --> UC9
+    Administrador --> UC10
+    Administrador --> UC11
+    Administrador --> UC12
+    Gravador --> UC2
+    Gravador --> UC3
+    Gravador --> UC4
