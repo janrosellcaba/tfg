@@ -90,7 +90,6 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
   \small Font: Elaboració pròpia.
 \end{table}
 
-\newpage
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{figures/gantt.png}
@@ -219,7 +218,7 @@ Quan algun indicador supera el llindar del 10\%, s'activa una revisió d'abast i
 \section{Tancament del projecte i desviacions finals}
 \label{sec:tancament_projecte}
 
-Un cop completat el cicle de desenvolupament i la redacció de la present memòria, es formalitza el tancament del projecte, amb l'objectiu d'analitzar retrospectivament les desviacions ocorregudes tant en la planificació temporal com en la gestió del pressupost, justificant les mesures correctores aplicades.
+Un cop completat el cicle de desenvolupament i la redacció de la present memòria, es formalitza el tancament del projecte, amb l'objectiu d'analitzar retrospectivament les desviacions ocorregudes tant en la planificació temporal com en la gestió del pressupost, i de justificar les mesures correctores aplicades.
 
 \subsection{Tancament temporal: Planificació prevista vs. real}
 La càrrega de treball prevista era de \textbf{540 hores}, però les desviacions tècniques acumulades han elevat el total real a \textbf{585 hores}. El sobrecost d'hores resultant ha estat absorbit pel marge de contingència pressupostat.
@@ -248,14 +247,14 @@ La Taula~\ref{tab:desviacions_temporal} recull la comparativa entre les hores pr
 
 Com s'observa en els indicadors, les fases de desenvolupament tècnic pur (\textbf{AV} i \textbf{GV}) han patit una desviació a l'alça acumulada de \textbf{+45 hores}. Aquesta desviació es justifica per dos motius principals:
 \begin{enumerate}
-    \item \textbf{El buffer i reproducció H.265 (fase AV):} La implementació i proves de descompressió de vídeo en temps real natiu sense dependència de \textit{plugins} sota diferents navegadors moderns va presentar problemes insospitats de desbordament del buffer, i en la conversió dels packets .ts.
+    \item \textbf{El buffer i reproducció H.265 (fase AV):} La implementació i les proves de descompressió de vídeo en temps real natiu sense dependència de \textit{plugins} sota diferents navegadors moderns van presentar problemes insospitats de desbordament del buffer i en la conversió dels paquets \texttt{.ts}.
     \item \textbf{El motor de configuració dinàmic (fase GV):} El recorregut i la validació recursiva de JSONs amb validacions complexes sobre camps anidats va resultar arquitectònicament més complex del previst.
 \end{enumerate}
 
 \subsection{Tancament econòmic: Pressupost estimat vs. final}
 La variació de les hores en les tasques de desenvolupament ha repercutit directament sobre els costos de personal. No obstant això, el pressupost global del projecte no s'ha vist compromès.
 
-La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per cada un dels rols humans definits.
+La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per a cadascun dels rols humans definits.
 
 \begin{table}[htbp]
   \centering
@@ -277,7 +276,7 @@ La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per 
 
 Les desviacions tècniques han requerit \textbf{+15 hores} addicionals d'Analista i \textbf{+30 hores} addicionals de Programador, generant un sobrecost brut de personal de \textbf{+1.134,00~\euro{}}.
 
-Aquest sobrecost ha estat absorbit íntegrament per la partida de \textbf{Marge de Contingència (10\%)}, pressupostada inicialment en \textbf{1.492,75~\euro{}}. Consolidant la resta de costos immutables (amortitzacions de maquinari a \textbf{210,00~\euro{}} i costos indirectes d'oficina a \textbf{1.150,00~\euro{}}), el pressupost total executat ascendeix a \textbf{16.061,50~\euro{}}.
+Aquest sobrecost ha estat absorbit íntegrament per la partida de \textbf{Marge de Contingència (10\%)}, pressupostada inicialment en \textbf{1.492,75~\euro{}}. En consolidar la resta de costos immutables (amortitzacions de maquinari a \textbf{210,00~\euro{}} i costos indirectes d'oficina a \textbf{1.150,00~\euro{}}), el pressupost total executat ascendeix a \textbf{16.061,50~\euro{}}.
 
 D'aquesta manera, el projecte es tanca amb un estalvi net de \textbf{358,75~\euro{}} respecte al pressupost màxim previst de \textbf{16.420,25~\euro{}}, demostrant una gestió econòmica eficient.
 
@@ -286,7 +285,7 @@ L'avaluació global del projecte requereix analitzar-ne l'impacte des de quatre 
 
 \begin{itemize}
   \item \textbf{Dimensió Econòmica:} La solució \textit{Schema-driven} del motor dinàmic de configuració permet adaptar el software a nous models de gravadors sense cost addicional d'enginyeria frontend, allargant la vida útil del producte i reduint el deute tècnic de l'empresa. El model \textit{single-NVR} democratitza l'accés a sistemes professionals per a petites empreses.
-  \item \textbf{Dimensió Ambiental:} L'ús d'una plataforma web remota accessible des de qualsevol navegador redueix dràsticament els desplaçaments físics de tècnics de manteniment a les instal·lacions del client, minimitzant directament la petjada de carboni associada a la flota de vehicles. L'optimització del codi (reducció del 35\% de CPU esmentada al capítol 6) té un impacte directe en l'eficiència energètica. Multiplicat pel nombre de terminals de control que operen de forma contínua en un centre de videovigilància, la reducció de la càrrega computacional es tradueix en un menor consum elèctric i una menor generació de calor, allargant la vida útil del hardware dels clients.
+  \item \textbf{Dimensió Ambiental:} L'ús d'una plataforma web remota accessible des de qualsevol navegador redueix dràsticament els desplaçaments físics de tècnics de manteniment a les instal·lacions del client, minimitzant directament la petjada de carboni associada a la flota de vehicles. L'optimització del codi (reducció del 35\% de CPU esmentada al capítol 6) té un impacte directe en l'eficiència energètica. Multiplicat pel nombre de terminals de control que operen de forma contínua en un centre de videovigilància, la reducció de la càrrega computacional es tradueix en un menor consum elèctric i una menor generació de calor, cosa que allarga la vida útil del hardware dels clients.
   \item \textbf{Dimensió Social:} Millora significativament la interfície de treball dels operadors de seguretat. S'ha reduït la càrrega cognitiva gràcies a un disseny clar i reactiu, fet que disminueix l'estrès operatiu i la fatiga visual en situacions d'incident crític o torns de monitorització perllongats.
   \item \textbf{Implicacions Ètiques:} Tractant-se d'un sistema de videovigilància, el projecte ha integrat el principi de \textit{Privadesa per Disseny}. L'arquitectura assegura que només els usuaris amb privilegis explícits puguin visualitzar el vídeo. El compliment de les directives RGPD s'aborda tècnicament garantint l'esborrat de dades passats 30 dies i la no persistència d'imatges o dades biomètriques al terminal de l'operador. A més, s'evita la inclusió de perfilats automatitzats opacs, garantint que les decisions de seguretat recaiguin sempre sobre el judici humà sota una estricta traçabilitat auditable (\textit{Audit Log}).
 \end{itemize}
