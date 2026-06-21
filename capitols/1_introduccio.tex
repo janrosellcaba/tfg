@@ -4,20 +4,20 @@
 En aquest primer capítol es defineix el marc en el qual es desenvolupa el projecte, s'analitza la problemàtica de la plataforma web \textit{legacy} de l'empresa Lanaccess i es justifica la necessitat de substituir-la per una solució moderna. Així mateix, es detallen els objectius, l'abast i els actors implicats en el cicle de vida del software.
 
 \section{Context del projecte}
-Aquest Treball de Final de Grau (TFG) consisteix en el disseny i desenvolupament de \textbf{Web Core View}, una aplicació web moderna destinada a la gestió centralitzada dels videogravadors de xarxa (\textit{Network Video Recorder}, d'ara endavant \textbf{NVR}) de l'empresa Lanaccess Telecom, SA. El projecte es realitza en col·laboració amb aquesta empresa tecnològica, especialitzada en el desenvolupament de solucions professionals de videovigilància i seguretat electrònica.
+Aquest Treball de Final de Grau (TFG) consisteix en el disseny i desenvolupament de \textbf{Web Core View}, una aplicació web moderna destinada a la gestió centralitzada dels videogravadors (\textit{Network Video Recorder}, d'ara endavant \textbf{NVR}) de la família \textbf{NXT} de l'empresa Lanaccess Telecom, SA. El projecte es realitza en col·laboració amb aquesta empresa tecnològica, especialitzada en el desenvolupament de solucions professionals de videovigilància i seguretat electrònica.
 
-El treball s'emmarca dins de la \textbf{Modalitat B} del TFG i de l'especialitat d'Enginyeria de Software, posant èmfasi en arquitectures \textit{frontend} i \textit{backend} modernes, seguretat en la comunicació i integració de protocols. L'objectiu és modernitzar la plataforma tecnològica de l'empresa, substituint l'aplicació web \textit{legacy} construïda als anys 90 amb tecnologies avui obsoletes (\textbf{ActiveX}) per una interfície de control i administració \textit{embedded} que s'executa directament al propi NVR, basada en l'ecosistema Angular i protocols estàndard oberts (WebRTC, HLS, WSS).
+El treball s'emmarca dins de la \textbf{Modalitat B} del TFG i de l'especialitat d'Enginyeria de Software, posant èmfasi en arquitectures \textit{frontend} i \textit{backend} modernes, seguretat en la comunicació i integració de protocols. L'objectiu és modernitzar la plataforma tecnològica de l'empresa, substituint l'aplicació web \textit{legacy} construïda als anys 90 amb tecnologies avui obsoletes (\textbf{ActiveX}) per una interfície de control i administració \textit{embedded} que s'executa directament al propi videogravador NXT, basada en l'ecosistema Angular i protocols estàndard oberts (WebRTC, HLS, WSS).
 
 \section{Identificació del problema i motivació}
 La plataforma \textit{legacy} de Lanaccess és una aplicació web construïda als anys 90 que depenia en la seva totalitat dels controls \textbf{ActiveX} de Microsoft per a la visualització de vídeo i la interacció amb el maquinari. Amb la retirada oficial del suport a Internet Explorer 11 per part de Microsoft el juny del 2022 \cite{microsoft_ie11_eol}, l'últim navegador capaç d'executar controls ActiveX va quedar obsolet, fent la plataforma pràcticament inoperativa per a qualsevol instal·lació moderna. Aquesta obsolescència es concreta en tres problemes fonamentals:
 
 \begin{itemize}
   \item \textbf{Incompatibilitat amb navegadors moderns:} ActiveX és una tecnologia exclusiva d'Internet Explorer. Els navegadors actuals (Chrome, Firefox, Edge, Safari) han eliminat completament el suport per a \textit{plugins} propietaris externs per raons de seguretat, de manera que la plataforma \textit{legacy} és avui inaccessible des de qualsevol navegador d'ús estàndard.
-  \item \textbf{Rigidesa davant hardware heterogeni:} La interfície estàtica de la plataforma \textit{legacy} no pot adaptar-se a la disparitat de paràmetres i \textit{firmwares} dels NVRs moderns (adreces IP, ports, lògiques d'alarma, còdecs suportats). Qualsevol canvi en el maquinari suportat requereix modificar i redistribuir manualment el codi de l'aplicació.
+  \item \textbf{Rigidesa davant hardware heterogeni:} La interfície estàtica de la plataforma \textit{legacy} no pot adaptar-se a la disparitat de paràmetres i \textit{firmwares} dels videogravadors NXT (adreces IP, ports, lògiques d'alarma, còdecs suportats). Qualsevol canvi en el maquinari suportat requereix modificar i redistribuir manualment el codi de l'aplicació.
   \item \textbf{Absència de capacitats en temps real:} La interfície, basada en pàgines estàtiques dels anys 90 (recàrregues completes, sense comunicació asíncrona), no ofereix cap de les funcionalitats de temps real que requereixen els operadors de seguretat actuals: visualització de vídeo en directe, alertes instantànies ni configuració dinàmica.
 \end{itemize}
 
-Paral·lelament, Lanaccess ha identificat una \textbf{necessitat de mercat addicional}: oferir una solució de gestió autònoma orientada a \textbf{empreses petites} amb un únic NVR. El model anterior era una aplicació web centralitzada, allotjada en un servidor intern de la instal·lació, que gestionava simultàniament tot el parc de dispositius d'una gran infraestructura. Aquesta arquitectura resulta sobredimensionada i innecessàriament complexa per a clients amb una sola unitat de gravació. Així, \textit{Web Core View} neix amb una doble finalitat: modernitzar la plataforma tecnològica obsoleta i, alhora, proporcionar una solució \textit{embedded} lleugera que s'executi directament en el propi NVR, permetent la gestió autònoma de l'equip des de qualsevol navegador sense requerir infraestructura centralitzada addicional.
+Paral·lelament, Lanaccess ha identificat una \textbf{necessitat de mercat addicional}: oferir una solució de gestió autònoma orientada a \textbf{empreses petites} amb un únic videogravador NXT. El model anterior era una aplicació web centralitzada, allotjada en un servidor intern de la instal·lació, que gestionava simultàniament tot el parc de dispositius d'una gran infraestructura. Aquesta arquitectura resulta sobredimensionada i innecessàriament complexa per a clients amb una sola unitat de gravació. Així, \textit{Web Core View} neix amb una doble finalitat: modernitzar la plataforma tecnològica obsoleta i, alhora, proporcionar una solució \textit{embedded} lleugera que s'executi directament en el propi videogravador NXT, permetent la gestió autònoma de l'equip des de qualsevol navegador sense requerir infraestructura centralitzada addicional.
 
 \section{Estat de l'art i alternatives existents}
 
@@ -77,7 +77,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{PostgreSQL / MySQL:} Són bases de dades relacionals molt potents, però funcionen com a serveis de sistema independents. Requereixen un consum elevat i constant de memòria RAM i CPU per mantenir el dimoni actiu, sent una sobrecàrrega inacceptable en dispositius embedded limitats.
   \item \textbf{MongoDB:} Base de dades documental NoSQL ideal per a grans volums de dades desestructurades, però amb una pila tecnològica pesada i requisits de recursos inassequibles per al maquinari de gravació local.
   \item \textbf{SQLite3:} És un motor de base de dades relacional \textit{serverless}, transaccional (ACID) i auto-tingut que s'executa en el mateix procés del backend (in-process). Guarda tota la informació en un únic fitxer físic al disc.
-  \item \textbf{Justificació:} S'ha seleccionat \textbf{SQLite3} com el motor de base de dades per al registre d'alarmes i logs del dispositiu, atès que ofereix un rendiment excel·lent per a lectures i escriptures ràpides amb un consum residual de memòria ($<15$~MB), essent ideal per a sistemes embedded Linux.
+  \item \textbf{Justificació:} S'ha seleccionat \textbf{SQLite3} com el motor de base de dades per al registre d'alarmes i logs del dispositiu, atès que ofereix un rendiment excel·lent per a lectures i escriptures ràpides amb un consum residual de memòria ($<15$~MB), essent ideal per als gravadors NXT de Lanaccess amb recursos de memòria i CPU limitats.
 \end{itemize}
 
 \subsection{Alternativa de Còdec de Vídeo: H.264 i H.265 coexistents segons Maquinari i Càmera}
@@ -95,7 +95,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
 \begin{itemize}
   \item \textbf{Formularis estàtics:} Programar una pantalla per a cada menú de configuració és més ràpid a curt termini però genera un deute tècnic insostenible, ja que cada canvi en el \textit{firmware} obligaria a actualitzar el \textit{frontend}.
   \item \textbf{Motor Schema-driven:} El \textit{frontend} actua com un intèrpret que renderitza la interfície basant-se en un esquema JSON rebut del servidor.
-  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compatibilitat futura amb els nous models de gravador de Lanaccess sense haver de modificar el codi de l'aplicació web.
+  \item \textbf{Justificació:} S'ha optat per la solució \textbf{Schema-driven} per garantir la compatibilitat futura amb els nous models de videogravador NXT de Lanaccess sense haver de modificar el codi de l'aplicació web.
 \end{itemize}
 
 \subsection{Alternativa de gestió d'estat: Redux vs. Angular Signals}
@@ -112,12 +112,12 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Gestió d'estat amb Signals:} L'ús d'\textbf{Angular Signals} representa un canvi de paradigma en la reactivitat. Aquesta funcionalitat permet una gestió granular dels canvis, optimitzant el rendiment del \textit{frontend} i garantint una fluïdesa absoluta fins i tot amb múltiples fluxos de vídeo simultanis, evitant sobrecàrregues de CPU innecessàries al terminal del client.
   \item \textbf{Control de concurrència:} Implementació d'un servei de bloqueig en temps real per evitar conflictes d'edició entre administradors.
   \item \textbf{Arquitectura d'esdeveniments:} Ús de \textit{WebSockets} (WSS) per rebre notificacions d'alarmes, notificacions del sistema i errors de forma immediata.
-  \item \textbf{Desplegament autònom (single-NVR):} L'aplicació s'executa directament dins del propi videogravador com a servidor web \textit{embedded}. Això permet que empreses petites amb un únic dispositiu puguin gestionar-lo de forma completa i autònoma des de qualsevol navegador, sense necessitat d'infraestructura centralitzada addicional ni de programari extern. Aquesta capacitat obre un nou segment de mercat per a Lanaccess que la plataforma \textit{legacy} anterior no podia cobrir.
+  \item \textbf{Desplegament autònom (single-NVR):} L'aplicació s'executa directament dins del propi videogravador NXT com a servidor web \textit{embedded}. Això permet que empreses petites amb un únic dispositiu puguin gestionar-lo de forma completa i autònoma des de qualsevol navegador, sense necessitat d'infraestructura centralitzada addicional ni de programari extern. Aquesta capacitat obre un nou segment de mercat per a Lanaccess que la plataforma \textit{legacy} anterior no podia cobrir.
 \end{itemize}
 
 \section{Objectius del projecte}
 \subsection{Objectiu general}
-Dissenyar i desenvolupar una consola de gestió web modular, reactiva i d'alt rendiment que centralitzi la gestió tècnica i operativa dels dispositius Lanaccess, substituint la plataforma web \textit{legacy} dels anys 90 i les seves tecnologies obsoletes (ActiveX) per una arquitectura i interfície completament modernes.
+Dissenyar i desenvolupar una consola de gestió web modular, reactiva i d'alt rendiment que centralitzi la gestió tècnica i operativa dels NVRs NXT de Lanaccess, substituint la plataforma web \textit{legacy} dels anys 90 i les seves tecnologies obsoletes (ActiveX) per una arquitectura i interfície completament modernes.
 
 \subsection{Objectius específics}
 \begin{itemize}
@@ -125,12 +125,12 @@ Dissenyar i desenvolupar una consola de gestió web modular, reactiva i d'alt re
   \item Integrar un mòdul de visualització híbrid compatible amb WebRTC i HLS (H264/H265).
   \item Implementar la gestió d'alarmes en temps real mitjançant comunicació bidireccional.
   \item Facilitar el manteniment remot (\textit{firmware}, llicències i logs) via navegador.
-  \item Dissenyar l'aplicació com una solució autònoma \textit{embedded} capaç de funcionar directament en un únic gravador (\textit{single-NVR}), sense dependència de servidors centralitzats, per cobrir el segment d'empreses petites.
+  \item Dissenyar l'aplicació com una solució autònoma \textit{embedded} capaç de funcionar directament en un únic NVR NXT (\textit{single-NVR}), sense dependència de servidors centralitzats, per cobrir el segment d'empreses petites.
 \end{itemize}
 
 \section{Abast i Obstacles}
 \subsection{Abast funcional}
-L'aplicació ha d'oferir un cicle complet de gestió: des de l'autenticació segura de l'usuari fins a la monitorització de càmeres en directe, la cerca de gravacions històriques i la configuració avançada de xarxa i paràmetres de sistema. El disseny ha de contemplar el desplegament autònom en un únic gravador (mode \textit{single-NVR}) com a cas d'ús principal, garantint que tota la funcionalitat sigui operable sense infraestructura externa.
+L'aplicació ha d'oferir un cicle complet de gestió: des de l'autenticació segura de l'usuari fins a la monitorització de càmeres en directe, la cerca de gravacions històriques i la configuració avançada de xarxa i paràmetres de sistema. El disseny ha de contemplar el desplegament autònom en un únic videogravador NXT (mode \textit{single-NVR}) com a cas d'ús principal, garantint que tota la funcionalitat sigui operable sense infraestructura externa.
 
 \subsection{Obstacles detectats}
 S'han identificat reptes tècnics que afecten diferents actors:
