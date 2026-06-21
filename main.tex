@@ -21,8 +21,9 @@
 \usepackage{csquotes}
 \usepackage[official]{eurosym}
 \DeclareQuoteAlias{spanish}{catalan}
-\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\usepackage[backend=biber,style=numeric,sorting=none,autolang=none]{biblatex}
 \addbibresource{references.bib}
+\DeclareLanguageMapping{nil}{english}
 \emergencystretch=1em % Help with overfull boxes in bibliography and text
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
