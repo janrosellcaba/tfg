@@ -212,6 +212,7 @@ L'autenticació és el flux d'entrada obligatori i prerequisit de tots els casos
   \label{tab:uc_login}
 \end{table}
 
+\clearpage
 \subsection{UC-01: Gestió de l'actualització de firmware}
 Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 
@@ -239,6 +240,7 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
   \label{tab:uc_firmware}
 \end{table}
 
+\clearpage
 \subsection{UC-02: Consulta de gravacions mitjançant Timeline}
 \begin{table}[htbp]
   \centering
@@ -295,3 +297,31 @@ El disseny tècnic actua com un element facilitador perquè les entitats de segu
   \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació compta amb un servei de registre d'activitat inalterable que monitoritza i audita les accions dels usuaris (qui ha visualitzat quina càmera, en quines dates i hores, i si s'han realitzat descàrregues de vídeo), cosa que assegura la traçabilitat exigida per a la custòdia d'evidències gràfiques.
 \end{itemize}
 Malgrat aquestes facilitats tècniques, el compliment final de la normativa depèn de la configuració i l'ús real que l'entitat de seguretat privada faci del sistema en la instal·lació del client.
+
+\subsection{Propietat Intel·lectual i Llicències de Programari}
+
+\paragraph{Titularitat del codi.}
+El projecte s'ha dut a terme en el marc de la \textbf{Modalitat B} del TFG, que implica el desenvolupament d'un producte real per encàrrec d'una empresa. En virtut de l'\textbf{article 97 del Text Refós de la Llei de Propietat Intel·lectual (LPI)}~\cite{lpi_spain}, els drets d'explotació exclusius d'un programa d'ordinador creat per encàrrec d'una empresa corresponen a aquesta. En conseqüència, el codi font de \textit{Web Core View} és propietat industrial i intel·lectual de \textbf{Lanaccess Telecom, SA}, que n'assumirà el manteniment, l'evolució i la distribució comercial un cop finalitzat el TFG. L'autor conserva els drets morals reconeguts per la LPI i la titularitat acadèmica de la present memòria, que es regeix pel reglament de TFG de la \textbf{Facultat d'Informàtica de Barcelona (FIB)}.
+
+\paragraph{Llicències de les dependències principals.}
+El \textit{frontend} de \textit{Web Core View} es construeix sobre programari de codi obert. La Taula~\ref{tab:llicencies} recull les dependències principals i les seves llicències, totes compatibles amb l'ús en productes comercials propietaris i sense cap obligació de publicar el codi font derivat:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Dependència} & \textbf{Versió} & \textbf{Llicència} \\
+\midrule
+Angular (framework)  & 19   & MIT \\
+RxJS                 & 7.x  & Apache 2.0 \\
+Angular Material     & 19   & MIT \\
+ngx-translate        & 16.x & MIT \\
+TypeScript           & 5.x  & Apache 2.0 \\
+NGINX                & 1.x  & BSD 2-Clause \\
+\bottomrule
+\end{tabular}
+\caption{Llicències de les principals dependències de codi obert de \textit{Web Core View}.}
+\label{tab:llicencies}
+\end{table}
+
+Cap de les llicències emprades pertany a la família \textit{copyleft} fort (GPL o LGPL en modalitat ``vírica''), de manera que la seva integració en el producte comercial de Lanaccess és legalment conforme i no imposa cap restricció sobre la distribució del \textit{firmware} resultant.
