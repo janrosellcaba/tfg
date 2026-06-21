@@ -25,14 +25,11 @@ Com a assignatura especialitzada en l'administració i optimització de sistemes
 \subsection{Arquitectura del Software (AS)}
 Aquesta assignatura de l'especialitat ha estat fonamental per al disseny estructural a gran escala de \textit{Web Core View}. S'ha definit un sistema organitzat en capes ben delimitades i independents: presentació (desenvolupada amb Angular), lògica de negoci (el motor d'interpretació dinàmica \textit{schema-driven}) i comunicacions (connectors per a API REST, WebSockets i WebRTC a través d'un proxy invers de NGINX). Addicionalment, s'ha aplicat el model reactiu \textbf{Observer} mitjançant el nou sistema de \textbf{Signals} d'Angular 19 per a la propagació d'estats sense introduir acoblaments de dades ni impactar negativament en el rendiment de renderitzat del navegador.
 
-\section{Bases de l'Enginyeria del Software}
-Aquesta àrea conté les bases estructurals i de qualitat per al desenvolupament de codi robust.
+\section{Core d'Enginyeria Informàtica}
+Les assignatures troncals de la carrera han ofert el fonament tècnic que ha permès implementar els diferents protocols, algoritmes i interaccions de baix nivell del sistema.
 
 \subsection{Introducció a l'Enginyeria del Software (IES)}
 IES ha aportat el marc conceptual fonamental per al disseny lògic i la modulació del codi del projecte. S'han aplicat els principis de disseny \textbf{SOLID} \cite{solid_principles} per assegurar que els serveis i components d'Angular estiguin desacoblats, reutilitzables i fàcils de mantenir. Així mateix, el modelatge amb diagrames UML (seqüència, activitat i classes) ha estat indispensable per analitzar les dependències lògiques abans de la fase d'implementació.
-
-\section[Core d'Enginyeria Informàtica (Troncals i Comuns)]{Core d'Enginyeria Informàtica\\(Troncals i Comuns)}
-Les assignatures troncals de la carrera han ofert el fonament tècnic que ha permès implementar els diferents protocols, algoritmes i interaccions de baix nivell del sistema.
 
 \subsection{Projecte de Programació (PROP)}
 La programació orientada a objectes de gran complexitat i l'aplicació d'estructures de dades robustes apreses a PROP s'han posat a prova en la creació del motor \textit{schema-driven}. Aquest motor actua analitzant recursivament una estructura de metadades altament niada expressada en JSON per construir, validar i renderitzar dinàmicament formularis HTML sencers en temps real. S'han dissenyat classes altament reutilitzables, una lògica eficient de tipatge dinàmic en TypeScript i mecanismes avançats de gestió d'excepcions per evitar que entrades mal formades bloquegessin el fil d'execució principal del navegador (\textit{UI thread}).
@@ -50,7 +47,7 @@ Atès que \textit{Web Core View} és una aplicació de gestió remota de disposi
 \subsection{Sistemes Operatius (SO)}
 Com que l'aplicació web actua com a portal d'administració d'un gravador autònom (\textit{embedded}), ha calgut entendre com el sistema operatiu hoste gestiona els recursos, la concurrència i la comunicació de baix nivell. El client web no es comunica directament amb el maquinari físic, sinó amb microserveis i servidors interns del gravador Linux. S'han aprofitat els conceptes d'IPC (Comunicació entre Processos) per interactuar amb APIs binàries d'alt rendiment basades en \textbf{gRPC} i s'ha comprès el comportament concurrent del bus de sistema \textbf{D-Bus} amb el qual es comuniquen els dimonis interns del gravador.
 
-\section{Interacció i Disseny d'Interfícies (IDI)}
+\subsection{Interacció i Disseny d'Interfícies (IDI)}
 El disseny de la interfície d'usuari (UI) i la definició de l'experiència d'usuari (UX) s'han recolzat directament en les teories d'usabilitat i disseny cognitiu d'IDI. Sent la videovigilància un entorn crític on els operadors de seguretat prenen decisions immediates, s'ha prioritzat la disminució de la càrrega cognitiva. S'ha adoptat un disseny visual net, amb alts contrastos adaptats per a visualitzacions prolongades i una jerarquia d'elements extremadament clara. Addicionalment, s'ha aconseguit que la interfície sigui altament reactiva en temps real mitjançant microanimacions i canvis d'estat immediats (com pèrdues de vídeo o alarmes actives) recolzant-se en la reactivitat nativa dels Signals d'Angular 19.
 
 \section{Assoliment de les competències de l'especialitat}
@@ -96,3 +93,32 @@ Més enllà dels coneixements reglats del pla d'estudis de la FIB, el projecte h
   \item \textbf{Protocol gRPC:} Recerca sobre la comunicació binària d'alt rendiment basada en HTTP/2 per establir connexions eficients i de molt baix sobrecost amb els microserveis de backend \cite{grpc_io}.
   \item \textbf{Configuració Avançada de NGINX:} Autoformació en la implementació de proxys inversos locals, gestió robusta de capçaleres de seguretat (CORS, CSP) i redirecció de trànsit WebSocket/HTTP de manera unificada.
 \end{itemize}
+
+Paral·lelament a l'entorn professional de Lanaccess, una font d'aprenentatge complementari i molt significativa ha estat el projecte \textbf{Express My Health}, una \textit{startup} de \textit{health tech} centrada en el seguiment diari i la traçabilitat de dades per a persones amb demència. La startup forma part del programa d'emprenedoria \textbf{Empren UPC} de la Universitat Politècnica de Catalunya, dins del qual l'autor ha rebut acompanyament de mentors especialitzats i ha col·laborat activament en el lideratge i desenvolupament del producte. Aquesta experiència ha aportat una perspectiva de disseny centrada en l'usuari final que va molt més enllà dels requisits funcionals: la gestió d'iteracions amb usuaris reals en entorns sensibles, la presa de decisions de producte sota incertesa tecnològica i la cultura de validació contínua d'hipòtesis. Molts d'aquests aprenentatges s'han transferit de forma directa a \textit{Web Core View}, especialment en la cura per la usabilitat percebuda per l'operador de seguretat i en la capacitat de dissenyar interfícies clares i eficients per a contextos operatius crítics.
+
+\section{Declaració d'Ús d'Intel·ligència Artificial}
+\label{sec:declaracio_ia}
+
+Aquest treball ha comptat amb el suport d'eines d'intel·ligència artificial generativa en determinades fases del seu desenvolupament i redacció. A continuació es detallen les eines emprades, la finalitat del seu ús i l'abast de la seva intervenció.
+
+\subsection*{Eines utilitzades}
+
+\begin{itemize}
+    \item \textbf{Google AI Studio — Gemini 2.5 Pro:} Eina principal d'assistència durant la fase de desenvolupament. S'ha emprat com a assistent tècnic per validar i refinar la implementació d'Angular 19, explorar la gestió de microserveis i revisar errors de compilació i lògica en TypeScript, entre d'altres
+
+    \item \textbf{Claude Code (Anthropic):} Incorporat a partir de maig de 2026, arran de la seva adopció per part de l'empresa Lanaccess. S'ha emprat com a assistent de codificació per a la revisió de serveis Angular i de serveis de \textit{backend}, l'anàlisi d'arquitectura i el suport a la revisió tècnica d'aquest document.
+\end{itemize}
+
+\subsection*{Finalitat i abast}
+
+L'ús d'aquestes eines ha tingut dues finalitats diferenciades:
+
+\begin{enumerate}
+    \item \textbf{Suport al desenvolupament de programari:} Les eines d'IA han actuat com a acceleradores del cicle de desenvolupament, revisant errors, proposant alternatives d'implementació i verificant la coherència de l'arquitectura. En cap cas s'ha incorporat codi sense comprendre'l i adaptar-lo a les especificitats del projecte.
+
+    \item \textbf{Suport a la redacció del document:} Les eines han assistit en la revisió estilística, la millora de la claredat expositiva i la comprovació de la coherència terminològica en seccions específiques d'aquest document. Tota la redacció ha estat iniciada, dirigida i revisada íntegrament per l'autor.
+\end{enumerate}
+
+\subsection*{Revisió i responsabilitat de l'autor}
+
+Tot el contingut generat amb el suport de les eines d'IA ha estat revisat, contrastat i, si s'escau, reformulat per l'autor. Les eines d'intel·ligència artificial han exercit un rol instrumental d'acceleració i verificació, no d'autoria. L'autor declara la seva plena responsabilitat sobre la totalitat del contingut tècnic i expositiu d'aquest treball, i certifica que el seu ús s'ha ajustat als principis del Compromís d'integritat acadèmica de la UPC.

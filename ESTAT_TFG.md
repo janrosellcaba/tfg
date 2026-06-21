@@ -14,13 +14,13 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 | Capítol | Títol | Estat | Notes |
 |---|---|---|---|
 | 1 | Introducció i Context | ✅ COMPLET | Problema, estat de l'art, justificació alternatives, objectius |
-| 2 | Gestió del Projecte | ✅ COMPLET | Kanban, Gantt, pressupost real (15.028,75€), sostenibilitat |
+| 2 | Gestió del Projecte | ✅ COMPLET | Kanban, Gantt, 585h reals (540h previstes), cost executat 16.061,50€ (pressupost màxim 16.420,25€, estalvi 358,75€), sostenibilitat |
 | 3 | Especificació de Requisits | ✅ COMPLET | User stories, RF/RNF, casos d'ús, marc normatiu (RGPD) |
 | 4 | Arquitectura i Disseny | ✅ COMPLET | Microserveis, NGINX, Schema-driven, model de dades |
 | 5 | Implementació | ✅ COMPLET | Login, Home, Config, WebRTC, HLS, Alarmes, Manteniment |
 | 6 | Validació i Proves | ✅ COMPLET | Jasmine/Karma, Playwright, latències, CPU/memòria, UAT |
 | 7 | Integració de Coneixements | ✅ COMPLET | Competències FIB, assignatures relacionades |
-| 8 | Conclusions i Treball Futur | ✅ COMPLET | Assoliment d'objectius, treball futur, reflexions personals |
+| 8 | Conclusions i Treball Futur | ✅ COMPLET | Reescrit (juny 2026): balanç narratiu, 7 objectius detallats, 6 línies de treball futur (inclou Reports dinàmics i fotos a alarmes), conclusions personals ampliades |
 | Annexos | Annexos | ✅ COMPLET | Annex A.1 corregit (juny 2026): format JSON real amb underscores |
 
 ---

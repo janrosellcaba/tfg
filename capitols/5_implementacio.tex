@@ -803,6 +803,7 @@ En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una sol
 
 \clearpage
 \subsection{Emmagatzematge de Vídeo}
+\label{sec:emmagatzematge_video}
 Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional, sinó en \textbf{FS2} (\textit{File System 2}), un sistema d'emmagatzematge propietari de Lanaccess que opera directament sobre la partició \textit{raw} del disc dur de l'NVR, sense intermediació del sistema de fitxers del nucli Linux (ext4). FS2 escriu els fotogrames de vídeo en espais contigus de mida fixa a nivell de blocs físics, cosa que elimina la fragmentació, redueix la latència d'escriptura i garanteix atomicitat en cas de tall elèctric sobtat: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada. Tot aquest accés de baix nivell queda encapsulat dins de \textbf{la-video-engine}: el frontend mai interactua directament amb FS2, sinó que consumeix les dades ja processades a través de l'API HTTP que el motor exposa.
 
 \subsection{Servidor de llistes de reproducció HLS}

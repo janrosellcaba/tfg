@@ -4,17 +4,18 @@
 En aquest capítol es descriu l'estratègia de validació seguida per garantir que la plataforma \textit{Web Core View} compleix els requisits funcionals i no funcionals definits inicialment. S'han realitzat proves a diferents nivells: des de la lògica interna del codi fins a la qualitat del flux de vídeo i l'acceptació per part dels usuaris tècnics de Lanaccess.
 
 \section{Estratègia de proves}
-S'ha seguit un enfocament de proves basat en el risc i en el cicle de vida del software. Les proves s'han dividit en tres grans blocs:
+S'ha seguit un enfocament de proves basat en el risc i en el cicle de vida del software. Les proves s'han dividit en quatre grans blocs:
 \begin{enumerate}
     \item \textbf{Proves Unitàries i d'Integració:} Per validar la lògica del \textit{frontend} (Angular) i la comunicació amb l'API.
     \item \textbf{Proves de Rendiment:} Centrades en la latència del vídeo i el consum de recursos.
-    \item \textbf{Proves de Robustesa:} Per verificar la capacitat de recuperació del sistema davant talls de xarxa.
+    \item \textbf{Proves de Robustesa:} Per verificar la capacitat de recuperació del sistema davant talls de xarxa i sobrecàrregues de connexió.
+    \item \textbf{Validació d'Acceptació:} Per recollir el \textit{feedback} dels tècnics d'instal·lació i mesurar la usabilitat percebuda mitjançant el qüestionari SUS.
 \end{enumerate}
 
-\section{Proves Unitàries i de Lògica}
+\section{Proves Unitàries i d'Integració}
 S'ha dissenyat i executat un pla d'automatització de proves per assegurar la robustesa del programari al llarg de l'evolució del projecte. Les proves s'han dividit segons el seu àmbit:
 \begin{itemize}
-    \item \textbf{Proves Unitàries:} Implementades utilitzant el framework de test \textbf{Jasmine} i el \textit{test runner} \textbf{Karma} natius d'Angular. S'han centrat a validar de manera aïllada el comportament de la lògica dels serveis crítics, com ara la gestió d'estat amb els Signals i la correcta negociació de la connexió WebRTC. S'ha assolit una cobertura de codi (\textit{code coverage}) global superior al 85\% en els fitxers de serveis.
+    \item \textbf{Proves Unitàries:} Implementades utilitzant el framework de test \textbf{Jasmine}~\cite{jasmine_testing} i el \textit{test runner} \textbf{Karma}~\cite{karma_runner} natius d'Angular. S'han centrat a validar de manera aïllada el comportament de la lògica dels serveis crítics, com ara la gestió d'estat amb els Signals i la correcta negociació de la connexió WebRTC. S'ha assolit una cobertura de codi (\textit{code coverage}) global superior al 85\% en els fitxers de serveis.
     \item \textbf{Proves E2E i Integració:} S'ha fet ús de la plataforma d'automatització moderna \textbf{Playwright} \cite{playwright_testing} per verificar els fluxos de treball complets des de l'òptica de l'usuari. S'han dissenyat scripts automatitzats que simulen l'inici de sessió amb credencials correctes i errònies, la navegació entre pantalles modulars i el bloqueig simultani de la configuració (\textit{Config Lock}).
 \end{itemize}
 
@@ -55,7 +56,7 @@ En un entorn \textit{embedded} on l'aplicació web corre directament en el maqui
 
 S'han dut a terme anàlisis de rendiment utilitzant el perfilador de memòria de Chrome DevTools durant sessions de reproducció continuada de vídeo WebRTC de dues hores de durada. Els resultats indiquen:
 \begin{itemize}
-    \item \textbf{Estabilitat de memòria (Heap):} El perfil del consum de memòria presenta una forma de "dent de serra" perfectament estable, oscil·lant entre els 45~MB i els 65~MB. Cada descens o caiguda abrupta en aquest perfil de "dent de serra" representa l'actuació de l'escombrador de memòria o \textbf{Garbage Collector} (GC) del motor V8 del navegador, el qual allibera immediatament i eficientment la memòria HEAP ocupada pels elements i estructures de dades descartades. Un cop finalitzades les connexions, aquest procés allibera el 100\% dels recursos gràcies al tancament net de la \texttt{RTCPeerConnection}, l'aturada activa de totes les pistes de vídeo (\texttt{track.stop()}), i la cancel·lació estricta de les subscripcions asíncrones, demostrant una \textbf{absència total de fugues de memòria} (\textit{memory leaks}). Aquesta estabilitat és atribuïble directament al mètode d'escombrat segur implementat al patró \textit{Strategy} de reproducció de vídeo (\texttt{StreamingStrategy.closeStream()}), el qual garanteix que, en destruir qualsevol cel·la del mosaic de càmeres, es tanquin activament totes les pistes de vídeo de la instància (\texttt{track.stop()}), es cancel·lin les subscripcions asíncrones pendents i es destrueixi completament el context de la \texttt{RTCPeerConnection} de la memòria d'execució del navegador.
+    \item \textbf{Estabilitat de memòria (Heap):} El perfil del consum de memòria presenta una forma de "dent de serra" perfectament estable, oscil·lant entre els 45~MB i els 65~MB; cada descens representa l'actuació del \textbf{Garbage Collector} (GC) del motor V8, que allibera la memòria HEAP dels elements descartats. Un cop finalitzades les connexions, el sistema allibera el 100\% dels recursos, demostrant una \textbf{absència total de fugues de memòria} (\textit{memory leaks}). Aquesta estabilitat és atribuïble al mètode \texttt{StreamingStrategy.closeStream()}, que en destruir qualsevol cel·la del mosaic de càmeres garanteix el tancament actiu de totes les pistes de vídeo (\texttt{track.stop()}), la cancel·lació de les subscripcions asíncrones pendents i la destrucció completa del context de la \texttt{RTCPeerConnection}.
     \item \textbf{Optimització de CPU:} Gràcies a la minimització de l'ús de \textit{Zone.js} en Angular 19 i a la consegüent reducció de les comprovacions de cicle complet, combinada amb la reactivitat granular basada en \textbf{Signals}, l'ús de la CPU en el fil d'execució del navegador s'ha reduït en un 35\% respecte a prototips previs basats en RxJS/comprovacions estàndard. Aquesta dada s'ha mesurat en un escenari de test real mitjançant un terminal de control de gamma de baix consum representatiu: un processador \textbf{Intel Core i3-8100T (4 nuclis, a 3,10~GHz)} amb 8~GB de RAM sota Windows 10 IoT. Aquesta reducció del 35\% de CPU garanteix la fluïdesa i estabilitat operacional les 24 hores del dia en entorns industrials i centres de vigilància amb maquinari limitat.
 \end{itemize}
 
@@ -74,9 +75,9 @@ S'ha simulat una pèrdua de xarxa d'un minut durant una sessió activa de config
 \end{itemize}
 
 \subsection{Validació dels límits de connexió concurrents}
-Per verificar el comportament del servidor web davant d'escenaris de congestió extrema i garantir la resiliència del dispositiu enfront d'atacs de denegació de servei (DoS) involuntaris o intencionals, s'han executat proves de càrrega mitjançant l'eina \textbf{ApacheBench} simulant ràfegues de connexions HTTP simultànies contra el microservei \textbf{la-core-legacy}.
+Per verificar el comportament del servidor web davant d'escenaris de congestió extrema i garantir la resiliència del dispositiu enfront d'atacs de denegació de servei (DoS) involuntaris o intencionals, s'han executat proves de càrrega mitjançant l'eina \textbf{ApacheBench}~\cite{apachebench} simulant ràfegues de connexions HTTP simultànies contra el microservei \textbf{la-core-legacy}.
 
-El servidor web inicialitza la llibreria \textit{Libmicrohttpd} amb un límit estricte de \textbf{25 connexions globals concurrents} i un sublímit de \textbf{12 connexions per adreça IP d'origen}. Els resultats de la prova han demostrat que:
+El servidor web inicialitza la llibreria \textit{Libmicrohttpd}~\cite{libmicrohttpd} amb un límit estricte de \textbf{25 connexions globals concurrents} i un sublímit de \textbf{12 connexions per adreça IP d'origen}. Els resultats de la prova han demostrat que:
 \begin{itemize}
     \item Quan el nombre de connexions simultànies se situa per sota del llindar establert, el servidor respon amb normalitat i sense degradació observable.
     \item Un cop superat el límit de 25 connexions concurrents, el microservei rebutja de manera segura i determinista les peticions addicionals, retornant un error de connexió controlat sense comprometre la memòria RAM ni la CPU de l'NVR.
@@ -88,6 +89,8 @@ Aquesta validació confirma que l'arquitectura del servidor web protegeix efica�
 \subsection{Robustesa del driver VFS davant de talls elèctrics sobtats}
 Un dels requisits de qualitat més crítics per a un sistema de videovigilància industrial és la integritat de les dades de configuració i d'alarmes davant d'una interrupció elèctrica sobtada. Per validar aquest requisit, es van simular talls de corrent forçats en diverses fases del cicle d'escriptura d'alarmes actives al microservei \textbf{la-db-engine}.
 
+Cal distingir aquest sistema del \textbf{FS2} descrit a la secció~\ref{sec:emmagatzematge_video}: mentre que FS2 és el sistema de fitxers propietari de Lanaccess que emmagatzema els fotogrames de vídeo directament sobre la partició \textit{raw} del disc, el driver \texttt{remote\_vfs} és la implementació de la interfície \textbf{SQLite VFS} que \textit{la-db-engine} utilitza per persistir les dades relacionals (alarmes i configuració) de forma atòmica. Són dos subsistemes independents amb responsabilitats i tecnologies diferenciades.
+
 Les proves han demostrat que l'arquitectura del driver personalitzat de sistema de fitxers virtual (\textbf{VFS}) garanteix la integritat de les dades gràcies a tres mecanismes combinats:
 \begin{itemize}
     \item \textbf{Escriptura per sectors de 512 bytes:} El driver \texttt{remote\_vfs} canalitza totes les operacions d'escriptura a disc en blocs alineats al sector físic via \texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR, ...)}, garantint l'atomicitat de cada operació d'escriptura elemental.
@@ -95,10 +98,10 @@ Les proves han demostrat que l'arquitectura del driver personalitzat de sistema 
     \item \textbf{Propietats ACID verificades:} En tots els escenaris de tall elèctric simulats, el sistema es va recuperar de forma atòmica en reincorporar-se el corrent: les transaccions incompletes van ser descartades automàticament sense corrompre les dades prèviament confirmades, consolidant el compliment dels principis d'Atomicitat, Consistència, Aïllament i Durabilitat (ACID).
 \end{itemize}
 
-\section{Validació d'Acceptació (UAT)}
+\section{Validació d'Acceptació}
 Finalment, l'aplicació s'ha presentat als tècnics d'instal·lació de Lanaccess per recollir el seu \textit{feedback}. S'ha aplicat el qüestionari \textbf{System Usability Scale} (SUS) adaptat a l'entorn de videovigilància industrial, amb un total de 8 participants (tècnics d'instal·lació i operadors de seguretat). Per avaluar l'evolució respecte a l'aplicació \textit{legacy}, es van formular preguntes específiques com: \textit{«Consideres que la navegació per trobar paràmetres de xarxa és més intuïtiva ara?»} o \textit{«Has necessitat suport tècnic per configurar una alarma nova?»}.
 
-La puntuació SUS obtinguda ha estat de \textbf{85,6 sobre 100}, corresponent a la categoria \textit{«Excellent»} en l'escala estàndard de Bangor et al. (2008). Aquesta puntuació supera el llindar d'\textit{«Acceptable»} (score $\geq$ 70) i el valor de referència de \textit{«Good»} ($\geq$ 80), validant que la interfície és percebuda com a intuïtiva i eficient pels operadors de seguretat, fins i tot en comparació amb sistemes web professionals del mercat.
+La puntuació SUS obtinguda ha estat de \textbf{85,6 sobre 100}, corresponent a la categoria \textit{«Excellent»} en l'escala estàndard de Bangor et al. (2008)~\cite{bangor2008_sus}. Aquesta puntuació supera el llindar d'\textit{«Acceptable»} (score $\geq$ 70) i el valor de referència de \textit{«Good»} ($\geq$ 80), validant que la interfície és percebuda com a intuïtiva i eficient pels operadors de seguretat, fins i tot en comparació amb sistemes web professionals del mercat.
 
 Els resultats qualitatius destacats pels participants inclouen:
 \begin{itemize}
