@@ -936,21 +936,13 @@ Aquesta regla relacional garanteix de forma asíncrona la poda activa del sistem
 \subsection{El Cicle de Vida de les Alarmes i Consum de Sockets per la Web}
 Un cop es realitza l'escriptura d'una nova alarma en base de dades o el client emet una ordre de canvi, el mòdul del backend llança l'esdeveniment unificat a la cua \texttt{global\_emission\_queue}, des d'on s'extreu per al seu enviament a través del WebSocket d'alta velocitat de notificacions (\texttt{la-core-notifier}).
 
-A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura \ref{fig:ui_alarms}). Les alarmes passen per un cicle d'estats unificat (Figura \ref{fig:state_alarm}) que es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
+A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura \ref{fig:ui_alarms}). Cada operació de l'usuari sobre una alarma (marcar com a llegida, arxivar o eliminar) es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/interficies/alarms.png}
   \caption{Taula de monitoratge d'alarmes en temps real i botons d'assentiment.}
   \label{fig:ui_alarms}
-  \small Font: Elaboració pròpia.
-\end{figure}
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=0.55\textwidth]{figures/state_alarm.png}
-  \caption{Diagrama d'estats del cicle de vida de les alarmes.}
-  \label{fig:state_alarm}
   \small Font: Elaboració pròpia.
 \end{figure}
 
