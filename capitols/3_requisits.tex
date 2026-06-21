@@ -195,18 +195,18 @@ L'autenticació és el flux d'entrada obligatori i prerequisit de tots els casos
     \hline
     \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-00: Autenticació i inici de sessió}                                                                                 \\ \hline
     \textbf{Actor}                          & Administrador / Operador                                                                                                       \\ \hline
-    \textbf{Descripció}                     & L'usuari introdueix les seves credencials per obtenir accés al sistema. El backend les valida, estableix una cookie de sessió segura, i la interfície inicialitza l'estat de l'usuari.                           \\ \hline
+    \textbf{Descripció}                     & L'usuari introdueix les seves credencials per obtenir accés al sistema. El procés és en dues fases: primer es validen les credencials i s'estableix la sessió, i després el sistema resol el rol i els permisos de l'usuari.   \\ \hline
     \textbf{Precondicions}                  & El dispositiu NVR és accessible per xarxa. L'usuari disposa de credencials vàlides al sistema.                                 \\ \hline
     \textbf{Flux Principal}                 &
     1. L'usuari accedeix a l'aplicació; el sistema redirigeix a la pàgina d'inici de sessió. \newline
     2. L'usuari introdueix nom d'usuari i contrasenya. \newline
-    3. El frontend envia les credencials al servei d'autenticació del backend. \newline
-    4. El backend valida les credencials i estableix una cookie de sessió segura, inaccessible des del codi client. \newline
+    3. El backend valida les credencials i estableix una cookie de sessió segura, inaccessible des del codi client. \newline
+    4. El sistema consulta el perfil de l'usuari per obtenir el seu rol i els permisos associats. \newline
     5. La interfície inicialitza l'estat de sessió i redirigeix a la pàgina principal. \newline
     6. S'estableix un canal de notificacions persistent que roman actiu durant tota la sessió.                                                                                     \\ \hline
     \textbf{Flux Alternatiu}                &
-    3a. Si les credencials són incorrectes, el sistema mostra un avís d'accés denegat. L'usuari pot reintentar.                  \\ \hline
-    \textbf{Postcondició}                   & L'usuari té accés a les funcionalitats del sistema d'acord amb el seu rol. La sessió es manté activa automàticament mentre el navegador roman obert.                             \\ \hline
+    3a. Si les credencials són incorrectes, el sistema mostra un avís indicant els intents restants. Després de cinc intents fallits consecutius, el compte queda bloquejat temporalment.  \\ \hline
+    \textbf{Postcondició}                   & L'usuari té accés a les funcionalitats del sistema d'acord amb el seu rol. La sessió es manté activa mitjançant un mecanisme de refresc periòdic; si el client deixa de respondre durant un temps prolongat, el servidor invalida la sessió automàticament.  \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-00.}
   \label{tab:uc_login}
@@ -228,13 +228,13 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
     \textbf{Flux Principal}                 &
     1. L'usuari accedeix al mòdul de Manteniment. \newline
     2. L'usuari selecciona un fitxer de firmware des del seu equip local. \newline
-    3. El sistema valida el format i la mida del fitxer abans de procedir. \newline
-    4. S'inicia la transferència del fitxer al dispositiu. \newline
-    5. El sistema mostra el progrés de la transferència en temps real. \newline
-    6. Un cop finalitzada la transferència, el gravador aplica el nou firmware i es reinicia.                                                                                 \\ \hline
+    3. El sistema valida la signatura, el format i la mida del fitxer abans de procedir. \newline
+    4. S'inicia la transferència del fitxer al dispositiu. La interfície bloqueja totes les accions de configuració i redirigeix qualsevol altre usuari connectat a la pantalla d'actualització. \newline
+    5. El sistema mostra el progrés per fases: transferència, gravació a la partició de reserva i reinici. \newline
+    6. El dispositiu es reinicia. La interfície mostra una pantalla d'espera fins que el dispositiu torna a estar en línia i confirma que l'actualització s'ha completat correctament.  \\ \hline
     \textbf{Flux Alternatiu}                &
-    5a. Si la connexió es talla durant la transferència, el sistema informa de l'error i permet reintentar l'operació.          \\ \hline
-    \textbf{Postcondició}                   & El dispositiu es reinicia amb el nou firmware. La interfície mostra una pantalla d'espera fins que el dispositiu torna a estar en línia. Si l'actualització falla, el dispositiu recupera automàticament la versió anterior de firmware per garantir la continuïtat del servei.                                                    \\ \hline
+    5a. Si es detecta un error durant la gravació (fitxer corrupte o fallada de verificació), el dispositiu recupera automàticament la versió anterior de firmware i torna a estar operatiu. \\ \hline
+    \textbf{Postcondició}                   & El dispositiu funciona amb el nou firmware. La sessió de tots els usuaris es restableix un cop el dispositiu torna a estar en línia.                                               \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-01.}
   \label{tab:uc_firmware}
@@ -250,13 +250,13 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
     \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-02: Cerca de vídeo històric}              \\ \hline
     \textbf{Actor}                          & Operador                                             \\ \hline
     \textbf{Descripció}                     & L'usuari accedeix al mode de reproducció (\textit{Playback}) per consultar el vídeo gravat en una data i hora concreta, navegant per una línia de temps interactiva generada a partir de l'índex de gravacions del gravador. \\ \hline
-    \textbf{Precondicions}                  & Usuari autenticat amb permisos de visualització. El gravador disposa de gravacions per a la data sol·licitada. La llicència del dispositiu permet l'accés a la reproducció d'historials. \\ \hline
+    \textbf{Precondicions}                  & Usuari autenticat amb permís de reproducció i descàrrega. El gravador disposa de gravacions per a la data sol·licitada.         \\ \hline
     \textbf{Flux Principal}                 &
     1. L'usuari activa el mode ``Playback'' des de la vista de càmera. \newline
     2. El frontend sol·licita al backend l'índex de gravacions per a una data concreta. \newline
     3. La interfície mostra una línia de temps amb codificació de colors per tipus de gravació (contínua, per alarma). \newline
     4. L'usuari fa clic en un punt de la línia de temps. \newline
-    5. El reproductor inicia la càrrega del fragment de vídeo corresponent al punt seleccionat. \\ \hline
+    5. El reproductor HLS inicia la càrrega del fragment de vídeo corresponent al punt seleccionat. \\ \hline
     \textbf{Flux Alternatiu}                &
     2a. Si no hi ha gravacions per a la data seleccionada, el sistema informa l'usuari i la línia de temps es mostra buida. \newline
     5a. Si el fragment sol·licitat no és accessible (corrupte o esborrat), el reproductor salta al fragment disponible més proper i n'informa l'usuari. \\ \hline
