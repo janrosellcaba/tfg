@@ -110,7 +110,7 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 \begin{itemize}
   \item \textbf{RF-1.1 Autenticació:} El sistema ha de validar les credencials contra el servei \textit{Core Legacy}.
   \item \textbf{RF-1.2 Sessió Persistent:} Mantenir la sessió activa mitjançant un mecanisme de \textit{keep-alive} que refresqui la cookie de sessió cada 60 segons.
-  \item \textbf{RF-1.3 Control de Concurrència:} El sistema ha de demanar un bloqueig d'escriptura quan un administrador entri en mode edició. Si un altre usuari intenta editar, el sistema mostrarà un avís de "Només Lectura".
+  \item \textbf{RF-1.3 Control de Concurrència:} El sistema ha de demanar un bloqueig d'escriptura quan un administrador entri en mode edició. Si un altre usuari intenta editar, el sistema mostrarà un avís de ``Només Lectura''.
 \end{itemize}
 
 \subsection{RF-2: Visualització Multimèdia}
@@ -123,7 +123,7 @@ A continuació es detallen els requisits tècnics dividits per blocs funcionals.
 \subsection{RF-3: Motor de Configuració Dinàmica}
 Aquest és el requisit funcional més complex i innovador del sistema. El seu principi fonamental és el \textit{schema-driven design}: el gravador dicta l'estructura de la interfície mitjançant esquemes JSON, de manera que el frontend es desacobla completament de la lògica de baix nivell del maquinari.
 \begin{itemize}
-  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El frontend ha de processar l'esquema JSON rebut del backend i renderitzar dinàmicament el component visual adequat per a cada paràmetre (camp de text, llista desplegable, \textit{slider} numèric), aplicant les restriccions de tipus, rang i format (\textit{regex}) definides a l'esquema sense requerir canvis al codi del frontend.
+  \item \textbf{RF-3.1 Interpretació de l'Esquema:} El frontend ha de processar l'esquema JSON rebut del backend i renderitzar dinàmicament el component visual adequat per a cada paràmetre (camp de text, llista desplegable, \textit{slider} numèric). Les restriccions de tipus, rang i format (\textit{regex}) definides a l'esquema s'apliquen automàticament, sense requerir canvis al codi del frontend.
   \item \textbf{RF-3.2 Validació en temps real:} Qualsevol restricció declarada a l'esquema (\texttt{\_min}, \texttt{\_max}, \texttt{\_regex}, \texttt{\_allowedValues}) ha de ser compilada i validada pel motor del frontend abans d'enviar cap petició al backend.
 \end{itemize}
 
@@ -169,7 +169,7 @@ Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
 
 \subsection{RNF-3: Compatibilitat i Portabilitat}
 \begin{itemize}
-  \item \textbf{RNF-3.1 Multi-navegador:} Compatible amb les últimes dues versions de Google Chrome, Mozilla Firefox i Microsoft Edge.
+  \item \textbf{RNF-3.1 Multi-navegador:} Compatible amb les darreres dues versions de Google Chrome, Mozilla Firefox i Microsoft Edge.
   \item \textbf{RNF-3.2 Responsive Design:} La interfície ha de ser plenament operativa en resolucions des de 1024px d'amplada (tauletes de manteniment) fins a 4K (centres de control).
 \end{itemize}
 
@@ -212,7 +212,6 @@ L'autenticació és el flux d'entrada obligatori i prerequisit de tots els casos
   \label{tab:uc_login}
 \end{table}
 
-\clearpage
 \subsection{UC-01: Gestió de l'actualització de firmware}
 Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 
@@ -240,7 +239,6 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
   \label{tab:uc_firmware}
 \end{table}
 
-\clearpage
 \subsection{UC-02: Consulta de gravacions mitjançant Timeline}
 \begin{table}[htbp]
   \centering
@@ -293,7 +291,7 @@ Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de
 \subsection{Llei de Seguretat Privada i Norma UNE-EN 62676}
 El disseny tècnic actua com un element facilitador perquè les entitats de seguretat compleixin amb la \textbf{Llei 5/2014 de Seguretat Privada} a Espanya, així com amb l'estàndard tècnic europeu \textbf{UNE-EN 62676} sobre sistemes de videovigilància per a aplicacions de seguretat:
 \begin{itemize}
-  \item \textbf{Control de caducitat i esborrat automàtic:} El sistema permet configurar de manera dinàmica les polítiques d'emmagatzematge per garantir que les gravacions es sobreescriuen automàticament en un període màxim de \textbf{30 dies}, complint rigorosament amb el límit d'emmagatzematge fixat per la Llei de Seguretat Privada i l'Agència Espanyola de Protecció de Dades (AEPD), excepte en cas de requeriment judicial.
-  \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació compta amb un servei de registre d'activitat inalterable que monitoritza i audita les accions dels usuaris (qui ha visualitzat quina càmera, en quines dates i hores, i si s'han realitzat descàrregues de vídeo), assegurant la traçabilitat exigida per a la custòdia d'evidències gràfiques.
+  \item \textbf{Control de caducitat i esborrat automàtic:} El sistema permet configurar de manera dinàmica les polítiques d'emmagatzematge per garantir que les gravacions es sobreescriuen automàticament en un període màxim de \textbf{30 dies}, en compliment estricte del límit d'emmagatzematge fixat per la Llei de Seguretat Privada i l'Agència Espanyola de Protecció de Dades (AEPD), excepte en cas de requeriment judicial.
+  \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació compta amb un servei de registre d'activitat inalterable que monitoritza i audita les accions dels usuaris (qui ha visualitzat quina càmera, en quines dates i hores, i si s'han realitzat descàrregues de vídeo), cosa que assegura la traçabilitat exigida per a la custòdia d'evidències gràfiques.
 \end{itemize}
 Malgrat aquestes facilitats tècniques, el compliment final de la normativa depèn de la configuració i l'ús real que l'entitat de seguretat privada faci del sistema en la instal·lació del client.
