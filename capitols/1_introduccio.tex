@@ -22,31 +22,32 @@ Paral·lelament, Lanaccess ha identificat una \textbf{necessitat de mercat addic
 \section{Estat de l'art i alternatives existents}
 
 \subsection{Estat de l'art}
-Actualment, el mercat de la videovigilància IP està dominat per grans fabricants com Hikvision o Dahua, que ofereixen interfícies web integrades. El principal inconvenient d'aquestes solucions és que sovint encara depenen de protocols propietaris o de la instal·lació de \textit{plugins} externs (com els antics ActiveX o extensions específiques) per poder visualitzar el vídeo, cosa que limita la seva compatibilitat a navegadors o sistemes operatius concrets.
+El mercat de la videovigilància IP és un dels sectors tecnològics de major creixement, en el qual fabricants com Hikvision i Dahua han assolit una posició de lideratge gràcies a dispositius d'alt rendiment i cost competitiu \cite{ihs_video_surveillance}. Les seves solucions incorporen interfícies web integrades als videogravadors, però sovint requereixen la instal·lació de \textit{plugins} propietaris per a la visualització de vídeo, fet que limita la seva compatibilitat a navegadors específics i planteja riscos de seguretat corporativa.
 
-Aquesta dependència està desapareixent amb la tendència actual cap al \textbf{Plugin-free video}. L'aparició d'estàndards com \textbf{WebRTC} \cite{rfc8825} ha suposat un punt d'inflexió, permetent la transmissió de fluxos multimèdia d'alta fidelitat i baixa latència de forma nativa en el navegador, eliminant les barreres de seguretat i instal·lació que imposaven les tecnologies anteriors. L'ús de WebRTC en aquest projecte és clau per eliminar la dependència de transcodificadors pesats al servidor, delegant part de l'esforç de descodificació al client mitjançant la seva GPU. Cal destacar que el disseny \textit{Plugin-free} respon a una necessitat imperativa de seguretat corporativa: la gran majoria d'organitzacions i corporacions bloquegen, per política interna, la instal·lació d'executables o \textit{plugins} a les estacions de treball dels operadors per evitar vectors d'atac. L'accés via navegadors web moderns, en canvi, és plenament permès i auditat, cosa que converteix la solució \textit{Plugin-free} en un requisit de compliment de seguretat fonamental per a grans infraestructures.
+Aquesta limitació reflecteix una tendència de canvi estructural del sector cap al \textbf{vídeo \textit{plugin-free}}. L'aparició d'estàndards oberts com \textbf{WebRTC} \cite{rfc8825} i \textbf{HLS} \cite{hls_apple} ha suposat un punt d'inflexió: permeten la transmissió de fluxos multimèdia de baixa latència i la reproducció d'enregistraments de forma nativa al navegador, sense extensions externes. Paral·lelament, la gran majoria d'organitzacions bloquegen per política interna la instal·lació de \textit{plugins} a les estacions de treball dels operadors per evitar vectors d'atac, fet que converteix el \textit{plugin-free} en un requisit de compliment de seguretat corporativa per a grans infraestructures.
 
-D'altra banda, els líders de programari VMS (\textit{Video Management System}) com Milestone o Genetec ofereixen solucions molt potents però amb arquitectures extremadament pesades i costos de llicenciament elevats, enfocades sovint a clients amb gran capacitat de còmput local. La proposta de \textit{Web Core View} es diferencia per ser una solució \textit{embedded-first}, on el servidor web corre directament en el hardware de gravació.
+D'altra banda, les plataformes VMS (\textit{Video Management System}) de gamma alta, com Milestone XProtect \cite{milestone_xprotect} o Genetec Security Center \cite{genetec_security_center}, ofereixen solucions modulars i molt potents, però requereixen una infraestructura de servidors dedicada, costos de llicenciament per canal elevats i personal TI especialitzat. Estan orientades a grans instal·lacions corporatives i no contemplen un model de desplegament autònom en un únic NVR sense servidors addicionals.
 
 \subsection{Taula comparativa}
-A la Taula \ref{tab:comparativa_mercat} es mostra una comparació entre l'aplicació web \textit{legacy} anterior, els líders de mercat i la proposta de Web Core View.
+La Taula~\ref{tab:comparativa_mercat} compara les dues categories de solucions de mercat predominants, la plataforma \textit{legacy} i la proposta de Web Core View, diferenciant entre fabricants de maquinari (Hikvision/Dahua) i plataformes VMS d'empresa (Milestone/Genetec).
 
 \begin{table}[h!]
   \centering
-  \caption{Comparativa de solucions de mercat.}
+  \caption{Comparativa de solucions de videovigilància web.}
   \label{tab:comparativa_mercat}
   \resizebox{\textwidth}{!}{
-    \begin{tabular}{@{}llll@{}}
+    \begin{tabular}{@{}lllll@{}}
       \toprule
-      \textbf{Característica} & \textbf{Web Legacy (ActiveX)} & \textbf{Market Leaders}    & \textbf{Web Core View}                     \\ \midrule
-      Accessibilitat          & Baixa (IE / ActiveX)          & Mitjana (\textit{Plugins}) & \textbf{Alta (Navegador)}                  \\
-      Manteniment             & Difícil (Obsoleta)            & Complex (Servidors)        & \textbf{Fàcil (Centralitzat)}              \\
-      Interfície (UX)         & Obsoleta (anys 90)            & Professional/Complexa      & \textbf{Moderna i Intuïtiva}               \\
-      Configuració            & Estàtica                      & Propietària                & \textbf{Dinàmica (\textit{Schema-driven} per microserveis)} \\ \bottomrule
+      \textbf{Característica} & \textbf{Web Legacy (ActiveX)} & \textbf{Hikvision / Dahua} & \textbf{VMS (Milestone / Genetec)} & \textbf{Web Core View} \\ \midrule
+      Accés web          & IE / ActiveX (obsolet)  & Parcial (\textit{plugins}) & App dedicada / client ric     & \textbf{Navegador modern}              \\
+      Protocol de vídeo  & RTSP via ActiveX        & RTSP / H.264               & RTSP / RTMP                   & \textbf{WebRTC / HLS}                  \\
+      Configuració       & Estàtica                & Fixa per model             & Propietària                   & \textbf{Dinàmica (\textit{Schema-driven})} \\
+      Cost / llicències  & N/A (intern)            & Inclòs en hardware         & Alt (per canal/càmera)        & \textbf{Inclòs al NXT}                 \\
+      Desplegament       & Servidor centralitzat   & Servidor centralitzat      & Servidors dedicats            & \textbf{Autònom (\textit{embedded})}   \\ \bottomrule
     \end{tabular}
   }
   \par\smallskip
-  \small Font: Elaboració pròpia.
+  \small Font: Elaboració pròpia a partir de la documentació pública dels fabricants \cite{milestone_xprotect, genetec_security_center}.
 \end{table}
 
 \section{Anàlisi d'alternatives i justificació de la solució}
