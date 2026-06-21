@@ -266,7 +266,7 @@ Aquest cas d'ús és crític per al manteniment del parc de gravadors.
 \section{Restriccions del sistema}
 El desenvolupament s'ha de cenyir a les següents limitacions:
 \begin{itemize}
-  \item \textbf{Seguretat:} Per evitar atacs \textit{Cross-Site Scripting} (XSS) i \textit{Cross-Site Request Forgery} (CSRF), no s'utilitzen cookies llegibles per JavaScript ni el \textit{LocalStorage} del navegador per emmagatzemar dades de sessió. La sessió es gestiona mitjançant cookies segures inaccessibles des del codi client, de manera que cap \textit{script} de la pàgina pot llegir ni modificar les credencials. L'estat d'autenticació al \textit{frontend} es manté únicament en memòria.
+  \item \textbf{Seguretat:} Per evitar atacs \textit{Cross-Site Scripting} (XSS) i \textit{Cross-Site Request Forgery} (CSRF)~\cite{owasp_top10}, no s'utilitzen cookies llegibles per JavaScript ni el \textit{LocalStorage} del navegador per emmagatzemar dades de sessió. La sessió es gestiona mitjançant cookies segures inaccessibles des del codi client, de manera que cap \textit{script} de la pàgina pot llegir ni modificar les credencials. L'estat d'autenticació al \textit{frontend} es manté únicament en memòria.
   \item \textbf{Same-Origin Policy:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
   \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}

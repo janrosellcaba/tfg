@@ -5,7 +5,7 @@ L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de mo
 
 \section{Arquitectura Global del Sistema}
 
-L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microserveis interns coordinats dins del sistema operatiu del gravador. La plataforma interactua amb els serveis crítics següents, que s'executen en l'entorn \textit{embedded}:
+L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microserveis interns coordinats~\cite{microservices_newman} dins del sistema operatiu del gravador. La plataforma interactua amb els serveis crítics següents, que s'executen en l'entorn \textit{embedded}:
 
 \begin{itemize}
     \item \textbf{la-core-legacy:} El nucli central del sistema. Gestiona la configuració del gravador (API REST), l'autenticació i autorització d'usuaris, els bloquejos de recursos (\textit{locks}) i la coordinació del cicle de vida de la resta de serveis.
@@ -13,7 +13,7 @@ L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microse
     \item \textbf{la-db-engine:} Passarel·la de persistència lògica. Implementa un \textit{Virtual File System} (VFS) personalitzat de SQLite que, en lloc d'operar sobre fitxers físics, redirigeix totes les lectures i escriptures a través de \textit{sockets} Unix cap a \textbf{la-video-engine}. Exposa una interfície \textbf{gRPC} als seus clients i no té permisos directes sobre el disc.
     \item \textbf{la-core-notifier:} Passarel·la de WebSockets per a notificacions generals del sistema. Es subscriu al bus \textbf{D-Bus} per detectar esdeveniments de maquinari —com pèrdues de senyal de vídeo o canvis d'estat de càmera— i els retransmet immediatament al \textit{frontend} via WSS.
     \item \textbf{la-core-alarm:} Passarel·la de WebSockets especialitzada en alarmes. Es comunica amb \textbf{la-db-engine} via \textbf{gRPC} per persistir els registres d'events, i escolta el \textbf{D-Bus} per detectar activacions de sensors i relés, transmetent-les en temps real al client.
-    \item \textbf{MediaMTX:} Servidor multimèdia de codi obert que actua com a motor de \textit{streaming} de vídeo en temps real. Rep els fluxos de les càmeres des de \textbf{la-video-engine} i els redistribueix als clients via dos protocols diferenciats: \textbf{WebRTC} (transport SRTP/UDP negociat per ICE), i \textbf{HLS} (\textit{HTTP Live Streaming}).
+    \item \textbf{MediaMTX:} Servidor multimèdia de codi obert que actua com a motor de \textit{streaming} de vídeo en temps real. Rep els fluxos de les càmeres des de \textbf{la-video-engine} i els redistribueix als clients via dos protocols diferenciats: \textbf{WebRTC} (transport SRTP~\cite{rfc3711}/UDP negociat per ICE~\cite{rfc8445}), i \textbf{HLS} (\textit{HTTP Live Streaming}).
 \end{itemize}
 
 Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy}, i connexions WebSocket segures (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
@@ -215,7 +215,7 @@ Des d'aquest node arrel, el \textit{router} desplega de forma mandrosa (\textit{
 Finalment, les dependències transversals es representen amb línies discontínues: els \textbf{Core Services \& Guards} s'injecten a les rutes autenticades, proporcionant la lògica de negoci i la gestió d'estat; els \textbf{Shared Components} s'importen allà on cal, evitant la duplicació de codi i garantint la coherència visual de la interfície.
 
 \subsection{Gestió de l'Estat}
-Aquest és un punt d'inflexió respecte a les versions anteriors del programari. Mentre que RxJS és excel·lent per a fluxos de dades complexos, \textbf{Angular Signals} permet una reactivitat granular \cite{learning_angular}.
+Aquest és un punt d'inflexió respecte a les versions anteriors del programari. Mentre que RxJS~\cite{rxjs_docs} és excel·lent per a fluxos de dades complexos, \textbf{Angular Signals} permet una reactivitat granular \cite{learning_angular}.
 \begin{itemize}
     \item \textbf{Eficiència:} En un sistema de vigilància on els estats de les càmeres canvien constantment, els \textit{Signals} asseguren que només es torni a renderitzar la part mínima de l'arbre del DOM afectada, reduint dràsticament l'ús de CPU al terminal del client.
     \item \textbf{Sincronització:} Els valors calculats (\textit{computed signals}) faciliten que la interfície s'adapti automàticament a canvis en el \textit{lock} de configuració o en l'estat de connectivitat informat pel \textit{Keep-alive}.
