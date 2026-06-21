@@ -29,9 +29,9 @@ Aquesta assignatura de l'especialitat ha estat fonamental per al disseny estruct
 Aquesta àrea conté les bases estructurals i de qualitat per al desenvolupament de codi robust.
 
 \subsection{Introducció a l'Enginyeria del Software (IES)}
-IES ha aportat el marc conceptual fonamental per al disseny lògic i la modulació del codi del projecte. S'han aplicat els principis de disseny \textbf{SOLID} \cite{solid_principles} per assegurar que els serveis i components d'Angular estiguin altament desacoblats, siguin reutilitzables i fàcils de mantenir. Així mateix, el modelatge estructurat mitjançant diagrames UML (com els diagrames de seqüència, d'activitat i de classes utilitzats al llarg de la memòria) ha estat indispensable per analitzar les dependències lògiques abans de procedir a la fase d'implementació.
+IES ha aportat el marc conceptual fonamental per al disseny lògic i la modulació del codi del projecte. S'han aplicat els principis de disseny \textbf{SOLID} \cite{solid_principles} per assegurar que els serveis i components d'Angular estiguin desacoblats, reutilitzables i fàcils de mantenir. Així mateix, el modelatge amb diagrames UML (seqüència, activitat i classes) ha estat indispensable per analitzar les dependències lògiques abans de la fase d'implementació.
 
-\section{Core d'Enginyeria Informàtica (Troncals i Comuns)}
+\section[Core d'Enginyeria Informàtica (Troncals i Comuns)]{Core d'Enginyeria Informàtica\\(Troncals i Comuns)}
 Les assignatures troncals de la carrera han ofert el fonament tècnic que ha permès implementar els diferents protocols, algoritmes i interaccions de baix nivell del sistema.
 
 \subsection{Projecte de Programació (PROP)}
@@ -44,7 +44,7 @@ Els conceptes fonamentals del model relacional i de llenguatges de consulta s'ha
 Atès que \textit{Web Core View} és una aplicació de gestió remota de dispositius de seguretat en xarxa, XC ha estat crucial per dissenyar la infraestructura de comunicacions. S'ha hagut de gestionar amb precisió la pila de protocols d'internet, prenent decisions basades en la naturalesa del transport:
 \begin{itemize}
   \item \textbf{TCP (Fiabilitat):} Emprat per al trànsit de configuracions via consultes REST (HTTP), el canal bidireccional en temps real per a senyalització i esdeveniments (WebSockets/WSS) i la reproducció de vídeo hereditària mitjançant HLS en navegadors antics.
-  \item \textbf{UDP (Baixa Latència):} Utilitzat a través del protocol de transport segur SRTP en \textbf{WebRTC}. XC va donar la base tècnica per comprendre la negociació de fluxos multimèdia (\textbf{SDP}) i la superació de restriccions de xarxa a través de tallafocs utilitzant protocols ICE, STUN i TURN.
+  \item \textbf{UDP (Baixa Latència):} Utilitzat a través del protocol de transport segur SRTP en \textbf{WebRTC}. XC va donar la base tècnica per comprendre la negociació de fluxos multimèdia (\textbf{SDP}) i els mecanismes de resolució de candidats d'adreces mitjançant el protocol \textbf{ICE}.
 \end{itemize}
 
 \subsection{Sistemes Operatius (SO)}
@@ -68,7 +68,7 @@ El projecte resol un repte d'integració de múltiples tecnologies heterogènies
 Web Core View és una aplicació clarament distribuïda on el navegador executa la lògica de presentació i dades dinàmiques que interaccionen amb servidors de gravació remots. S'han aplicat i avaluat protocols de xarxa distribuïts com WebSockets asíncrons (WSS) per mantenir la sincronització en temps real d'esdeveniments d'alarmes, i el protocol WebRTC basat en l'encapsulació SRTP sobre UDP per resoldre l'enviament distribuït de fluxos de vídeo. A més, s'han gestionat rigorosament les capçaleres de seguretat distribuïda CORS i polítiques de Same-Origin a NGINX.
 
 \noindent \textbf{CES3.1: Desenvolupar serveis i aplicacions multimèdia.}\\
-El nucli del valor operatiu del projecte és la gestió multimèdia. S'ha desenvolupat i avaluat un motor de reproducció integrat al navegador capaç de commutar entre dos fluxos: vídeo en directe de molt baixa latència (WebRTC) mitjançant negociació SDP asíncrona i navegació de tallafocs per canals ICE (STUN/TURN), i vídeo històric sota la tecnologia HLS (HTTP Live Streaming) emprant la llibreria HLS.js. S'ha treballat en l'optimització de còdecs H.264 i la integració del buffer d'Angular per suportar de forma eficient el processament del format H.265 sense requerir endolls (\textit{plugins}) de navegadors antics.
+El nucli del valor operatiu del projecte és la gestió multimèdia. S'ha desenvolupat i avaluat un motor de reproducció integrat al navegador capaç de commutar entre dos fluxos: vídeo en directe de molt baixa latència (WebRTC) mitjançant negociació SDP asíncrona per ICE, i vídeo històric sota la tecnologia HLS (HTTP Live Streaming) emprant la llibreria HLS.js. S'ha treballat en l'optimització de còdecs H.264 i la integració del buffer d'Angular per suportar de forma eficient el processament del format H.265 sense requerir endolls (\textit{plugins}) de navegadors antics.
 
 \subsection{Competències assolides en un nivell notable (Bastant)}
 

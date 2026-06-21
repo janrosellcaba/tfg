@@ -8,6 +8,8 @@ Aquest Treball de Final de Grau (TFG) consisteix en el disseny i desenvolupament
 
 El treball s'emmarca dins de la \textbf{Modalitat B} del TFG i de l'especialitat d'Enginyeria de Software, posant èmfasi en arquitectures \textit{frontend} i \textit{backend} modernes, seguretat en la comunicació i integració de protocols. L'objectiu és modernitzar la plataforma tecnològica de l'empresa, substituint l'aplicació web \textit{legacy} construïda als anys 90 amb tecnologies avui obsoletes (\textbf{ActiveX}) per una interfície de control i administració \textit{embedded} que s'executa directament al propi videogravador NXT, basada en l'ecosistema Angular i protocols estàndard oberts (WebRTC, HLS, WSS).
 
+El projecte s'ha desenvolupat durant el curs acadèmic 2025--2026 en col·laboració continuada amb l'equip tècnic de Lanaccess. La planificació s'ha gestionat amb una metodologia àgil basada en \textbf{Kanban}; els detalls de la planificació i el pressupost s'exposen al Capítol~\ref{ch:gestio}.
+
 \section{Identificació del problema i motivació}
 La plataforma \textit{legacy} de Lanaccess és una aplicació web construïda als anys 90 que depenia en la seva totalitat dels controls \textbf{ActiveX} de Microsoft per a la visualització de vídeo i la interacció amb el maquinari. Amb la retirada oficial del suport a Internet Explorer 11 per part de Microsoft el juny del 2022 \cite{microsoft_ie11_eol}, l'últim navegador capaç d'executar controls ActiveX va quedar obsolet, fent la plataforma pràcticament inoperativa per a qualsevol instal·lació moderna. Aquesta obsolescència es concreta en tres problemes fonamentals:
 
@@ -19,9 +21,7 @@ La plataforma \textit{legacy} de Lanaccess és una aplicació web construïda al
 
 Paral·lelament, Lanaccess ha identificat una \textbf{necessitat de mercat addicional}: oferir una solució de gestió autònoma orientada a \textbf{empreses petites} amb un únic videogravador NXT. El model anterior era una aplicació web centralitzada, allotjada en un servidor intern de la instal·lació, que gestionava simultàniament tot el parc de dispositius d'una gran infraestructura. Aquesta arquitectura resulta sobredimensionada i innecessàriament complexa per a clients amb una sola unitat de gravació. Així, \textit{Web Core View} neix amb una doble finalitat: modernitzar la plataforma tecnològica obsoleta i, alhora, proporcionar una solució \textit{embedded} lleugera que s'executi directament en el propi videogravador NXT, permetent la gestió autònoma de l'equip des de qualsevol navegador sense requerir infraestructura centralitzada addicional.
 
-\section{Estat de l'art i alternatives existents}
-
-\subsection{Estat de l'art}
+\section{Estat de l'art}
 El mercat de la videovigilància IP és un dels sectors tecnològics de major creixement, en el qual fabricants com Hikvision i Dahua han assolit una posició de lideratge gràcies a dispositius d'alt rendiment i cost competitiu \cite{ihs_video_surveillance}. Les seves solucions incorporen interfícies web integrades als videogravadors, però sovint requereixen la instal·lació de \textit{plugins} propietaris per a la visualització de vídeo, fet que limita la seva compatibilitat a navegadors específics i planteja riscos de seguretat corporativa.
 
 Aquesta limitació reflecteix una tendència de canvi estructural del sector cap al \textbf{vídeo \textit{plugin-free}}. L'aparició d'estàndards oberts com \textbf{WebRTC} \cite{rfc8825} i \textbf{HLS} \cite{hls_apple} ha suposat un punt d'inflexió: permeten la transmissió de fluxos multimèdia de baixa latència i la reproducció d'enregistraments de forma nativa al navegador, sense extensions externes. Paral·lelament, la gran majoria d'organitzacions bloquegen per política interna la instal·lació de \textit{plugins} a les estacions de treball dels operadors per evitar vectors d'atac, fet que converteix el \textit{plugin-free} en un requisit de compliment de seguretat corporativa per a grans infraestructures.
@@ -124,45 +124,97 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
 \end{itemize}
 
 \section{Solució proposada i valor afegit}
-\textbf{Web Core View} es proposa com una solució integral que aprofita les noves funcionalitats de rendiment d'\textbf{Angular 19}. L'elecció d'aquesta versió respon a la voluntat d'utilitzar tecnologies actualitzades i de llarg suport. Les aportacions clau de la solució proposada són:
+\label{sec:solucioproposada}
+\textbf{Web Core View} es proposa com una solució integral construïda sobre \textbf{Angular 19} i el seu nou paradigma de reactivitat. L'elecció d'aquesta versió específica no és arbitrària: és la primera que incorpora \textbf{Signals} \cite{angular_signals} com a primitiva nativa de reactivitat granular, elimina la dependència de \textit{Zone.js} per al \textit{change detection} (\textit{zoneless rendering}), introdueix els blocs \texttt{@defer} per a la càrrega diferida de components sota demanda, i consolida els components autònoms (\textit{standalone}). En un dispositiu \textit{embedded} on la CPU comparteix prioritat amb la descodificació de vídeo, cadascuna d'aquestes característiques es tradueix en menys cicles de processament per a la interfície. Les aportacions clau de la solució proposada són:
 \begin{itemize}
-  \item \textbf{Arquitectura Schema-driven:} La interfície interpreta un esquema JSON enviat pel gravador i genera automàticament els controls de configuració, assegurant compatibilitat amb qualsevol versió de hardware.
-  \item \textbf{Gestió d'estat amb Signals:} L'ús d'\textbf{Angular Signals} representa un canvi de paradigma en la reactivitat. Aquesta funcionalitat permet una gestió granular dels canvis, optimitzant el rendiment del \textit{frontend} i garantint una fluïdesa absoluta fins i tot amb múltiples fluxos de vídeo simultanis, evitant sobrecàrregues de CPU innecessàries al terminal del client.
-  \item \textbf{Control de concurrència:} Implementació d'un servei de bloqueig en temps real per evitar conflictes d'edició entre administradors.
-  \item \textbf{Arquitectura d'esdeveniments:} Ús de \textit{WebSockets} (WSS) per rebre notificacions d'alarmes, notificacions del sistema i errors de forma immediata.
-  \item \textbf{Desplegament autònom (single-NVR):} L'aplicació s'executa directament dins del propi videogravador NXT com a servidor web \textit{embedded}. Això permet que empreses petites amb un únic dispositiu puguin gestionar-lo de forma completa i autònoma des de qualsevol navegador, sense necessitat d'infraestructura centralitzada addicional ni de programari extern. Aquesta capacitat obre un nou segment de mercat per a Lanaccess que la plataforma \textit{legacy} anterior no podia cobrir.
+  \item \textbf{Arquitectura Schema-driven:} La interfície interpreta un esquema JSON enviat pel gravador i genera automàticament els controls de configuració, assegurant compatibilitat amb qualsevol versió de hardware i de \textit{firmware} sense modificar el codi del \textit{frontend}.
+  \item \textbf{Gestió d'estat amb Signals:} L'ús d'\textbf{Angular Signals} permet una gestió granular dels canvis d'estat, eliminant les comprovacions globals de \textit{Zone.js} i optimitzant el rendiment fins i tot amb múltiples fluxos de vídeo simultanis actius.
+  \item \textbf{Control de concurrència (Config Lock):} La configuració distribuïda entre múltiples usuaris es gestiona mitjançant un protocol de \textbf{bloqueig distribuït}: quan un usuari obre un node de configuració, el \textit{backend} li atorga un bloqueig exclusiu amb un temps de vigència (\texttt{expiresIn}) de 30 o 120 segons, depenent del tipus de node. El \textit{frontend} el renova automàticament a la meitat del seu període de vigència, fora de \textit{Zone.js}. El \textit{backend} allibera el bloqueig automàticament si el client perd la connexió, i l'administrador pot forçar-ne l'alliberament amb el paràmetre \texttt{force=true}, garantint que cap sessió defectuosa bloquegi indefinidament la configuració del sistema.
+  \item \textbf{Seguretat de sessió (cookies \texttt{HttpOnly}/\texttt{Secure}):} Les credencials de sessió no s'emmagatzemen mai al \textit{LocalStorage} ni al \textit{SessionStorage}: NGINX gestiona la \textit{cookie} de sessió amb els atributs \texttt{HttpOnly} i \texttt{Secure}, fent-la inaccessible des de JavaScript. L'estat de sessió es manté en un Signal privat en memòria (zero-persistència), eliminant el vector d'atac XSS sobre les credencials, en línia amb les recomanacions de l'OWASP.
+  \item \textbf{Arquitectura d'esdeveniments en temps real:} Ús de \textbf{WebSockets} (WSS) per als dos canals bidireccionals amb el \textit{backend}: el canal de notificacions globals del sistema i el canal d'alarmes, que permet tant rebre alertes com confirmar-ne la lectura des del client.
+  \item \textbf{Desplegament autònom (\textit{embedded}):} El \textit{build} de producció d'Angular genera un conjunt d'actius estàtics (HTML, CSS, JS) que NGINX serveix directament des de la partició del firmware del NXT, sense cap servidor addicional. Els blocs \texttt{@defer} d'Angular 19 mantenen el paquet inicial reduït, adequat per al hardware limitat del dispositiu. Aquesta arquitectura fa possible que \textbf{Web Core View} funcioni de forma completament autònoma en un únic NVR, obrint el segment de petites empreses que la plataforma \textit{legacy} no podia atendre.
 \end{itemize}
 
 \section{Objectius del projecte}
 \subsection{Objectiu general}
-Dissenyar i desenvolupar una consola de gestió web modular, reactiva i d'alt rendiment que centralitzi la gestió tècnica i operativa dels NVRs NXT de Lanaccess, substituint la plataforma web \textit{legacy} dels anys 90 i les seves tecnologies obsoletes (ActiveX) per una arquitectura i interfície completament modernes.
+Dissenyar i implementar el sistema \textbf{Web Core View} en la seva totalitat: el \textit{frontend} Angular 19 (interfície web de gestió modular, reactiva i d'alt rendiment), la integració amb els microserveis C++ del \textit{backend} de Lanaccess (\texttt{la-core-legacy}, \texttt{la-core-alarm}, \texttt{la-core-notifier}, \texttt{video-engine}), la capa de comunicació en temps real (WebSockets WSS, WebRTC SRTP/UDP, HLS) i la infraestructura de desplegament \textit{embedded} (NGINX com a \textit{proxy} invers, gestió de sessions i política \textit{same-origin}). Tot plegat ha de substituir la plataforma web \textit{legacy} dels anys 90, basada en controls ActiveX avui incompatibles, per una arquitectura i interfície completament modernes.
 
 \subsection{Objectius específics}
+Els objectius específics es classifiquen en \textbf{obligatoris} (necessaris per a la validació del projecte) i \textbf{desitjables} (d'alt valor però no blocants per a l'entrega).
+
+\noindent\textbf{Obligatoris:}
 \begin{itemize}
-  \item Desenvolupar un motor de configuració dinàmic basat en esquemes metadada.
-  \item Integrar un mòdul de visualització híbrid compatible amb WebRTC i HLS (H264/H265).
-  \item Implementar la gestió d'alarmes en temps real mitjançant comunicació bidireccional.
-  \item Facilitar el manteniment remot (\textit{firmware}, llicències i logs) via navegador.
-  \item Dissenyar l'aplicació com una solució autònoma \textit{embedded} capaç de funcionar directament en un únic NVR NXT (\textit{single-NVR}), sense dependència de servidors centralitzats, per cobrir el segment d'empreses petites.
+  \item Desenvolupar un motor de configuració dinàmic basat en \textbf{esquemes de metadades} enviats pel \textit{backend}, que renderitzi automàticament els controls adequats sense conèixer el model de hardware ni la versió de \textit{firmware}.
+  \item Integrar un mòdul de visualització híbrid: \textbf{WebRTC} per al vídeo en directe (latència $<$300~ms) i \textbf{HLS} per a la reproducció de gravacions, coordinant-se amb el servidor de segments HLS implementat al \textit{backend} en C++; incloent un \textbf{panell de cerca de gravacions} amb selector de càmera, calendari de disponibilitat i \textit{Timeline} interactiu codificat per colors (gravació contínua vs.\ per esdeveniment).
+  \item Implementar un \textbf{sistema d'alarmes} complet: recepció d'alertes en temps real via \textbf{WebSockets} (WSS), i un panell de gestió amb filtratge, historial i cicle de vida complet (activa $\to$ confirmada $\to$ resolta).
+  \item Facilitar el manteniment remot via navegador: actualització de \textit{firmware} (fitxer \texttt{.bin}), \textbf{gestió de llicències} (consulta de l'estat legal i operatiu del sistema —nombre màxim de canals permesos i vigència— i activació o renovació de la llicència), i un \textbf{visor de registres d'auditoria} conforme a la norma UNE-EN~62676, amb navegació per calendari, filtratge per paraula clau i exportació en format CSV.
+  \item Implementar una capa de seguretat transversal: autenticació d'usuaris, control d'accés per rols (operador/administrador), gestió de sessions mitjançant cookies \texttt{HttpOnly}/\texttt{Secure} i política \textit{same-origin} centralitzada per NGINX.
+  \item Dissenyar l'aplicació com una solució autònoma \textit{embedded} capaç de funcionar directament en un únic NVR NXT (\textit{single-NVR}), sense dependència de servidors centralitzats.
+\end{itemize}
+
+\noindent\textbf{Desitjables:}
+\begin{itemize}
+  \item Proporcionar una interfície completament internacionalitzada (EN/ES/FR) per adaptar l'aplicació a clients de mercats europeus sense modificar el codi base.
+  \item Reimplementar en Angular el mòdul de \textbf{Wizards} (assistents d'instal·lació guiats pas a pas): detecció automàtica de càmeres IP per ONVIF, assignació de canals i segmentació de xarxa. La solució actual adapta visualment l'eina \textit{legacy} via CSS; l'objectiu desitjable és una implementació Angular nativa amb validació reactiva.
+  \item Desenvolupar un \textbf{tauler de \textit{Reports}} (estat i monitorització global): una pàgina de resum de l'estat de tots els subsistemes del NVR (canals de vídeo, ocupació de disc, estat de la xarxa, alarmes actives i historial d'esdeveniments) que permeti a l'operador diagnosticar el dispositiu d'un cop d'ull sense navegar per múltiples seccions. Aquest mòdul, no inclòs dins l'abast original del projecte, s'està implementant posteriorment a l'entrega com a extensió del producte.
+  \item Afegir exportació de \textbf{clips de vídeo} des del \textit{Timeline}: selecció d'un interval temporal sobre la línia de temps i descàrrega directa del fragment sense intervenció del servidor principal.
 \end{itemize}
 
 \section{Abast i Obstacles}
 \subsection{Abast funcional}
-L'aplicació ha d'oferir un cicle complet de gestió: des de l'autenticació segura de l'usuari fins a la monitorització de càmeres en directe, la cerca de gravacions històriques i la configuració avançada de xarxa i paràmetres de sistema. El disseny ha de contemplar el desplegament autònom en un únic videogravador NXT (mode \textit{single-NVR}) com a cas d'ús principal, garantint que tota la funcionalitat sigui operable sense infraestructura externa.
+L'aplicació ha d'oferir un cicle complet de gestió: autenticació segura, monitorització de càmeres en directe, cerca de gravacions històriques, gestió d'alarmes, configuració avançada del dispositiu i manteniment remot (\textit{firmware}, llicències, logs). Tota la funcionalitat ha de ser operable des d'un navegador modern, sense cap extensió externa ni infraestructura de servidor addicional més enllà del propi gravador NXT (vegeu \ref{sec:solucioproposada}).
 
 \subsection{Obstacles detectats}
-S'han identificat reptes tècnics que afecten diferents actors:
+S'han identificat els reptes tècnics principals que el projecte ha hagut de superar:
+
 \begin{itemize}
-  \item \textbf{Complexitat del vídeo natiu:} El repte de visualitzar H.265 sense \textit{plugins}. Afecta al \textbf{Projectista} (recerca de llibreries) i a l'\textbf{Usuari final} (potencial latència).
-  \item \textbf{Sincronització en temps real:} Requereix una gestió d'estat robusta perquè l'\textbf{Operador} vegi alarmes sense retard.
-  \item \textbf{Seguretat i NGINX:} Configuració del \textbf{Proxy Invers} per centralitzar els microserveis sota un mateix origen i garantir polítiques de \textit{Same-Origin}.
+  \item \textbf{Suport irregular de H.265 als navegadors:} La descodificació hardware de H.265 (HEVC) no és universal als navegadors: depèn de la disponibilitat de decodificació hardware al terminal client i de restriccions de patents. Afecta \textbf{el Projectista} (disseny de la lògica de \textit{fallback} automàtic a H.264) i l'\textbf{Usuari final} (potencial increment de latència en terminals sense suport hardware).
+
+  \item \textbf{Heterogeneïtat de \textit{firmwares} i models NXT:} La família NXT inclou múltiples models de hardware amb versions de \textit{firmware} independents. L'API interna \texttt{la-core-legacy} no exposa un contracte uniforme entre models, fent inviable una interfície estàtica. Obliga el motor \textit{schema-driven} a ser el mecanisme d'adaptació central i exigeix validació contínua amb cada \textit{firmware} nou. Afecta \textbf{el Projectista}.
+
+  \item \textbf{Restriccions de CPU i memòria del hardware \textit{embedded}:} Els NVRs NXT operen amb recursos compartits entre la descodificació de vídeo, l'escriptura al sistema de fitxers FS2 i el servei de la interfície web. Qualsevol \textit{overhead} de la interfície (renders innecessaris, \textit{polling} excessiu) degrada el rendiment global del dispositiu. Afecta \textbf{el Projectista} (optimització via Signals i blocs \texttt{@defer}) i l'\textbf{Usuari final} (fluïdesa de la interfície).
+
+  \item \textbf{Dependència d'API interna sense especificació formal:} El \textit{frontend} depèn dels microserveis C++ interns de Lanaccess sense una especificació OpenAPI formal. Qualsevol canvi en l'API durant el desenvolupament pot trencar funcionalitats del \textit{frontend} sense avís previ. Afecta \textbf{el Projectista} (coordinació contínua amb l'equip de \textit{backend} i adaptació reactiva).
+
+  \item \textbf{Absència d'entorn de \textit{staging} idèntic al de producció:} Les proves funcionals completes (gravació real, vídeo en directe, actualització de \textit{firmware}) requereixen hardware NXT físic amb càmeres IP connectades. L'absència d'un entorn de \textit{staging} permanent obliga a usar \textit{mocks} per a les capes de vídeo i emmagatzematge, limitant la cobertura dels tests automàtics. Afecta \textbf{el Projectista} i l'\textbf{Equip QA} de Lanaccess.
+\end{itemize}
+
+\subsection{Limitacions de l'abast}
+Per delimitar clarament l'abast, s'especifica el que queda \textbf{fora} d'aquest TFG:
+
+\begin{itemize}
+  \item \textbf{Arquitectura multi-NVR centralitzada:} La gestió d'un parc de dispositius des d'un servidor d'empresa no és objectiu d'aquest treball. Les decisions arquitecturals per escalar en aquest escenari queden fora de l'abast.
+  \item \textbf{Infraestructura de xarxa del client:} La configuració de tallafocs, routers i segmentació de xarxa del client final no és gestionada per l'aplicació i queda fora de l'abast del projecte.
+  \item \textbf{Aplicació mòbil nativa:} L'accés al sistema es realitza exclusivament via navegador web d'escriptori o tauleta. No s'ha desenvolupat cap client natiu per a plataformes iOS ni Android.
+  \item \textbf{Anàlisi de vídeo intel·ligent:} El sistema no incorpora cap mòdul d'anàlisi de contingut visual: detecció de moviment per visió artificial, reconeixement facial, seguiment d'objectes ni analítica de vídeo basada en aprenentatge automàtic. Aquestes funcions depenen de les capacitats del \textit{firmware} de les càmeres IP connectades.
 \end{itemize}
 
 \section{Actors implicats (Stakeholders)}
-\begin{enumerate}
-  \item \textbf{Usuari final (Operador):} Monitoritza càmeres i gestiona incidents.
-  \item \textbf{Administrador tècnic:} Configura el sistema i realitza manteniment.
-  \item \textbf{Lanaccess Telecom:} Proporciona el \textit{hardware} i coneixement de negoci.
-  \item \textbf{Projectista (Estudiant):} Responsable únic de l'anàlisi i la implementació.
-  \item \textbf{Equip docent (Director i Ponent):} Supervisen el rigor acadèmic i tècnic.
-\end{enumerate}
+Els actors s'ordenen per proximitat al sistema, de la màxima a la mínima:
+
+\begin{itemize}
+  \item \textbf{Lanaccess Telecom, SA (Client i promotor):} Empresa que inicia, finança i acull el projecte. Proporciona el hardware NXT, l'accés als microserveis del \textit{backend} C++, els requisits de producte i el coneixement de negoci del sector de la videovigilància. És el principal beneficiari de la solució resultant i n'assumirà el manteniment i l'evolució un cop lliurada.
+
+  \item \textbf{Operador de seguretat:} Usuari final amb accés de monitorització. Visualitza càmeres en directe i gravacions, gestiona alarmes (recepció i confirmació d'incidents) i consulta l'estat del sistema. No té accés a la configuració del hardware ni a les funcions de manteniment. La interfície ha de ser fluïda i operable en tauletes de manteniment i en monitors d'alta resolució.
+
+  \item \textbf{Administrador tècnic:} Usuari final amb accés complet al sistema. A més de totes les funcions de l'Operador, configura els paràmetres del videogravador i de les càmeres, gestiona llicències, executa actualitzacions de \textit{firmware} i consulta logs de diagnòstic.
+
+  \item \textbf{Projectista (Estudiant TFG):} Responsable de l'anàlisi de requisits, el disseny de l'arquitectura, la implementació del \textit{frontend} Angular i de mòduls de \textit{backend} en C++, la integració entre capes, les proves automàtiques i d'acceptació d'usuari, i la documentació acadèmica. Actua com a interlocutor entre les necessitats de Lanaccess i les decisions tècniques del projecte.
+
+  \item \textbf{Equip docent (Director i Ponent):} Supervisors acadèmics que validen l'abast, els objectius i el rigor tècnic del TFG, i garanteixen que el treball compleixi els estàndards de la FIB--UPC.
+\end{itemize}
+
+\section{Estructura de la memòria}
+\label{sec:estructura}
+La memòria s'organitza en vuit capítols:
+
+\begin{itemize}
+  \item \textbf{Capítol 1 — Introducció i Context} (aquest capítol): Defineix el marc del projecte, analitza l'estat de l'art, justifica les decisions tecnològiques i estableix els objectius, l'abast i els actors implicats.
+  \item \textbf{Capítol 2 — Gestió del Projecte:} Descriu la metodologia àgil, la planificació temporal, el pressupost del projecte i l'anàlisi de sostenibilitat.
+  \item \textbf{Capítol 3 — Especificació de Requisits:} Detalla les \textit{user stories}, els requisits funcionals i no funcionals, els casos d'ús i el marc normatiu aplicable.
+  \item \textbf{Capítol 4 — Arquitectura i Disseny:} Presenta l'arquitectura de microserveis, el rol de NGINX com a proxy invers, el model de dades i les decisions de disseny clau.
+  \item \textbf{Capítol 5 — Implementació:} Explica en detall les solucions tècniques de cada mòdul: login, visualització de vídeo, gestió d'alarmes, configuració dinàmica i manteniment.
+  \item \textbf{Capítol 6 — Validació i Proves:} Documenta l'estratègia de \textit{testing}, els resultats de rendiment i les mesures de latència.
+  \item \textbf{Capítol 7 — Integració de Coneixements:} Relaciona el projecte amb les competències i assignatures cursades a la FIB--UPC.
+  \item \textbf{Capítol 8 — Conclusions i Treball Futur:} Avalua l'assoliment dels objectius, exposa les lliçons apreses i proposa línies de millora futura.
+\end{itemize}

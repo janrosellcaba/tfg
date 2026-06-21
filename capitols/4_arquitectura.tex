@@ -13,7 +13,7 @@ L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microse
     \item \textbf{la-db-engine:} Passarel·la de persistència lògica. Implementa un \textit{Virtual File System} (VFS) personalitzat de SQLite que, en lloc d'operar sobre fitxers físics, redirigeix totes les lectures i escriptures a través de \textit{sockets} Unix cap a \textbf{la-video-engine}. Exposa una interfície \textbf{gRPC} als seus clients i no té permisos directes sobre el disc.
     \item \textbf{la-core-notifier:} Passarel·la de WebSockets per a notificacions generals del sistema. Es subscriu al bus \textbf{D-Bus} per detectar esdeveniments de maquinari —com pèrdues de senyal de vídeo o canvis d'estat de càmera— i els retransmet immediatament al \textit{frontend} via WSS.
     \item \textbf{la-core-alarm:} Passarel·la de WebSockets especialitzada en alarmes. Es comunica amb \textbf{la-db-engine} via \textbf{gRPC} per persistir els registres d'events, i escolta el \textbf{D-Bus} per detectar activacions de sensors i relés, transmetent-les en temps real al client.
-    \item \textbf{MediaMTX:} Servidor de mitjana de codi obert que actua com a motor de \textit{streaming} de vídeo en temps real. Rep els fluxos de les càmeres des de \textbf{la-video-engine} i els redistribueix als clients via dos protocols diferenciats: \textbf{WebRTC} (transport SRTP/UDP negociat per ICE), i \textbf{HLS} (\textit{HTTP Live Streaming}).
+    \item \textbf{MediaMTX:} Servidor multimèdia de codi obert que actua com a motor de \textit{streaming} de vídeo en temps real. Rep els fluxos de les càmeres des de \textbf{la-video-engine} i els redistribueix als clients via dos protocols diferenciats: \textbf{WebRTC} (transport SRTP/UDP negociat per ICE), i \textbf{HLS} (\textit{HTTP Live Streaming}).
 \end{itemize}
 
 Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy}, i connexions de WebSockets segurs (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
@@ -75,7 +75,7 @@ Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:
 \end{table}
 
 \clearpage
-El Llistat \ref{lst:nginx_routing} mostra els blocs de configuració NGINX que implementen les rutes principals de la plataforma, extrets directament del fitxer \texttt{la-core.conf} del repositori de build \textbf{mantos-rec} (\texttt{sources/meta-mantos/recipes-httpd/nginx/nginx/la-core.conf}):
+El Llistat \ref{lst:nginx_routing} mostra els blocs de configuració NGINX que implementen les rutes principals de la plataforma, extrets directament del fitxer \texttt{la-core.conf} del repositori de build \textbf{mantos-rec} (\texttt{sources/\allowbreak{}meta-mantos/\allowbreak{}recipes-httpd/\allowbreak{}nginx/\allowbreak{}nginx/\allowbreak{}la-core.conf}):
 
 \begin{lstlisting}[language=bash, label={lst:nginx_routing}, caption={Fragment de la configuració NGINX (la-core.conf, repositori mantos-rec): rutes principals de la plataforma.}]
 # Aplicacio Angular (SPA) - requereix autenticacio
