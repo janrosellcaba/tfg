@@ -120,6 +120,8 @@ Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:
     % \textbf{la-video-engine} & \textbf{la-db-engine} & — & Unix Sockets & Persistència al disc (VFS SQLite) \\ \bottomrule
   \end{tabular}
   }
+\par\smallskip
+\small Font: Elaboració pròpia.
 \end{table}
 
 El Llistat \ref{lst:nginx_routing} mostra els blocs de configuració NGINX que implementen les rutes principals de la plataforma, extrets directament del fitxer \texttt{la-core.conf} del repositori de build \textbf{mantos-rec} (\texttt{sources/\allowbreak{}meta-mantos/\allowbreak{}recipes-httpd/\allowbreak{}nginx/\allowbreak{}nginx/\allowbreak{}la-core.conf}):
@@ -179,6 +181,7 @@ location /stream/ {
     proxy_set_header Connection "upgrade";
 }
 \end{lstlisting}
+\smallskip\par{\small\noindent Font: Codi de producció, repositori \texttt{mantos-rec} (\texttt{sources/meta-mantos/recipes-httpd/nginx/la-core.conf}).}
 
 % Per resoldre aquest desacoblament a l'hora d'enviar esdeveniments, s'ha dissenyat un mecanisme de \textbf{bridging de protocols (Protocol Bridging)} centralitzat en el servei de notificacions (\textit{Core Notifier}) del gravador. Aquest servei actua com a intermediari actiu (\textit{gateway}): es subscriu als esdeveniments de sistema (com pèrdues de vídeo o activació de relés) mitjançant el bus D-Bus i canals gRPC, tradueix aquestes estructures de baix nivell en missatges JSON lleugers i, finalment, els transmet en temps real pel canal de \textbf{WebSockets} (WSS) \cite{rfc6455} fins al client Angular. Aquest disseny garanteix que el frontend pugui respondre immediatament a qualsevol esdeveniment de seguretat, sense connexions binàries natives costoses ni sobrecàrrega de la CPU del client.
 
@@ -221,6 +224,7 @@ server {
                "strict-origin-when-cross-origin"   always;
 }
 \end{lstlisting}
+\smallskip\par{\small\noindent Font: Codi de producció, repositori \texttt{mantos-rec} (\texttt{sources/meta-mantos/recipes-httpd/nginx/la-core.conf}).}
 
 \section{Disseny del Frontend}
 L'elecció d'Angular 19 no és casual. A diferència d'altres \textit{frameworks} de construcció de web-apps, Angular és un \textit{framework} molt complet: incorpora per defecte un sistema d'injecció de dependències, un \textit{router} oficial, un mòdul de formularis reactius i una arquitectura orientada a serveis. Aquesta decisió forçada elimina la necessitat de prendre centenars de decisions d'integració que en altres ecosistemes recauen sobre l'equip de desenvolupament, i és especialment valuosa en un entorn professional on la coherència i el manteniment a llarg termini de l'aplicació són prioritaris.
