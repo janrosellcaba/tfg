@@ -12,7 +12,7 @@ S'ha seguit un enfocament de proves basat en el risc i en el cicle de vida del s
     \item \textbf{Validació d'Acceptació:} Per recollir el \textit{feedback} dels tècnics d'instal·lació i mesurar la usabilitat percebuda mitjançant el qüestionari SUS.
 \end{enumerate}
 
-\section{Proves Unitàries i d'Integració}
+\section{Proves unitàries i d'integració}
 S'ha dissenyat i executat un pla d'automatització de proves per assegurar la robustesa del programari al llarg de l'evolució del projecte. Les proves s'han dividit segons el seu àmbit:
 \begin{itemize}
     \item {\sloppy\textbf{Proves Unitàries:} Implementades utilitzant el framework de test \textbf{Jasmine}~\cite{jasmine_testing} i el \textit{test runner} \textbf{Karma}~\cite{karma_runner} natius d'Angular. S'han centrat a validar de manera aïllada el comportament de la lògica dels serveis crítics, com ara la gestió d'estat amb els Signals i la correcta negociació de la connexió WebRTC. S'ha assolit una cobertura de codi (\textit{code coverage}) global superior al 85\% en els fitxers de serveis.\par}
@@ -21,7 +21,7 @@ S'ha dissenyat i executat un pla d'automatització de proves per assegurar la ro
 
 S'ha posat especial èmfasi en la validació del motor \textit{Schema-driven} mitjançant proves de robustesa. Atès que la interfície es genera dinàmicament, és fonamental assegurar que qualsevol variació en el JSON enviat pel gravador no bloquegi l'aplicació.
 
-\subsection{Validació del Parser de metadades}
+\subsection{Validació del parser de metadades}
 S'han creat casos de prova automatitzats en què s'envien esquemes JSON amb valors límit, tipus de dades erronis o nodes inexistents. El sistema ha demostrat ser capaç de:
 \begin{itemize}
     \item Gestionar errors de tipatge sense degradar l'experiència d'usuari.
@@ -51,7 +51,7 @@ ActiveX+RTSP (Legacy) & 800 -- 2.000                   & Baixa (Plugin inestable
 
 Aquests resultats validen que la solució web moderna és capaç de superar àmpliament la latència de l'antiga plataforma basada en ActiveX, eliminant un dels principals arguments en contra de les solucions basades en navegadors moderns. Cal remarcar que la fila \textit{ActiveX+RTSP (Legacy)} representa el comportament de la plataforma original: el control ActiveX de Microsoft rebia el flux RTSP intern i el descodificava al navegador Internet Explorer. Tanmateix, la sobrecàrrega del \textit{plugin} i la seva naturalesa inherentment asíncrona provocaven retards mesurables entre 800 i 2.000 ms, molt superiors als 150--300 ms de WebRTC. Els rangs no se solapen: la latència mínima d'ActiveX (800 ms) és superior a la màxima observada en WebRTC (300 ms) en condicions de xarxa local equivalents.
 
-\subsection{Consum de CPU, Memòria i Absència de Fuites}
+\subsection{Consum de CPU, memòria i absència de fuites}
 En un entorn \textit{embedded} on l'aplicació web s'executa directament en el maquinari de gravació i els clients la visualitzen des de navegadors de terminals de control, l'optimització de recursos és crítica. 
 
 S'han dut a terme anàlisis de rendiment utilitzant el perfilador de memòria de Chrome DevTools~\cite{chrome_devtools} durant sessions de reproducció continuada de vídeo WebRTC de dues hores de durada. Els resultats indiquen:
@@ -60,7 +60,7 @@ S'han dut a terme anàlisis de rendiment utilitzant el perfilador de memòria de
     \item \textbf{Optimització de CPU:} Gràcies a la minimització de l'ús de \textit{Zone.js} en Angular 19 i a la consegüent reducció de les comprovacions de cicle complet, combinada amb la reactivitat granular basada en \textbf{Signals}, l'ús de la CPU en el fil d'execució del navegador s'ha reduït en un 35\% respecte a prototips previs basats en RxJS~\cite{rxjs_docs}/comprovacions estàndard. Aquesta dada s'ha mesurat en un escenari de test real mitjançant un terminal de control de gamma de baix consum representatiu: un processador \textbf{Intel Core i3-8100T (4 nuclis, a 3,10~GHz)} amb 8~GB de RAM sota Windows 10 IoT. Aquesta reducció del 35\% de CPU garanteix la fluïdesa i estabilitat operacional les 24 hores del dia en entorns industrials i centres de vigilància amb maquinari limitat.
 \end{itemize}
 
-\section{Proves de Robustesa i Comunicació asíncrona}
+\section{Proves de robustesa i comunicació asíncrona}
 S'ha validat la persistència de la sessió i la recepció d'alarmes mitjançant el sistema \textit{Keep-alive} i la reconnexió automàtica de \textit{WebSockets}.
 
 En les proves de connectivitat, s'ha validat l'eficiència de l'algorisme de \textbf{backoff exponencial} implementat amb RxJS al servei de connectivitat del \textit{frontend}. Davant d'una caiguda de xarxa, el sistema no intenta reconnectar de forma agressiva, la qual cosa podria provocar un atac de denegació de servei (DoS) involuntari sobre el gravador quan la xarxa es recuperi. 
@@ -99,7 +99,7 @@ Les proves han demostrat que l'arquitectura del driver personalitzat de sistema 
     \item \textbf{Propietats ACID verificades:} En tots els escenaris de tall elèctric simulats, el sistema es va recuperar de forma atòmica en reincorporar-se el corrent: les transaccions incompletes van ser descartades automàticament sense corrompre les dades prèviament confirmades, consolidant el compliment dels principis d'Atomicitat, Consistència, Aïllament i Durabilitat (ACID).
 \end{itemize}
 
-\section{Validació d'Acceptació}
+\section{Validació d'acceptació}
 Finalment, l'aplicació s'ha presentat als tècnics d'instal·lació de Lanaccess per recollir el seu \textit{feedback}. S'ha aplicat el qüestionari \textbf{System Usability Scale} (SUS)~\cite{brooke1996_sus} adaptat a l'entorn de videovigilància industrial, amb un total de 8 participants (tècnics d'instal·lació i operadors de seguretat). Per avaluar l'evolució respecte a l'aplicació \textit{legacy}, es van formular preguntes específiques com: \textit{«Consideres que la navegació per trobar paràmetres de xarxa és més intuïtiva ara?»} o \textit{«Has necessitat suport tècnic per configurar una alarma nova?»}.
 
 La puntuació SUS obtinguda ha estat de \textbf{85,6 sobre 100}, corresponent a la categoria \textit{«Excellent»} en l'escala estàndard de Bangor et al. (2008)~\cite{bangor2008_sus}. Aquesta puntuació supera el llindar d'\textit{«Acceptable»} (score $\geq$ 70) i el valor de referència de \textit{«Good»} ($\geq$ 80), validant que la interfície és percebuda com a intuïtiva i eficient pels operadors de seguretat, fins i tot en comparació amb sistemes web professionals del mercat.

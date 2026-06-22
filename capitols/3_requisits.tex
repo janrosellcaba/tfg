@@ -35,7 +35,7 @@ S'han definit tres actors principals, classificant-los segons el seu nivell d'in
         \end{itemize}
 \end{description}
 
-\section{Casos d'Ús}
+\section{Casos d'ús}
 \label{sec:casos_us}
 El model de casos d'ús unifica en una sola especificació tant el \textbf{valor que cada funcionalitat aporta als actors} ---la perspectiva de negoci de les \textit{user stories}--- com els \textbf{requisits tècnics de comportament} que la fan operativa. Aquesta integració elimina la redundància que sorgeix quan les narratives d'usuari i els requisits funcionals es mantenen en seccions separades: la justificació de negoci (``\textit{com a [rol], vull [acció], per tal de [valor]}'') queda incorporada a la Descripció de cada cas d'ús, i els requisits de comportament del sistema es formalitzen als camps Flux Principal i Postcondició.
 
@@ -261,7 +261,7 @@ Com a Administrador, es vol gestionar el cicle de vida del dispositiu (comptes d
 \small Font: Especificació pròpia elaborada amb metodologia de casos d'ús (UML).
 \end{table}
 
-\section{Requisits No Funcionals}
+\section{Requisits no funcionals}
 \label{sec:rnf}
 Els requisits no funcionals (RNF) defineixen les qualitats observables del sistema i les restriccions d'implementació. Seguint l'estructura de l'estàndard VOLERE~\cite{volere_robertson}, cada requisit es formalitza amb els camps \textbf{Descripció}, \textbf{Justificació} i \textbf{Criteris d'Acceptació}. Aquests criteris utilitzen mètriques quantitatives directament alineades amb les proves de rendiment, latència i càrrega descrites al Capítol~\ref{ch:validacio}.
 
@@ -404,7 +404,7 @@ Els requisits no funcionals (RNF) defineixen les qualitats observables del siste
 \small Font: Elaboració pròpia seguint la plantilla VOLERE de requisits no funcionals.
 \end{table}
 
-\section{Model Conceptual}
+\section{Model conceptual}
 \label{sec:model_conceptual}
 El model conceptual representa les entitats pures de la lògica de negoci del sistema NVR, independentment de la tecnologia d'implementació (Angular al \textit{frontend}, C++ al \textit{backend} o el sistema de fitxers FS2 per a les gravacions). L'objectiu és capturar els conceptes del domini ---les seves propietats, relacions i invariants--- tal com els percep el negoci, sense entrar en detalls d'implementació~(Figura~\ref{fig:model_conceptual}).
 

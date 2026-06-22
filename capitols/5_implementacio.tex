@@ -6,7 +6,7 @@ En aquest capítol es detalla el procés de construcció del sistema \textit{Web
 \section{Entorn de desenvolupament i tecnologies}
 Per a la implementació del \textit{frontend}, s'ha configurat un entorn basat en \textbf{Node.js} i l'ecosistema \textbf{Angular CLI 19}. Tal com s'ha descrit al Capítol~\ref{ch:arquitectura}, l'estructura del projecte adopta el model de \textit{Standalone Components} i càrrega mandrosa (\textit{lazy loading}), de manera que cada secció de l'aplicació només es descarrega al navegador quan l'usuari hi navega activament.
 
-\subsection{Sistema de Build Embedded}
+\subsection{Sistema de build embedded}
 
 El \textit{frontend} \textit{Web Core View} no existeix de manera aïllada: s'integra com un component més d'un \textit{firmware} complet per a un dispositiu \textit{embedded}. El repositori \textbf{mantos-rec} centralitza la construcció de tot el sistema operatiu del nou videogravador NXT, basat en el projecte \textbf{Yocto} —el \textit{framework} estàndard de la indústria per a la creació de distribucions Linux personalitzades per a maquinari específic.
 
@@ -24,7 +24,7 @@ La integració del \textit{frontend} al \textit{firmware} segueix un cicle de vi
 
 La clau d'aquest disseny és la separació entre una partició de sistema \textbf{immutable} i una partició \texttt{/data/} de \textbf{lectura i escriptura}. Durant el desenvolupament, n'hi ha prou amb compilar el projecte amb \texttt{ng build -{}-configuration=production} i transferir el directori \texttt{dist/} al videogravador via \texttt{scp}, seguit d'un \texttt{systemctl restart nginx} per aplicar els canvis; tot plegat en qüestió de segons, sense necessitat de recompilar tot el \textit{firmware} —un procés que pot trigar hores. Aquest patró, habitual en sistemes \textit{embedded} de producció, equilibra la robustesa del sistema operatiu amb l'agilitat del desplegament.
 
-\subsection{Configuració del Proxy Invers NGINX}
+\subsection{Configuració del proxy invers NGINX}
 \label{sec:nginx_config}
 
 El component de xarxa que unifica tots els microserveis de l'NVR davant del navegador és \textbf{NGINX}, que actua com a proxy invers, terminador TLS i gestor de cookies de sessió. La seva configuració —el fitxer \texttt{la-core.conf}— s'integra al \textit{firmware} mitjançant la recepta Yocto \texttt{recipes-httpd/} del repositori \textbf{mantos-rec}, que l'empaqueta directament a la imatge del sistema i el desplega a la partició immutable. Aquesta estratègia garanteix que la configuració de xarxa mai pugui ser alterada accidentalment per les particions de dades de l'usuari, i que qualsevol actualització de firmware dugui implícita una nova configuració de proxy revisada.
@@ -54,7 +54,7 @@ L'arxiu \texttt{la-core.conf} defineix un únic bloc \texttt{server} que escolta
 
 Més enllà de l'enrutament, NGINX centralitza tres responsabilitats de seguretat crítiques. En primer lloc, la \textbf{terminació TLS}: tots els certificats i les claus privades resideixen a la partició immutable; el navegador sempre es comunica per HTTPS i mai té accés directe als ports interns dels microserveis. En segon lloc, la \textbf{gestió de cookies de sessió}: la directiva \texttt{proxy\_cookie\_flags} afegeix automàticament els atributs \texttt{HttpOnly} i \texttt{Secure} a totes les cookies emeses per \texttt{la-core-legacy}, impedint que qualsevol \textit{script} de la pàgina pugui llegir o modificar les credencials de sessió. En tercer lloc, la \textbf{negociació de WebSockets}: les rutes \texttt{/ws/} inclouen les capçaleres \texttt{Upgrade: websocket} i \texttt{Connection: Upgrade} necessàries perquè el navegador pugui establir canals persistents bidireccionals amb els serveis de notificació i alarmes de l'NVR.
 
-\section{Capa d'Estils i Consistència Visual}
+\section{Capa d'estils i consistència visual}
 Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arquitectura d'estils modular basada en \textbf{SCSS} (la sintaxi moderna del preprocessador \textbf{SASS}, \textit{Syntactically Awesome Style Sheets}). El principal repte de disseny residia en la coexistència, dins d'una mateixa aplicació, de dos entorns d'ús amb exigències visuals radicalment oposades: la consola d'administració tècnica, concebuda per treballar amb llum natural i que requereix fons clars i alt contrast per facilitar la lectura de paràmetres de configuració; i el mosaic de visualització de vídeo, pensat per a operadors que monitoritzen càmeres de manera contínua en sales de control amb llum reduïda, on els fons gairebé negres minimitzen la fatiga visual durant torns llargs.
 
 Resoldre aquesta dualitat amb un únic \textit{codebase} d'estils coherent va exigir una arquitectura CSS deliberada. La solució adoptada s'articula en tres eixos complementaris: una paleta de variables semàntiques centralitzada que actua com a única font de veritat cromàtica, un model d'encapsulació per component que garanteix l'aïllament d'estils i el rendiment gràfic, i un sistema de disseny adaptatiu basat en unitats relatives i \textit{media queries} que assegura la usabilitat en qualsevol terminal de l'operador.
@@ -85,12 +85,12 @@ $int-connectivity-gray: #CCCCCC;
 
 Aquest desacoblament permet aplicar de manera homogènia els temes de color. Per exemple, els components d'I/O o d'estat de connexió utilitzen aquestes variables semàntiques (\texttt{\$int-connectivity-green}, etc.) per garantir que un mateix canvi d'estat es visualitzi de manera idèntica a qualsevol panell de l'aplicació web.
 
-\subsection{Encapsulació de l'Estil}
+\subsection{Encapsulació de l'estil}
 Per defecte, Angular aplica \texttt{ViewEncapsulation.Emulated}, que garanteix que les regles SCSS de cada component quedin aïllades i no contaminin la resta de vistes. Tanmateix, en casos excepcionals ha calgut trencar aquest aïllament de forma controlada mitjançant l'operador \texttt{::ng-deep}: concretament, per sobreescriure el disseny intern dels panells de pestanyes d'Angular Material i dels components del visor de terminals \textit{Xterm}, els quals no exposen variables CSS públiques que permetin una personalització menys invasiva.
 
 Quant al rendiment visual, totes les microanimacions de la interfície —transicions de panells, rotació d'icones de càrrega— es basen exclusivament en les propietats CSS \texttt{transform} i \texttt{opacity}. Ambdues es gestionen directament per la GPU sense provocar recàlcul d'esquema (\textit{reflow}), a diferència de propietats com \texttt{width} o \texttt{margin}. Aquesta disciplina és especialment rellevant en un dispositiu encastat amb recursos limitats: garanteix una ràtio de fotogrames estable de 60 FPS fins i tot quan hi ha múltiples fluxos de vídeo WebRTC actius simultàniament.
 
-\subsection{Adaptabilitat de Disseny}
+\subsection{Adaptabilitat de disseny}
 Per donar resposta al requisit de compatibilitat multi-terminal (des de tauletes de manteniment de 1024px d'amplada de tècnics de camp, fins a monitors de definició 4K de centres de control), s'ha implementat un disseny totalment adaptatiu utilitzant regles flexibles de \textbf{Flexbox} i \textbf{CSS Grid}.
 
 S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substituint-les per unitats de mesura relatives basades en la mida de font del document (\texttt{rem}) i de l'espai d'execució de la pantalla (\texttt{vh}, \texttt{vw}, \texttt{\%}). Les variacions d'esquema més dràstiques es controlen mitjançant consultes de mitjans (@media queries) enfocades als llindars de resolució següents~(Llistat~\ref{lst:media_query_responsive}):
@@ -257,7 +257,7 @@ El \textit{dispatcher} deriva la càrrega útil cap a l'\texttt{AlertService}, q
 
 \textbf{Interrupció per actualització de firmware (\texttt{SOFTWARE\_UPDATE\_NOTIFY}):} Aquest missatge, sense \textit{payload}, s'emet quan un administrador llança un procés d'actualització del microprogramari. A diferència del flux d'errors, l'Angular el tracta com un avís crític i paralitzant: desallotja l'operador de la pantalla on es trobi i el redirigeix forçosament a la ruta \texttt{/firmware} amb l'estat inicial \texttt{UPLOADING}. Aquesta decisió de disseny garanteix que cap operador pugui continuar modificant la configuració del gravador mentre el firmware s'està escrivint a la memòria flash, prevenint possibles corrupcions de dades.
 
-\section{Tauler Principal i Panells d'Informació}
+\section{Tauler principal i panells d'informació}
 La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el despatxador de navegació lògic de la plataforma. És la primera interfície que l'operador visualitza un cop el sistema valida correctament les seves credencials en el flux de connexió (Figura~\ref{fig:ui_home}).
 
 \begin{figure}[htbp]
@@ -270,7 +270,7 @@ La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el des
 
 Des d'aquesta pantalla centralitzada, l'usuari pot navegar de manera asíncrona mitjançant el menú de mosaic o utilitzar els controls globals de la capçalera de l'aplicació per accedir a les diferents eines operatives.
 
-\subsection{Organització de Funcionalitats}
+\subsection{Organització de funcionalitats}
 Per garantir una experiència d'usuari (UX) neta, adaptada al context de treball i lliure de sobrecàrregues cognitives, les eines del sistema s'organitzen visualment en tres grans seccions funcionals de treball:
 
 \begin{itemize}
@@ -281,7 +281,7 @@ Per garantir una experiència d'usuari (UX) neta, adaptada al context de treball
 
 L'aspecte més destacable d'aquest disseny és que el motor de renderitzat del \textit{frontend} avalua de forma immediata el mètode reactiu \texttt{functionalities} derivat de la llista de \textit{grants} de l'usuari a través d'Angular Signals. Si l'operador actual manca d'un permís determinat (com ara l'accés a la modificació d'usuaris o a l'actualització de firmware), els botons i rutes d'aquella secció específica s'exclouen directament del cicle de vida del client. Això no només augmenta la seguretat en l'entorn de treball, sinó que evita la renderització d'elements redundants que l'usuari final no pot utilitzar.
 
-\subsection{Panells d'Informació de Maquinari i Usuari}
+\subsection{Panells d'informació de maquinari i usuari}
 A la part superior dreta de l'aplicació, dins de la barra de capçalera persistent, s'ubiquen els controls d'accés ràpid i els panells flotants en temps real (Figura~\ref{fig:ui_home_panels}).
 
 \begin{figure}[htbp]
@@ -311,7 +311,7 @@ Al seu costat, el panell d'usuari (Figura~\ref{fig:ui_home_panels}, dreta) detal
   \item \textbf{Selector d'idioma d'interfície:} Un desplegable reactiu que permet commutar de manera immediata la llengua de la interfície entre l'anglès (\texttt{en}), l'espanyol (\texttt{es}) i el francès (\texttt{fr}), tal com s'explica a la secció següent.
 \end{enumerate}
 
-\subsection{Gestió Multilingüe}
+\subsection{Gestió multilingüe}
 L'aplicació suporta tres idiomes complets implementats amb la llibreria \textbf{ngx-translate}. L'objectiu no és únicament adaptar els textos de la interfície, sinó dissenyar el sistema perquè el departament de documentació de l'empresa pugui revisar i ampliar traduccions editant un únic fitxer JSON per idioma, sense necessitat de recompilar el codi Angular.
 
 \textbf{Estructura dels diccionaris:} Les cadenes de text estan organitzades jeràrquicament per vistes i mòduls funcionals dins de la carpeta \texttt{/assets/i18n/}. Cada clau segueix la convenció \texttt{modul.seccio.clau}, referenciada directament des de les plantilles HTML amb el \textit{pipe} de traducció: \texttt{\{\{ 'system.dialogs.rebootTitle' | translate \}\}}~(Llistats~\ref{lst:i18n_en} i~\ref{lst:i18n_es}).
@@ -372,7 +372,7 @@ L'aplicació suporta tres idiomes complets implementats amb la llibreria \textbf
 
 \textbf{Canvi d'idioma i sincronització per URL:} Un aspecte rellevant del disseny és que la llengua activa s'insereix directament a l'URL de navegació (ex: \texttt{/en/home} o \texttt{/es/configuration/network}). Quan l'operador commuta l'idioma des del selector de la capçalera, el \texttt{InfoUsrComponent} realitza dues operacions: primer invoca \texttt{this.translate.use(newLang)}, que descarrega el nou diccionari asíncronament i aplica els textos a tot el DOM de forma reactiva a través del \textit{pipe}; tot seguit, substitueix el primer segment de l'URL pel nou codi de llengua sense perdre la pantalla activa (\texttt{replaceUrl: true}), mantenint la consistència de l'historial del navegador i permetent desar o compartir adreces directes per idioma.
 
-\subsection{Gestió de Llicències}
+\subsection{Gestió de llicències}
 Accedint a través del botó del panell d'informació del videogravador (Figura~\ref{fig:ui_home_panels}), l'operador és redirigit a la pàgina de llicència (Figura~\ref{fig:ui_license}). En aquesta pantalla es mostra el resum de l'estat legal i operatiu del sistema, on s'especifica informació clau com el nombre màxim de canals de vídeo permesos per la llicència actual, i permet procedir a l'activació o renovació de la llicència quan sigui necessari.
 
 \clearpage
@@ -410,7 +410,7 @@ La distinció entre els dos comptadors és fonamental per a l'UX industrial: \te
 
 \textbf{Actualització optimista.} Quan l'operador obre el panell de diagnòstic (Figura~\ref{fig:ui_errors}) i desactiva el LED d'alarma d'un error concret, el frontend llança un \texttt{HTTP PUT} a \path{/webprotocol/device-service/errors/{id}}. Si el servidor confirma l'operació, l'\texttt{AlertService} no espera el pròxim missatge WebSocket: resta 1 al Signal \texttt{nAlertsPending} immediatament, de manera que el badge reflecteix el canvi. El proper \texttt{ERRORS\_NOTIFY} del servidor actua com a reconciliació i garanteix la consistència final. Aquest patró — servidor com a font de veritat absoluta, actualització local per a la immediatesa — és un exemple directe de l'arquitectura \textit{Backend-Driven} amb reactivitat Signal d'Angular 19.
 
-\section{Configuració del Sistema}
+\section{Configuració del sistema}
 El mòdul de Configuració és el centre de control del videogravador. Organitzat en un menú lateral jeràrquic, permet gestionar des dels paràmetres generals del sistema i els comptes d'usuari fins a la configuració individual de cada càmera IP, les entrades físiques o la xarxa (Figura~\ref{fig:config_system_users}).
 
 \begin{figure}[htbp]
@@ -425,7 +425,7 @@ El repte tècnic d'aquest mòdul és que el \textit{firmware} del NVR evoluciona
 
 Internament l'NVR emmagatzema la configuració en format pla de clau-valor via D-Bus; \textbf{la-core-legacy} s'encarrega de reconstruir-ho com a arbre JSON jeràrquic per al \textit{frontend} i d'injectar automàticament els valors per defecte de l'esquema per a les propietats no modificades per l'usuari.
 
-\subsection{Model de Validació}
+\subsection{Model de validació}
 Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usuari pugui programar gravacions d'una càmera o d'un sensor físicament inexistent), el sistema organitza la informació en un model de validació estructural de tres capes que es complementen de forma jeràrquica:
 
 \begin{enumerate}
@@ -448,7 +448,7 @@ La pàgina de configuració de xarxa il·lustra com les tres capes operen en con
 Mitjançant aquesta validació en cascada, el client d'Angular consulta de manera proactiva la capa de recursos i l'esquema de dades bruts abans de dibuixar la vista.
 % Si l'operador intenta forçar una petició d'escriptura invàlida, el servidor la rebutja immediatament amb un error \texttt{HTTP 422 Unprocessable Entity}.
 
-\subsection{Motor Dinàmic del Frontend}
+\subsection{Motor dinàmic del frontend}
 El component \texttt{ConfigInputComponent} actua com a intèrpret de les definicions d'esquema: rep la metadada d'una propietat i selecciona l'element d'entrada adequat en funció del camp \texttt{\_type}. Independentment del tipus renderitzat, el component mostra sempre la pista \textit{"Default: \{valor\}"} sota el camp, permetent a l'operador conèixer en tot moment el valor de fàbrica definit a \texttt{\_default}.
 
 \begin{itemize}
@@ -530,7 +530,7 @@ El Llistat~\ref{lst:schema_json} mostra un fragment real de l'esquema JSON que e
 
 L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solapin amb propietats reals del dispositiu. El component \texttt{ConfigInputComponent} llegeix el camp \texttt{\_type} de cada entrada per decidir quin element de la interfície renderitzar: un commutador per a \texttt{"boolean"}, un selector per a \texttt{"list"} usant \texttt{\_allowedValues}, o un camp numèric amb rang per a \texttt{"numeric"} usant \texttt{\_minValue} i \texttt{\_maxValue}.
 
-\subsection{Validació Dinàmica}
+\subsection{Validació dinàmica}
 La validació de les entrades segueix una estratègia dual que separa els casos senzills dels formats complexos per minimitzar la càrrega sobre el motor de detecció de canvis d'Angular.
 
 Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValue}) i de longitud de text (\texttt{\_maxLength}), el \textit{template} Angular vincula directament els valors de l'esquema als atributs natius de l'\texttt{<input>} HTML5. D'aquesta manera, el navegador s'encarrega de la validació sense que Angular hagi d'executar cap lògica addicional. El component gestiona el cas en què el \textit{backend} pugui enviar indistintament \texttt{\_min} o \texttt{\_minValue} mitjançant un operador ternari al propi \textit{template}~(Llistat~\ref{lst:schema_input_binding}):
@@ -570,7 +570,7 @@ passwordRequirements = computed<RequirementStatus[]>(() => {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
-\subsection{Bloqueig de Configuració}
+\subsection{Bloqueig de configuració}
 Per evitar que dos operadors sobreescriguin els mateixos paràmetres simultàniament, el sistema implementa un \textit{Pessimistic Locking}: en el moment en què un operador accedeix a la pàgina de configuració, el \textit{frontend} adquireix automàticament el bloqueig enviant un \texttt{POST} a \path{/device-service/properties/lock?node=config&seed=...} sense que l'usuari hagi de fer cap acció manual (Figura~\ref{fig:seq_config_lock}).
 
 El paràmetre \texttt{seed} és un identificador únic generat per Angular i persistit a \textit{localStorage} per a cada pestanya del navegador. El seu propòsit és evitar interferències entre pestanyes del mateix dispositiu: si un operador obre la pàgina de configuració en una segona pestanya, el servidor detecta que el \texttt{seed} és diferent del que té el lock i retorna un error \texttt{423 Locked}. D'aquesta manera, el sistema garanteix que en tot moment només hi hagi una única pestanya amb permisos d'escriptura actius.
@@ -599,7 +599,7 @@ El \texttt{token} actua com a signatura obligatòria per a totes les operacions 
 \clearpage
 El token caduca passat \texttt{expiresIn} segons si el \textit{frontend} no el renova. Per garantir la continuïtat sense saturar el cicle de detecció de canvis d'Angular, el \texttt{ConfigService} programa la renovació cada \texttt{expiresIn/2} segons.
 
-\subsection{Desat de la Configuració}
+\subsection{Desat de la configuració}
 El desar és sempre explícit: no hi ha autosave ni \textit{debounce}. L'operador ha de prémer el botó \textit{Save Changes} per confirmar les modificacions.
 
 \begin{sloppypar}
@@ -659,7 +659,7 @@ Quan l'operador intenta navegar cap a una altra secció amb canvis pendents, l'a
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\section{Assistents de Configuració}
+\section{Assistents de configuració}
 La posada en marxa d'un videogravador en un entorn real pot implicar la configuració de desenes de càmeres IP, la segmentació de xarxa, l'assignació de canals de gravació i la gestió de credencials. Per reduir la complexitat operativa d'aquest procés, el sistema ofereix assistents de configuració pas a pas (\textit{Wizards}) que guien l'instal·lador a través de cada decisió de manera seqüencial, sense necessitat de coneixements tècnics avançats. El \textit{Wizard} de detecció de càmeres, per exemple, divideix el flux en quatre passes: selecció del rang de xarxa a escanejar, llistat dels dispositius detectats per descoberta ONVIF~\cite{onvif_spec}, validació de credencials per càmera i, finalment, assignació al canal de gravació. Amb aquest flux, un instal·lador pot posar en marxa un gravador de quatre canals en menys de cinc minuts sense editar cap fitxer de configuració manual.
 
 El repte d'aquest mòdul és que els \textit{Wizards} estan altament personalitzats per a cada client: cada instal·lació pot requerir passes, validacions i integracions específiques que difereixen entre projectes. Afrontar una reimplementació completa en Angular de la totalitat de variants existents hauria estat inabordable dins l'abast del projecte. La decisió de disseny adoptada va ser, per tant, reutilitzar la lògica ja provada de l'eina \textit{legacy} (\texttt{core-legacy}) i adaptar-ne únicament la capa de presentació: s'ha sobreescrit el full d'estils CSS per tal que les pàgines del \textit{Wizard} es renderitzin amb les mateixes variables de disseny, tipografia i paleta de colors que la resta de l'aplicació Angular (Figura~\ref{fig:ui_wizards}). Aquesta estratègia ha permès integrar visualment el mòdul en el nou \textit{front-end} mantenint la funcionalitat existent sense duplicar la lògica de negoci.
@@ -672,7 +672,7 @@ El repte d'aquest mòdul és que els \textit{Wizards} estan altament personalitz
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\section{Eina de Xarxa}
+\section{Eina de xarxa}
 En entorns de seguretat física, és habitual que les càmeres IP i altres dispositius (encoders, sensors) estiguin connectats a una subxarxa aïllada del gravador, inaccessible directament des de la xarxa corporativa. Aquesta segmentació és intencionada: impedeix que un accés no autoritzat a la xarxa general pugui interactuar amb els dispositius perimetrals. El problema operatiu és que cada dispositiu exposa el seu propi portal web de configuració (resolució, compressió, credencials, paràmetres de xarxa) al qual els tècnics necessiten accedir puntualment sense interrompre l'operativa.
 
 Per resoldre-ho sense comprometre l'aïllament de xarxa, l'aplicació ofereix una eina de gestió de regles de \textit{Web Proxy} (Figura~\ref{fig:ui_proxy}). La interfície presenta una taula d'\textit{Active Proxy Rules} on cada entrada associa un \textbf{port d'entrada} del propi NVR —assignat seqüencialment a partir del 18000— a l'adreça de destinació del dispositiu intern (\texttt{IP:port}) i al protocol corresponent (HTTP, HTTPS, SSH o OTHER). L'operador pot crear, editar i eliminar regles en qualsevol moment; múltiples regles poden estar actives simultàniament, permetent accedir a diversos dispositius en paral·lel.
@@ -694,7 +694,7 @@ El flux tècnic de cada regla implica tres etapes:
 \end{figure}
 
 \clearpage
-\section{Visualització Multimèdia en Directe}
+\section{Visualització multimèdia en directe}
 La visualització de vídeo en directe representa el component més crític de l'operativa de seguretat diària. Per aconseguir un flux de streaming d'alta fidelitat i eliminar l'ús de connectors externs o codi propietari del costat de client, s'ha implementat una arquitectura híbrida de vídeo integrada al sistema operatiu embedded del gravador NXT, utilitzant el protocol de comunicació estàndard \textbf{WebRTC} com a canal de transport principal i \textbf{HLS} (\textit{HTTP Live Streaming}) com a mètode de contingència o \textit{fallback}.
 
 \begin{figure}[htbp]
@@ -714,7 +714,7 @@ Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix 
 
 Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
 
-\subsection{Interfície de Càmeres}
+\subsection{Interfície de càmeres}
 A la pàgina de Càmeres (Figura~\ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$ i $2\times2$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
 
 La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag and Drop}) nativa integrada amb la llista lateral de càmeres del panell esquerre. L'usuari pot arrossegar qualsevol càmera cap a una cel·la del mosaic. Aquesta acció de drop recupera la identitat del dispositiu d'entrada, demana el seu mètode d'accessibilitat i demana de forma dinàmica la càrrega del flux, seguint el cicle d'activitat descrit a la Figura~\ref{fig:activity_video_connection}.
@@ -756,7 +756,7 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 %   \small Font: Elaboració pròpia.
 % \end{figure}
 
-\subsection{Orquestració de Vídeo}
+\subsection{Orquestració de vídeo}
 Per desacoblar el component visual del protocol de transport concret, s'ha aplicat el patró de disseny \textbf{Strategy}: tant \texttt{WebRTCService} com \texttt{HlsService} implementen la mateixa interfície \texttt{StreamingStrategy}, de manera que el component de la graella no sap ni necessita saber quin protocol està usant~(Llistat~\ref{lst:streaming_strategy_iface}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:streaming_strategy_iface}, caption={Interfície comuna \texttt{StreamingStrategy}: contracte que han de complir les implementacions WebRTC i HLS.}]
@@ -771,7 +771,7 @@ export interface StreamingStrategy {
 
 Angular injecta automàticament la implementació correcta en funció del protocol actiu, de manera que el canvi de WebRTC a HLS (o a l'inrevés) no requereix cap modificació al component de visualització.
 
-\subsection{Gestió en Temps Real de les Entrades i Sortides Digitals}
+\subsection{Gestió en temps real de les entrades i sortides digitals}
 De forma complementària al panell de visualització de càmeres, la vista principal disposa d'un panell lateral dret interactiu de control d'entrades i sortides lògiques (I/O), el \texttt{CamerasIoPanelComponent}. Entrades i sortides es representen amb la mateixa interfície de dades unificada, \texttt{IoItem}~(Llistat~\ref{lst:io_item_model}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:io_item_model}, caption={Model unificat \texttt{IoItem} per a entrades i sortides digitals.}]
@@ -815,7 +815,7 @@ Destaca l'ús del verb \textbf{GET} amb tots els paràmetres a la \textit{query 
 
 \textbf{Convenció visual dels indicadors.} Cada element pot trobar-se en tres estats visuals: actiu, inactiu o desconnectat. Contràriament a la convenció habitual, el sistema de CCTV utilitza el \textbf{vermell per indicar activitat} (alarma en curs, relé tancat) i el \textbf{verd per indicar repòs} (\textit{idle}, \textit{deactivated}), ja que en seguretat física l'estat "tranquil" és el desitjat. Un símbol d'interrogació gris indica una entrada desconnectada o amb estat desconegut.
 
-\section{Reproducció de Gravacions}
+\section{Reproducció de gravacions}
 La cerca, consulta i reproducció de gravacions històriques constitueix una de les funcionalitats més complexes i crítiques del dispositiu, ja que requereix que l'operador pugui navegar per milers d'hores de gravació de càmeres IP d'alta resolució des de qualsevol navegador web sense instal·lar cap connector o extensió (\textit{Plugin-free}).
 
 En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una solució integrada extrem a extrem: des de la capa de backend de \textbf{la-video-engine} ---que s'encarrega de l'emmagatzematge, la segmentació i el servei HLS--- fins al component \textit{Timeline} d'Angular~19 que l'operador utilitza des del navegador (Figura~\ref{fig:ui_recordings}).
@@ -829,7 +829,7 @@ En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una sol
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\subsection{Emmagatzematge de Vídeo}
+\subsection{Emmagatzematge de vídeo}
 \label{sec:emmagatzematge_video}
 Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional, sinó en \textbf{FS2} (\textit{File System 2}), un sistema d'emmagatzematge propietari de Lanaccess que opera directament sobre la partició \textit{raw} del disc dur de l'NVR, sense intermediació del sistema de fitxers del nucli Linux (ext4). FS2 escriu els fotogrames de vídeo en espais contigus de mida fixa a nivell de blocs físics, cosa que elimina la fragmentació, redueix la latència d'escriptura i garanteix atomicitat en cas de tall elèctric sobtat: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada. Tot aquest accés de baix nivell queda encapsulat dins de \textbf{la-video-engine}: el frontend mai interactua directament amb FS2, sinó que consumeix les dades ja processades a través de l'API HTTP que el motor exposa.
 
@@ -844,7 +844,7 @@ Quan l'operador selecciona un interval de temps a la interfície d'Angular, el c
   \item \textbf{Gestió de talls de vídeo (\textit{Discontinuity}):} Si l'NVR detecta que el salt temporal entre dos buffers de gravació és superior a 3.0 segons natius (a causa d'una gravació per esdeveniments interrompuda), el servidor injecta de manera automàtica les directives especials \texttt{\#EXT-X-DISCONTINUITY} i \texttt{\#EXT-X-PROGRAM-DATE-TIME}. Això és un requisit crític que informa el reproductor de la interfície d'Angular que la línia temporal s'ha trencat, evitant congelacions en el motor de descodificació de vídeo del client.
 \end{enumerate}
 
-\subsection{Servidor de Segmentació Dinàmica}
+\subsection{Servidor de segmentació dinàmica}
 Quan el reproductor d'Angular avança a través de la llista de reproducció, demana de manera recursiva i asíncrona cadascun dels segments virtuals llistats mitjançant crides a \texttt{/segment.ts?id=...\&buffer=...\&codec=...}.
 
 La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la petició d'escriptura, obrir el fitxer físic sota \texttt{fs2\_file\_read\_buffer} i carregar el bloc en memòria en un espai temporal de baix nivell unificat de 8 MB assignat per l'arena d'emmagatzematge de dades de l'equip (\texttt{Buffer8MBPlayer}). Un cop en memòria, en lloc de decodificar o transcodificar el vídeo (el que inutilitzaria la CPU del dispositiu embedded), el servidor executa un procés de \textbf{trans-muxing ràpid sota demanda}:
@@ -855,7 +855,7 @@ La funció de backend unificada \texttt{cgi\_segment} s'encarrega de rebre la pe
   \item Es retorna el segment complet amb la capçalera de tipus MIME unificada \texttt{Content-Type: video/MP2T}.
 \end{enumerate}
 
-\subsection{Descodificació de Còdecs H.264 i H.265}
+\subsection{Descodificació de còdecs H.264 i H.265}
 Un dels reptes tecnològics més complexos de la plataforma és la compatibilitat amb el còdec d'última generació \textbf{H.265 (HEVC)} de forma paral·lela a \textbf{H.264 (AVC)}. L'H.265 ofereix un gran valor operacional a l'NVR ja que redueix a la meitat l'espai necessari als discs durs i l'ample de banda de xarxa per a la mateixa qualitat d'imatge. No obstant això, el seu processament natiu dins dels navegadors web tradicionals requeria històricament l'ús de connectors (\textit{plugins}) pesats o controls ActiveX degut a restriccions de patents.
 
 Amb el nou disseny, el motor de segmentació del backend és capaç d'empaquetar i servir ambdós formats de manera dinàmica. Tanmateix, per tal que el descodificador per maquinari de la GPU del client pugui processar un segment de vídeo H.265, necessita rebre immediatament abans de cada imatge clau (IDR) les metadades de paràmetres de seqüència, imatge i vídeo (SPS, PPS i VPS).
@@ -867,7 +867,7 @@ En registrar-se la crida de segment, el mètode del backend \texttt{cgi\_segment
   \item Si no es troben en el buffer actual perquè és un fragment de fotogrames intermedis (imatges P/B), el servidor retrocedeix de forma lògica a l'índex del primer buffer del fitxer de gravació de la càmera per buscar les capçaleres de referència de la seqüència original de l'NVR, garantint d'aquesta manera que el descodificador del client rebi sempre un flux de vídeo complet i autònom.
 \end{itemize}
 
-\subsection{Línia de Temps Interactiva}
+\subsection{Línia de temps interactiva}
 Al costat del client, el disseny s'estructura en un calendari flotant, un selector lateral de càmeres i una línia de temps interactiva unificada de tipus \textit{Timeline} (Figura~\ref{fig:ui_recordings}).
 
 El cicle de funcionament de la interfície segueix els passos següents:
@@ -908,7 +908,7 @@ loadVideo(): void {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
-\section{Sistema d'Alarmes}
+\section{Sistema d'alarmes}
 La gestió, notificació i persistència de dades d'incidents d'alarma constitueix un dels \textbf{requisits operatius més crítics} d'un sistema de videovigilància professional. Qualsevol pèrdua de dades o retard en la senyalització pot tenir conseqüències greus per a la seguretat física de les instal·lacions.
 
 En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron \textit{multi-capa extrem a extrem}: des del model de subscripció reactiva al costat de client d'Angular~19, passant pels canals de comunicació \textit{full-duplex} de WebSockets i el servei d'orquestració \textit{multithreading} en C++, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
@@ -991,7 +991,7 @@ Per assegurar l'atomicitat de les dades (propietats ACID) del servei de persist�
   \item \textbf{Escriptura i Consistència en Disc Físic:} El motor de vídeo rep la trama, verifica l'offset físic a la partició relacional del disc i s'encarrega d'executar l'operació d'escriptura de manera atòmica i transparent per al motor de base de dades. Per protegir el desgast físic del disc dur flaix (NAND/NOR) i evitar colls d'ampolla en entorns d'alta concurrència d'accessos, s'ha configurat el motor amb la línia estructurada de major rendiment: \textbf{Write-Ahead Logging (WAL)} de SQLite3, normalitzant els commits mitjançant sincronització normal (\texttt{PRAGMA synchronous=NORMAL}).
 \end{enumerate}
 
-\subsection{Protecció i Poda de dades Activa}
+\subsection{Protecció i poda de dades activa}
 Com que el videogravador de seguretat opera de manera ininterrompuda (24/7), el volum d'alarmes i logs emmagatzemats podria provocar un desgast excessiu de la memòria de disc flaix o alentir les cerques. Durant la fase d'inicialització de la base de dades, el motor \texttt{DatabaseManager} actualitza un disparador automàtic relacional o \textbf{Trigger} dins del fitxer de la base de dades que s'executa després de cada inserció de nova alarma~(Llistat~\ref{lst:alarm_prune_trigger}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=SQL, label={lst:alarm_prune_trigger}, caption={Trigger de base de dades per a la poda automatica del registre d'alarmes.}]
@@ -1007,7 +1007,7 @@ END;
 
 Aquesta regla relacional garanteix de forma asíncrona la poda activa del sistema, mantenint l'historial del dispositiu optimitzat amb un màxim estricte de 10.000 registres de manera transparent per al codi del programari d'Angular o de C++.
 
-\subsection{El Cicle de Vida de les Alarmes}
+\subsection{El cicle de vida de les alarmes}
 Un cop es realitza l'escriptura d'una nova alarma en base de dades o el client emet una ordre de canvi, el mòdul del backend llança l'esdeveniment unificat a la cua \texttt{global\_emission\_queue}, des d'on s'extreu per al seu enviament a través del WebSocket d'alta velocitat de notificacions (\texttt{la-core-alarm}).
 
 A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura~\ref{fig:ui_alarms}). Cada operació de l'usuari sobre una alarma (marcar com a llegida, arxivar o eliminar) es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
@@ -1037,7 +1037,7 @@ L'operador pot interaccionar amb qualsevol dels registres per tal d'assentir-los
 
 El receptor de comandes de la cua del backend \texttt{db\_client\_command\_thread} processa la petició, canvia el flag \texttt{is\_read = 1} al fitxer SQLite3 de forma atòmica i re-emet el senyal d'èxit cap a qualsevol client connectat mitjançant el missatge \texttt{ALARM\_READ\_SUCCESS}, garantint que totes les pantalles d'operadors d'una mateixa instal·lació d'un NVR estiguin sincronitzades i informades en temps real de la recepció de l'incident.
 
-\section{Mòdul d'Actualització de Firmware}
+\section{Mòdul d'actualització de firmware}
 L'actualització de firmware és un procés crític en sistemes embedded de seguretat, ja que una fallida d'alimentació o d'escriptura durant el procés d'escriptura (\textit{flashing}) pot deixar el dispositiu inutilitzable. Per minimitzar aquest risc i proporcionar una monitorització en temps real a l'operador, s'ha dissenyat un sistema d'actualització robust i tolerant a fallides estructurat en tres fases d'execució:
 
 \begin{figure}[htbp]
@@ -1083,7 +1083,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
 \end{figure}
 
 \clearpage
-\section{Configuració Global}
+\section{Configuració global}
 El panell d'accions de configuració unifica les comandes administratives destructives i de salvaguarda de dades (Figura~\ref{fig:ui_configuration_actions}).
 
 \begin{figure}[htbp]
@@ -1119,7 +1119,7 @@ Per poder treballar amb volums de dades molt grans que poden superar les 500.000
 \textbf{Filtratge per columna amb expressions regulars.} Per facilitar la cerca en conjunts de dades molt grans, cada columna de la taula disposa d'un filtre independent: l'operador fa clic sobre la capçalera de la columna i escriu una expressió de cerca, que s'interpreta com una \textbf{expressió regular} (\textit{regex}). El component aplica la coincidència fila a fila sobre el valor de la columna seleccionada i actualitza la vista de manera instantània a cada keystroke, sense cap retard perceptible. Diversos filtres de columna es poden activar simultàniament i actuen en conjunció (AND lògic), permetent a l'operador combinar criteris com, per exemple, filtrar per un identificador d'usuari concret a la columna \textit{User} i per un patró d'acció a la columna \textit{Event} alhora. Cap d'aquestes operacions genera trànsit de xarxa: tot el processament es realitza sobre les dades ja carregades en memòria pel parser SheetJS.
 \end{enumerate}
 
-\section{Ajuda i Documentació}
+\section{Ajuda i documentació}
 Un videogravador és un sistema amb una gran quantitat de funcionalitats i paràmetres configurables; és habitual que un operador necessiti consultar la documentació tècnica durant la posada en marxa o davant d'una situació poc freqüent. A més, en entorns industrials o de màxima seguretat, és habitual que els gravadors treballin en una xarxa aïllada físicament del món exterior, on accedir a internet o a servidors corporatius de suport externs és impossible.
 
 \begin{figure}[htbp]
