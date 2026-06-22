@@ -3,6 +3,53 @@
 
 L'arquitectura de \textit{Web Core View} s'ha dissenyat sota els principis de modularitat, escalabilitat i eficiència en el consum de recursos. Atès que el software s'executa en un entorn \textit{embedded} (el videogravador), s'ha optat per una arquitectura desacoblada on el \textit{frontend} assumeix la major part de la lògica de presentació per alliberar la CPU del maquinari per a les tasques crítiques de seguretat.
 
+\section{Disseny Extern i Fluxos de Navegació}
+\label{sec:disseny_extern}
+
+Abans d'abordar l'arquitectura interna de microserveis, és rellevant descriure la capa que és directament percebuda per l'usuari: l'estructura de les pantalles, el model de navegació i la distribució funcional dels mòduls de la interfície. Aquesta perspectiva externa complementa el model conceptual de requisits i serveix de pont entre l'especificació (Capítol~\ref{ch:requisits}) i les decisions d'implementació tècnica.
+
+\subsection{Estructura general de la interfície (\textit{Layout} d'operador)}
+
+El \textit{layout} de \textit{Web Core View} segueix el model estàndard de les aplicacions de gestió industrial (\textit{operator dashboard}): una \textbf{barra de navegació lateral persistent} que agrupa els mòduls per àmbit funcional, i una \textbf{àrea de contingut principal} que renderitza dinàmicament la vista seleccionada. La barra de navegació roman visible en tot moment i indica visualment l'estat del sistema: badge de notificació d'alarmes actives, indicador de sessió i accés ràpid al perfil d'usuari.
+
+L'aplicació s'organitza en tres àmbits funcionals principals, accessibles des de la barra de navegació:
+
+\begin{description}
+  \item[\textbf{Configuració} (rol Administrador):] Agrupa les vistes de configuració del dispositiu basades en el motor \textit{schema-driven}:
+        \begin{itemize}
+          \item \textbf{\textit{System}:} Configuració general del dispositiu (xarxa, ports, paràmetres del sistema).
+          \item \textbf{\textit{IP Video Cameras}:} Configuració individual de cada càmera IP (codec, resolució, \textit{framerate}, etc.).
+        \end{itemize}
+  \item[\textbf{Vídeo:}] Agrupa les funcionalitats de monitorització visual en temps real i la consulta d'incidents passats:
+        \begin{itemize}
+          \item \textbf{\textit{Cameras}:} Visualització en directe (\textit{live}) de fins a 4 càmeres en mosaic. Cada cel·la del mosaic permet la selecció de càmera, el canvi de protocol (WebRTC/HLS) i l'activació del mode \textit{Playback} per a la consulta de gravacions mitjançant la línia de temps.
+          \item \textbf{\textit{Recordings}:} Vista dedicada a la cerca de gravacions amb selecció de càmera i rang horari, i reproducció via fragments HLS.
+          \item \textbf{\textit{Alarms}:} Historial d'alarmes amb filtrat per càmera i estat, gestió del cicle de vida (llegida / arxivada) i configuració de regles de detecció (rol Administrador).
+        \end{itemize}
+  \item[\textbf{Manteniment} (rol Administrador):] Agrupa les funcionalitats del cicle de vida del dispositiu:
+        \begin{itemize}
+          \item \textbf{\textit{Update}:} Actualització de firmware amb seguiment de progrés per fases (transferència, gravació, reinici).
+          \item \textbf{\textit{Configuration}:} Descàrrega, càrrega i restauració de la configuració del sistema.
+          \item \textbf{\textit{Log}:} Cerca i descàrrega dels registres d'events del dispositiu.
+          \item \textbf{\textit{Documentation}:} Accés a manuals i guies de configuració integrades.
+        \end{itemize}
+\end{description}
+
+\subsection{Fluxos de navegació}
+
+La Figura~\ref{fig:flux_navegacio} representa el diagrama de flux de navegació de \textit{Web Core View}. Les transicions principals representen accions explícites de l'usuari (clic en un element de menú, selecció d'una càmera, activació del mode \textit{playback}); les transicions guardades representen canvis d'estat condicionals (\textit{role check}, \textit{timeout} de sessió).
+
+\clearpage
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth, height=0.85\textheight, keepaspectratio]{figures/diagrames/flux_navegacio.png}
+  \caption{Diagrama de flux de navegació de l'aplicació \textit{Web Core View}.}
+  \label{fig:flux_navegacio}
+  \small Font: Elaboració pròpia.
+\end{figure}
+
+El punt d'entrada sempre és la pantalla de \textit{Login}. Un cop autenticat, l'usuari arriba a la pàgina principal, que per als operadors mostra directament la vista de càmeres i per als administradors inclou l'accés complet a tots els mòduls. La sessió es tanca per dues vies: \textit{logout} explícit de l'usuari, o expiració del mecanisme \textit{keep-alive} (RNF-06), que redirigeix automàticament a la pantalla de \textit{Login}. En cas de tancament per \textit{timeout}, el \textit{Config Lock} actiu s'allibera automàticament al backend en un màxim de 120 s (RNF-05), garantint que cap altre administrador no queda bloquejat.
+
 \section{Arquitectura Global del Sistema}
 
 L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microserveis interns coordinats~\cite{microservices_newman} dins del sistema operatiu del gravador. La plataforma interactua amb els serveis crítics següents, que s'executen en l'entorn \textit{embedded}:

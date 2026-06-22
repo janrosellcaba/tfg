@@ -1,5 +1,5 @@
 # Estat del TFG — Web Core View
-> Actualitzat: 22 juny 2026. Integrades 8 cites bibliogràfiques fins llavors òrfenes. Compilació neta (133 pàg, 0 warnings). Memòria 100% polida i bibliogràficament completa.
+> Actualitzat: 22 juny 2026. Reestructuració major del capítol 3 (Carles Farré): casos d'ús unificats (UC-00..UC-06), RNF en format VOLERE (RNF-01..RNF-08), model conceptual nou (§3.5). Nou §4.1 Disseny Extern al capítol 4. Compilació neta (138 pàg, 0 errors).
 
 ---
 
@@ -15,8 +15,8 @@ La memòria del TFG està **pràcticament completa**. Tots els 8 capítols i l'a
 |---|---|---|---|
 | 1 | Introducció i Context | ✅ COMPLET | Problema, estat de l'art, justificació alternatives, objectius |
 | 2 | Gestió del Projecte | ✅ COMPLET | Kanban, Gantt, 585h reals (540h previstes), cost executat 16.061,50€ (pressupost màxim 16.420,25€, estalvi 358,75€), sostenibilitat |
-| 3 | Especificació de Requisits | ✅ COMPLET | User stories, RF/RNF, casos d'ús, marc normatiu (RGPD) |
-| 4 | Arquitectura i Disseny | ✅ COMPLET + POLIT | Microserveis, NGINX, Schema-driven; 0 overfulls, flotants corregits (21 jun 2026) |
+| 3 | Especificació de Requisits | ✅ COMPLET + PONENT | UC-00..UC-06 unificats (US+RF integrats), RNF VOLERE (RNF-01..08), Model Conceptual §3.5, diagrama use_cases, marc normatiu (RGPD) |
+| 4 | Arquitectura i Disseny | ✅ COMPLET + PONENT | §4.1 Disseny Extern nou (layout+navegació+figura flux), Microserveis, NGINX, Schema-driven; 0 overfulls |
 | 5 | Implementació | ✅ COMPLET + POLIT | Login, Home, Config, WebRTC, HLS, Alarmes, Manteniment; 0 overfulls, 12 correccions lingüístiques, 6 clearpage eliminats (21 jun 2026) |
 | 6 | Validació i Proves | ✅ COMPLET + POLIT | Jasmine/Karma, Playwright, latències, CPU/memòria, UAT; 0 overfulls, 5 correccions lingüístiques (21 jun 2026) |
 | 7 | Integració de Coneixements | ✅ COMPLET + POLIT | Competències FIB, assignatures relacionades; 0 overfulls, 6 correccions lingüístiques (21 jun 2026) |

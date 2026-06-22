@@ -1,0 +1,77 @@
+%%{init: {
+ 'theme': 'base',
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+}}%%
+
+classDiagram
+  direction LR
+
+  class NVR {
+    +versioFirmware : String
+    +estat : Connected | Offline
+  }
+
+  class Camara {
+    +id : String
+    +nom : String
+    +adrecaIP : String
+    +codec : H264 | H265
+    +estat : Connected | Disconnected | Error
+  }
+
+  class Flux {
+    +protocol : WebRTC | HLS
+    +estat : Actiu | Inactiu
+    +latencia : ms
+  }
+
+  class Gravacio {
+    +id : String
+    +timestamp : DateTime
+    +duracio : Integer
+    +tipusGravacio : Continua | Alarma
+  }
+
+  class Alarma {
+    +id : String
+    +timestamp : DateTime
+    +tipus : Sensor | Rele | Sistema | Video
+    +estat : NoLlegida | Llegida | Arxivada
+  }
+
+  class Usuari {
+    +id : String
+    +nom : String
+    +rol : Administrador | Operador
+    +grants : String[]
+  }
+
+  class Sessio {
+    +keepAliveInterval : 60s
+    +estat : Activa | Expirada
+  }
+
+  class ConfigLock {
+    +idModul : String
+    +expiresIn : 30 | 120
+    +ultimaRenovacio : DateTime
+  }
+
+  NVR "1" --> "0..151" Camara : conté
+  NVR "1" --> "0..*" Alarma : genera (Sistema)
+  
+  Camara "1" --> "0..2" Flux : produeix
+  Camara "1" --> "0..*" Gravacio : emmagatzema
+  Camara "1" --> "0..*" Alarma : genera (Vídeo/Analítica)
+  
+  Usuari "1" --> "0..*" Sessio : inicia
+  Usuari "0..1" --> "0..1" ConfigLock : posseeix

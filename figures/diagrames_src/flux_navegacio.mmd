@@ -1,0 +1,67 @@
+%%{init: {
+ 'theme': 'base',
+ 'flowchart': {
+   'curve': 'linear',
+   'nodeSpacing': 40,
+   'rankSpacing': 90,
+   'padding': 16
+ },
+ 'themeVariables': {
+   'background': '#ffffff',
+   'primaryColor': '#ffffff',
+   'primaryTextColor': '#000000',
+   'primaryBorderColor': '#000000',
+   'lineColor': '#000000',
+   'secondaryColor': '#ffffff',
+   'tertiaryColor': '#ffffff',
+   'edgeLabelBackground': '#ffffff'
+ },
+ 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { fill: #ffffff !important; stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; } .edgeLabel rect { fill: #ffffff !important; stroke: none !important; } .edgeLabel span { background: #ffffff; padding: 0 3px; }'
+}}%%
+
+flowchart LR
+    Start([Inici]) --> Login
+
+    Login["Login"]
+    Login -->|"Autenticació OK"| Home
+    Login -->|"Error 401"| Login
+
+    Home["Home"]
+    
+    %% -- NAVEGACIÓ GLOBAL (Header) --
+    Home -.->|"Accés Global"| Header["Header (Topbar)"]
+    Header -->|"Notificacions"| Alerts["Alerts / Errors"]
+    Header -->|"Info NVR"| NVRInfo["Panell Info VR"]
+    NVRInfo -->|"Estat Llicència"| License["License Status"]
+    Header -->|"Usuari"| UserInfo["Panell Info Usuari"]
+    UserInfo -->|"Logout"| Login
+
+    %% -- SECCIÓ VIDEO --
+    Home --> Cameras["Cameras"]
+    
+    Home --> Recordings["Recordings"]
+    Recordings -->|"Eina interna"| Playback["Playback"]
+    Playback -->|"Torna"| Recordings
+
+    Home --> Alarms["Alarms"]
+    Alarms -->|"Clica fila"| AlarmDetail["Panell Detall Alarma"]
+    AlarmDetail -->|"Tanca"| Alarms
+
+    %% -- SECCIÓ CONFIGURACIÓ --
+    Home -->|"Rol: Administrador"| Configuration["Grup: Configuration"]
+    Configuration --> System["System"]
+    Configuration --> Proxy["Web Proxy"]
+    Configuration --> Wizards["Wizards (Legacy)"]
+    
+    %% Detalls del System
+    System --> IPCams["IP Video / Cameres"]
+    System --> Users["Users & Permissions"]
+    System --> OtherConfig["... (Network, I/O, etc)"]
+
+    %% -- SECCIÓ MANTENIMENT --
+    Home -->|"Rol: Administrador"| Maintenance["Grup: Maintenance"]
+    Maintenance --> Reports["Reports / Disks"]
+    Maintenance --> Update["Firmware Update"]
+    Maintenance --> SysConfig["System Config"]
+    Maintenance --> Logs["Logs"]
+    Maintenance --> Docs["Documentation"]
