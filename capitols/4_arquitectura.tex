@@ -141,7 +141,7 @@ Com a requisit no funcional de seguretat crítica, el \textit{frontend} s'ha dis
 
 Addicionalment, a la capa de NGINX, s'ha unificat l'origen de l'aplicació i l'API REST sota un mateix servidor de recursos, cosa que permet aplicar polítiques de \textit{Same-Origin} estrictes que limiten els vectors d'injeccions \textit{Cross-Site Scripting} (XSS) i els intents de \textit{Clickjacking}.
 
-L'ús de NGINX com a \textit{entry point} és indispensable per a la seguretat del sistema. En centralitzar les peticions, NGINX actua de tallafoc per als serveis \textbf{la-video-engine} i \textbf{la-core-legacy}, impedint l'accés directe als ports interns. A més, permet que el token JWT generat per l'autenticació sigui vàlid per a tots els microserveis sota un mateix domini de seguretat, simplificant la gestió de capçaleres \textit{Authorization} i evitant problemes de CORS (Cross-Origin Resource Sharing) que podrien bloquejar l'streaming de vídeo.
+L'ús de NGINX com a \textit{entry point} és indispensable per a la seguretat del sistema. En centralitzar les peticions, NGINX actua de tallafoc per als serveis \textbf{la-video-engine} i \textbf{la-core-legacy}, impedint l'accés directe als ports interns. A més, permet que la cookie de sessió sigui vàlida per a tots els microserveis sota un mateix domini de seguretat, simplificant la gestió de l'autenticació i evitant problemes de CORS (Cross-Origin Resource Sharing) que podrien bloquejar l'streaming de vídeo.
 
 \clearpage
 \begin{lstlisting}[language=bash, label={lst:nginx_security}, caption={Fragment de la configuració NGINX (la-core.conf): TLS i capçaleres de seguretat HTTP.}, float=!ht]

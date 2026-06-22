@@ -812,7 +812,7 @@ Les gravacions de vídeo no s'emmagatzemen en un sistema de fitxers convencional
 \subsection{Servidor de llistes de reproducció HLS}
 La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi obert \textbf{HLS (HTTP Live Streaming)}, el qual fragmenta la transmissió en fluxos d'arxius curts de pocs segons per evitar l'enviament de fitxers de gravació massius que col·lapsarien l'ample de banda i la memòria de l'equip de xarxa.
 
-Quan l'operador selecciona un interval de temps a la interfície d'Angular, el client demana la llista de reproducció realitzant una crida HTTP GET cap a la ruta \texttt{/hls-play.\allowbreak{}m3u8?token=...\allowbreak{}\&start=...\allowbreak{}\&end=...}. El servidor de vídeo de l'NVR intercepta la petició mitjançant la funció unificada \texttt{cgi\_hls} i executa el següent algorisme en temps real:
+Quan l'operador selecciona un interval de temps a la interfície d'Angular, el client demana la llista de reproducció realitzant una crida HTTP GET cap a la ruta \texttt{/video-engine/hls-play.\allowbreak{}m3u8?token=...\allowbreak{}\&start=...\allowbreak{}\&end=...}. El servidor de vídeo de l'NVR intercepta la petició mitjançant la funció unificada \texttt{cgi\_hls} i executa el següent algorisme en temps real:
 \begin{enumerate}
   \item \textbf{Cerca de fitxers d'enregistrament:} Mitjançant la biblioteca d'indexació \texttt{lanaccess::searcher}, s'interroga l'historial de gravacions associat al token per localitzar els fitxers d'enregistrament d'FS2 (\textit{File System 2}) que contenen vídeo dins de l'interval indicat pel client.
   \item {\sloppy\textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega la capçalera unificada en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(\allowbreak{}HD\_BYTES\_PER\_SECTOR,\allowbreak{} ...)}), la qual conté les metadades d'índex de tots els buffers de vídeo que formen el fitxer físic d'enregistrament.\par}
@@ -980,7 +980,7 @@ END;
 Aquesta regla relacional garanteix de forma asíncrona la poda activa del sistema, mantenint l'historial del dispositiu optimitzat amb un màxim estricte de 10.000 registres de manera transparent per al codi del programari d'Angular o de C++.
 
 \subsection{El Cicle de Vida de les Alarmes}
-Un cop es realitza l'escriptura d'una nova alarma en base de dades o el client emet una ordre de canvi, el mòdul del backend llança l'esdeveniment unificat a la cua \texttt{global\_emission\_queue}, des d'on s'extreu per al seu enviament a través del WebSocket d'alta velocitat de notificacions (\texttt{la-core-notifier}).
+Un cop es realitza l'escriptura d'una nova alarma en base de dades o el client emet una ordre de canvi, el mòdul del backend llança l'esdeveniment unificat a la cua \texttt{global\_emission\_queue}, des d'on s'extreu per al seu enviament a través del WebSocket d'alta velocitat de notificacions (\texttt{la-core-alarm}).
 
 A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura \ref{fig:ui_alarms}). Cada operació de l'usuari sobre una alarma (marcar com a llegida, arxivar o eliminar) es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
 
