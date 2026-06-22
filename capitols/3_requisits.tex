@@ -16,7 +16,7 @@ S'han definit tres actors principals, classificant-los segons el seu nivell d'in
   \item[Administrador de Sistema:] Actor amb privilegis totals sobre el videogravador. El seu objectiu és la posada en marxa de l'equip i el manteniment correctiu. Les seves responsabilitats inclouen:
         \begin{itemize}
           \item Configuració de paràmetres de xarxa (IP, DNS, Gateways).
-          \item Gestió del cicle de vida del hardware (Reinicis, actualització de firmware).
+          \item Gestió del cicle de vida del \textit{hardware} (Reinicis, actualització de \textit{firmware}).
           \item Administració de comptes d'usuari i permisos.
         \end{itemize}
 
@@ -65,7 +65,7 @@ Com a Administrador o Operador, l'usuari necessita un mecanisme d'accés segur q
     \textbf{Flux Principal}                 &
     1. L'usuari accedeix a l'aplicació; el sistema redirigeix a la pàgina d'inici de sessió. \newline
     2. L'usuari introdueix nom d'usuari i contrasenya. \newline
-    3. El backend valida les credencials i estableix una cookie de sessió segura, inaccessible des del codi client. \newline
+    3. El \textit{backend} valida les credencials i estableix una cookie de sessió segura, inaccessible des del codi client. \newline
     4. El sistema consulta el perfil de l'usuari per obtenir el seu rol i els permisos associats (\textit{grants}). \newline
     5. La interfície inicialitza l'estat de sessió en memòria (Signal privat, \textit{zero-persistence}) i redirigeix a la pàgina principal. \newline
     6. S'estableix el canal de notificacions persistent \textbf{la-core-notifier} que roman actiu durant tota la sessió.                                                                                     \\ \hline
@@ -80,28 +80,28 @@ Com a Administrador o Operador, l'usuari necessita un mecanisme d'accés segur q
 \end{table}
 
 \clearpage
-\subsection{UC-01: Gestió de l'actualització de firmware}
-Com a Administrador de Sistema, es vol actualitzar el firmware del dispositiu des de la interfície web per mantenir el sistema al dia amb les darreres millores i correccions de seguretat, sense necessitat d'accés físic al gravador.
+\subsection{UC-01: Gestió de l'actualització de \textit{firmware}}
+Com a Administrador de Sistema, es vol actualitzar el \textit{firmware} del dispositiu des de la interfície web per mantenir el sistema al dia amb les darreres millores i correccions de seguretat, sense necessitat d'accés físic al gravador.
 
 \begin{table}[htbp]
   \centering
   \small
   \begin{tabular}{|l|p{10cm}|}
     \hline
-    \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-01: Actualització remota de firmware}                                                                               \\ \hline
+    \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-01: Actualització remota de \textit{firmware}}                                                                               \\ \hline
     \textbf{Actor}                          & Administrador                                                                                                                  \\ \hline
-    \textbf{Descripció}                     & L'usuari carrega un binari de firmware per actualitzar les capacitats del dispositiu. L'operació és crítica: durant la gravació del binari a la partició de reserva i el reinici, el sistema és inaccessible i cap altre usuari no pot realitzar canvis de configuració.                                                                                              \\ \hline
+    \textbf{Descripció}                     & L'usuari carrega un binari de \textit{firmware} per actualitzar les capacitats del dispositiu. L'operació és crítica: durant la gravació del binari a la partició de reserva i el reinici, el sistema és inaccessible i cap altre usuari no pot realitzar canvis de configuració.                                                                                              \\ \hline
     \textbf{Precondicions}                  & Usuari autenticat com administrador. El gravador ha de tenir més d'un 10\% d'espai lliure a la partició de sistema.            \\ \hline
     \textbf{Flux Principal}                 &
     1. L'usuari accedeix al mòdul de Manteniment. \newline
-    2. L'usuari selecciona un fitxer de firmware des del seu equip local. \newline
+    2. L'usuari selecciona un fitxer de \textit{firmware} des del seu equip local. \newline
     3. El sistema valida la signatura, el format i la mida del fitxer abans de procedir. \newline
     4. S'inicia la transferència del fitxer al dispositiu. La interfície bloqueja totes les accions de configuració i redirigeix qualsevol altre usuari connectat a la pantalla d'actualització. \newline
     5. El sistema mostra el progrés per fases: transferència, gravació a la partició de reserva i reinici. \newline
     6. El dispositiu es reinicia. La interfície mostra una pantalla d'espera fins que el dispositiu torna a estar en línia i confirma que l'actualització s'ha completat correctament.  \\ \hline
     \textbf{Flux Alternatiu}                &
-    5a. Si es detecta un error durant la gravació (fitxer corrupte o fallada de verificació), el dispositiu recupera automàticament la versió anterior de firmware i torna a estar operatiu. \\ \hline
-    \textbf{Postcondició}                   & El dispositiu funciona amb el nou firmware. La sessió de tots els usuaris es restableix un cop el dispositiu torna a estar en línia.                                               \\ \hline
+    5a. Si es detecta un error durant la gravació (fitxer corrupte o fallada de verificació), el dispositiu recupera automàticament la versió anterior de \textit{firmware} i torna a estar operatiu. \\ \hline
+    \textbf{Postcondició}                   & El dispositiu funciona amb el nou \textit{firmware}. La sessió de tots els usuaris es restableix un cop el dispositiu torna a estar en línia.                                               \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-01.}
   \label{tab:uc_firmware}
@@ -124,7 +124,7 @@ Com a Operador, es vol consultar i reproduir el vídeo gravat del passat mitjan�
     \textbf{Precondicions}                  & Usuari autenticat amb permís de reproducció i descàrrega. El gravador disposa de gravacions per a la data sol·licitada.         \\ \hline
     \textbf{Flux Principal}                 &
     1. L'usuari activa el mode ``Playback'' des de la vista de càmera. \newline
-    2. El frontend sol·licita al backend l'índex de gravacions per a una data concreta. \newline
+    2. El \textit{frontend} sol·licita al \textit{backend} l'índex de gravacions per a una data concreta. \newline
     3. La interfície mostra una línia de temps amb codificació de colors per tipus de gravació (contínua, per alarma). \newline
     4. L'usuari fa clic en un punt de la línia de temps. \newline
     5. El reproductor HLS inicia la càrrega del fragment de vídeo corresponent al punt seleccionat (criteri: precisió d'1 segon a través del lliscador). \\ \hline
@@ -154,12 +154,12 @@ Com a Operador, es vol veure el vídeo de qualsevol càmera connectada per vigil
     \textbf{Precondicions}                  & Sessió activa. La càmera és accessible a la xarxa i el servei \textbf{MediaMTX} és operatiu.                                  \\ \hline
     \textbf{Flux Principal}                 &
     1. L'usuari selecciona una càmera a la llista de la vista \textit{Cameras}. \newline
-    2. El frontend negocia la connexió WebRTC: envia una petició \texttt{POST} WHEP a \texttt{/stream/<camera\_id>/whep} via NGINX. \newline
+    2. El \textit{frontend} negocia la connexió WebRTC: envia una petició \texttt{POST} WHEP a \texttt{/stream/<camera\_id>/whep} via NGINX. \newline
     3. \textbf{MediaMTX} retorna la resposta SDP i estableix el flux SRTP/UDP directe (ICE Host Candidate en LAN). \newline
     4. El reproductor mostra el vídeo en directe amb latència $<$300 ms. \newline
     5. L'usuari pot afegir fins a tres càmeres addicionals al mosaic seguint el mateix procés.                                   \\ \hline
     \textbf{Flux Alternatiu}                &
-    3a. Si els ports UDP 10000--20000 estan bloquejats per \textit{firewall}, el frontend detecta el \textit{timeout} ICE i commuta a HLS en $<$5 s. \newline
+    3a. Si els ports UDP 10000--20000 estan bloquejats per \textit{firewall}, el \textit{frontend} detecta el \textit{timeout} ICE i commuta a HLS en $<$5 s. \newline
     4a. Qualsevol pèrdua de connexió és notificada immediatament al \textit{frontend} via WebSocket (\textbf{la-core-notifier}).  \\ \hline
     \textbf{Postcondició}                   & El vídeo es reprodueix de forma contínua. Si la connexió es talla, el sistema intenta la reconnexió automàtica.                \\ \hline
   \end{tabular}
@@ -188,10 +188,10 @@ Com a Operador, es volen rebre i gestionar notificacions d'alarmes en temps real
     3. L'alarma s'envia al \textit{frontend} via WSS en $<$1 s des de la detecció. \newline
     4. La interfície mostra la notificació (badge visual i alerta sonora) a la barra de navegació. \newline
     5. L'operador accedeix a la pàgina d'alarmes, filtra per càmera o estat i selecciona l'alarma. \newline
-    6. L'operador marca l'alarma com a llegida, l'arxiva o l'elimina; l'acció es confirma immediatament al backend.               \\ \hline
+    6. L'operador marca l'alarma com a llegida, l'arxiva o l'elimina; l'acció es confirma immediatament al \textit{backend}.               \\ \hline
     \textbf{Flux Alternatiu}                &
     3a. Si el WebSocket es talla, el sistema intenta reconnexió exponencial; en reconnectar, recupera els events perduts. \newline
-    6a. Si l'operador no té permís per eliminar, l'acció es deshabilita visualment i el backend retorna 403.                      \\ \hline
+    6a. Si l'operador no té permís per eliminar, l'acció es deshabilita visualment i el \textit{backend} retorna 403.                      \\ \hline
     \textbf{Postcondició}                   & L'historial d'alarmes queda actualitzat. Els canvis d'estat es reflecteixen a tots els clients connectats en temps real.       \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-04.}
@@ -202,7 +202,7 @@ Com a Operador, es volen rebre i gestionar notificacions d'alarmes en temps real
 
 \clearpage
 \subsection{UC-05: Motor de configuració dinàmica}
-Com a Administrador, es vol que els nous paràmetres afegits al firmware apareguin a la web sense haver de reprogramar el \textit{frontend}, garantint que la interfície evoluciona automàticament amb el maquinari sense cap intervenció del equip de desenvolupament.
+Com a Administrador, es vol que els nous paràmetres afegits al \textit{firmware} apareguin a la web sense haver de reprogramar el \textit{frontend}, garantint que la interfície evoluciona automàticament amb el maquinari sense cap intervenció de l'equip de desenvolupament.
 
 \begin{table}[htbp]
   \centering
@@ -211,7 +211,7 @@ Com a Administrador, es vol que els nous paràmetres afegits al firmware aparegu
     \hline
     \rowcolor{backcolour} \textbf{ID i Nom} & \textbf{UC-05: Configuració dinàmica per esquema JSON}                                                                         \\ \hline
     \textbf{Actor}                          & Administrador                                                                                                                  \\ \hline
-    \textbf{Descripció}                     & El motor \textit{schema-driven} permet que \textbf{la-core-legacy} sigui l'única font de veritat de la configuració. El \textit{frontend} no té cap descripció codificada dels paràmetres del gravador: els descobreix en temps d'execució via l'esquema JSON i en renderitza els controls visualment de forma dinàmica (camps de text, llistes desplegables, \textit{sliders}). Les restriccions de tipus, rang i format declarades a l'esquema (\texttt{\_type}, \texttt{\_min}, \texttt{\_max}, \texttt{\_regex}, \texttt{\_allowedValues}) s'apliquen automàticament sense requerir cap canvi al codi del \textit{frontend}. Cobreix la configuració de xarxa (IP, DNS, ports) i tots els paràmetres de les càmeres i del firmware.   \\ \hline
+    \textbf{Descripció}                     & El motor \textit{schema-driven} permet que \textbf{la-core-legacy} sigui l'única font de veritat de la configuració. El \textit{frontend} no té cap descripció codificada dels paràmetres del gravador: els descobreix en temps d'execució via l'esquema JSON i en renderitza els controls visualment de forma dinàmica (camps de text, llistes desplegables, \textit{sliders}). Les restriccions de tipus, rang i format declarades a l'esquema (\texttt{\_type}, \texttt{\_min}, \texttt{\_max}, \texttt{\_regex}, \texttt{\_allowedValues}) s'apliquen automàticament sense requerir cap canvi al codi del \textit{frontend}. Cobreix la configuració de xarxa (IP, DNS, ports) i tots els paràmetres de les càmeres i del \textit{firmware}.   \\ \hline
     \textbf{Precondicions}                  & L'administrador s'ha autenticat i navega a un mòdul de configuració. \textbf{la-core-legacy} és accessible. Cap altre administrador no posseeix el \textit{lock} del mòdul.      \\ \hline
     \textbf{Flux Principal}                 &
     1. El \textit{frontend} adquireix el \textit{Config Lock} exclusiu del mòdul (\texttt{LockService}). \newline
@@ -222,7 +222,7 @@ Com a Administrador, es vol que els nous paràmetres afegits al firmware aparegu
     6. El \textit{lock} s'allibera; la nova configuració és activa al dispositiu.                                                 \\ \hline
     \textbf{Flux Alternatiu}                &
     1a. Si un altre administrador té el \textit{lock} actiu, el mòdul s'obre en mode ``Només Lectura'' amb indicació del propietari. \newline
-    5a. Si el backend rebutja algun camp, el \textit{lock} s'allibera i cap canvi no s'aplica; l'error es mostra a l'usuari.      \\ \hline
+    5a. Si el \textit{backend} rebutja algun camp, el \textit{lock} s'allibera i cap canvi no s'aplica; l'error es mostra a l'usuari.      \\ \hline
     \textbf{Postcondició}                   & La nova configuració és activa al dispositiu. El \textit{lock} queda alliberat per a futurs editors.                          \\ \hline
   \end{tabular}
   \caption{Especificació detallada del Cas d'Ús UC-05.}
@@ -249,7 +249,7 @@ Com a Administrador, es vol gestionar el cicle de vida del dispositiu (comptes d
     \textbf{Llicència:} Consulta la data de caducitat i les funcionalitats habilitades; si cal, inicia el procés de renovació. \newline
     \textbf{Configuració general:} Descarrega la configuració actual, la carrega des d'un fitxer extern o restaura els valors de fàbrica; les operacions destructives requereixen confirmació explícita. \newline
     \textbf{Documentació:} Accedeix a manuals, notes de versió i guies de configuració integrades al sistema sense necessitat de recursos externs. \newline
-    \textbf{Log:} Cerca per filtre (data, nivell) i descarrega els registres d'events del dispositiu per al diagnòstic i l'auditoria.  \\ \hline
+    \textbf{Log:} Cerca per filtre (data, nivell) i descarrega els registres d'esdeveniments del dispositiu per al diagnòstic i l'auditoria.  \\ \hline
     \textbf{Flux Alternatiu}                &
     Restauració a valors de fàbrica: requereix doble confirmació (diàleg modal + text de confirmació escrit) per evitar l'execució accidental. \newline
     Modificació d'usuaris: qualsevol canvi de permisos invalida les sessions actives de l'usuari afectat.                        \\ \hline
@@ -307,7 +307,7 @@ Els requisits no funcionals (RNF) defineixen les qualitats observables del siste
   \begin{tabular}{|l|p{10cm}|}
     \hline
     \textbf{Codi}                    & RNF-03 \\ \hline
-    \textbf{Descripció}              & El \textit{frontend} ha de minimitzar el trànsit innecessari vers el backend i les renderitzacions redundants del DOM, per alliberar la CPU del gravador ---un dispositiu \textit{embedded} de recursos limitats--- per a les seves tasques crítiques de captura i gravació. \\ \hline
+    \textbf{Descripció}              & El \textit{frontend} ha de minimitzar el trànsit innecessari vers el \textit{backend} i les renderitzacions redundants del DOM, per alliberar la CPU del gravador ---un dispositiu \textit{embedded} de recursos limitats--- per a les seves tasques crítiques de captura i gravació. \\ \hline
     \textbf{Justificació}            & El \textit{polling} HTTP periòdic i les re-renderitzacions de Zone.js innecessàries consumeixen CPU tant al client com al servidor, degradant la qualitat del vídeo gravat en situació de càrrega alta. \\ \hline
     \textbf{Criteris d'Acceptació}   & (a) Arquitectura WebSocket \textit{event-driven} per a notificacions (zero \textit{polling}). (b) Ús exclusiu d'\textit{Angular Signals} per a la reactivitat dels components de vídeo. (c) L'ús de CPU del procés NGINX no ha d'incrementar en més d'un 5\% respecte a la línia base en la prova de càrrega de 4 fluxos simultanis (Capítol~\ref{ch:validacio}). \\ \hline
   \end{tabular}
@@ -344,7 +344,7 @@ Els requisits no funcionals (RNF) defineixen les qualitats observables del siste
     \textbf{Codi}                    & RNF-05 \\ \hline
     \textbf{Descripció}              & Per evitar escriptures concurrents conflictives, el sistema ha d'aplicar un bloqueig pessimista (\textit{Pessimistic Locking}) en l'adquisició dels formularis de configuració activa. Cap usuari no pot modificar paràmetres d'un mòdul si un altre usuari en posseeix el \textit{lock} exclusiu. \\ \hline
     \textbf{Justificació}            & En instal·lacions amb múltiples administradors connectats simultàniament (centres de control multi-operador), les escriptures concurrents podrien corrompre la configuració del gravador. \\ \hline
-    \textbf{Criteris d'Acceptació}   & (a) El \textit{lock} es renova automàticament cada \texttt{expiresIn/2} (30 s o 60 s) fora de Zone.js. (b) Si el client perd la connexió, el backend allibera el \textit{lock} en $\leq 120$ s. (c) Un administrador amb privilegi pot forçar l'alliberament (\texttt{force=true}) per desbloquejar sessions zombi. \\ \hline
+    \textbf{Criteris d'Acceptació}   & (a) El \textit{lock} es renova automàticament cada \texttt{expiresIn/2} (30 s o 60 s) fora de Zone.js. (b) Si el client perd la connexió, el \textit{backend} allibera el \textit{lock} en $\leq 120$ s. (c) Un administrador amb privilegi pot forçar l'alliberament (\texttt{force=true}) per desbloquejar sessions zombi. \\ \hline
   \end{tabular}
   \caption{RNF-05: Config Lock pessimista.}
   \label{tab:rnf05}
@@ -360,7 +360,7 @@ Els requisits no funcionals (RNF) defineixen les qualitats observables del siste
     \hline
     \textbf{Codi}                    & RNF-06 \\ \hline
     \textbf{Descripció}              & La sessió activa ha de mantenir-se viva de forma automàtica durant tot el temps que l'usuari tingui la pestanya oberta, mitjançant un mecanisme de \textit{keep-alive} que refresqui la cookie de sessió cada 60 s. \\ \hline
-    \textbf{Justificació}            & Un operador de vigilància pot romandre a la mateixa vista durant hores sense interacció activa. Un \textit{timeout} de sessió forçat interrompria el treball de monitorització i obligaria l'operador a rautenticar-se. \\ \hline
+    \textbf{Justificació}            & Un operador de vigilància pot romandre a la mateixa vista durant hores sense interacció activa. Un \textit{timeout} de sessió forçat interrompria el treball de monitorització i obligaria l'operador a reautenticar-se. \\ \hline
     \textbf{Criteris d'Acceptació}   & La cookie de sessió es refresca cada $60 \pm 5$ s, verificat per inspecció de les peticions de xarxa al navegador durant 10 min. El servidor invalida la sessió si no rep cap \textit{keep-alive} en $>90$ s. \\ \hline
   \end{tabular}
   \caption{RNF-06: Keep-alive de sessió.}
@@ -406,7 +406,7 @@ Els requisits no funcionals (RNF) defineixen les qualitats observables del siste
 
 \section{Model Conceptual}
 \label{sec:model_conceptual}
-El model conceptual representa les entitats pures de la lògica de negoci del sistema NVR, independentment de la tecnologia d'implementació (Angular al \textit{frontend}, C++ al backend o el sistema de fitxers FS2 per a les gravacions). L'objectiu és capturar els conceptes del domini ---les seves propietats, relacions i invariants--- tal com els percep el negoci, sense entrar en detalls d'implementació.
+El model conceptual representa les entitats pures de la lògica de negoci del sistema NVR, independentment de la tecnologia d'implementació (Angular al \textit{frontend}, C++ al \textit{backend} o el sistema de fitxers FS2 per a les gravacions). L'objectiu és capturar els conceptes del domini ---les seves propietats, relacions i invariants--- tal com els percep el negoci, sense entrar en detalls d'implementació.
 
 \begin{figure}[htbp]
   \centering
@@ -420,7 +420,7 @@ El model conceptual representa les entitats pures de la lògica de negoci del si
 El model identifica set entitats principals i les seves relacions:
 
 \begin{description}
-  \item[\textbf{NVR (Videogravador):}] Entitat arrel que representa el dispositiu físic. Conté la versió de firmware activa i el seu estat de connectivitat. Totes les entitats dependents (càmeres, usuaris) existeixen en el context d'un NVR concret.
+  \item[\textbf{NVR (Videogravador):}] Entitat arrel que representa el dispositiu físic. Conté la versió de \textit{firmware} activa i el seu estat de connectivitat. Totes les entitats dependents (càmeres, usuaris) existeixen en el context d'un NVR concret.
 
   \item[\textbf{Càmera:}] Representa una càmera IP connectada al gravador. Cada càmera té un identificador numèric únic, una adreça IP, el codec de compressió actiu (H.264 o H.265) i un estat de connectivitat. \textbf{Restricció d'integritat:} un NVR pot tenir entre 0 i un màxim de 151 càmeres, determinat per les capacitats del model de maquinari i la llicència activa.
 
@@ -440,7 +440,7 @@ El desenvolupament s'ha de cenyir a les següents limitacions:
 \begin{itemize}
   \item \textbf{Seguretat:} Per evitar atacs \textit{Cross-Site Scripting} (XSS) i \textit{Cross-Site Request Forgery} (CSRF)~\cite{owasp_top10}, no s'utilitzen cookies llegibles per JavaScript ni el \textit{LocalStorage} del navegador per emmagatzemar dades de sessió. La sessió es gestiona mitjançant cookies segures inaccessibles des del codi client, de manera que cap \textit{script} de la pàgina pot llegir ni modificar les credencials. L'estat d'autenticació al \textit{frontend} es manté únicament en memòria.
   \item \textbf{Same-Origin Policy:} Les peticions només poden ser acceptades si provenen del mateix origen que serveix l'aplicació Angular (configurat al NGINX).
-  \item \textbf{Llicència:} El sistema ha de verificar que la llicència del hardware permet la visualització de vídeo abans d'obrir els ports de streaming.
+  \item \textbf{Llicència:} El sistema ha de verificar que la llicència del \textit{hardware} permet la visualització de vídeo abans d'obrir els ports de streaming.
 \end{itemize}
 \section{Marc normatiu i regulacions}
 Atesa la naturalesa del projecte, que gestiona fluxos de vídeo en temps real, reproduccions d'imatges de persones físiques i dades de configuració de dispositius de seguretat crítics, el disseny i desenvolupament de \textit{Web Core View} s'ha cenyit als estàndards legals i regulacions tècniques nacionals i europees:
