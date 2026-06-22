@@ -29,11 +29,11 @@ flowchart LR
     Home["Home"]
     
     %% -- NAVEGACIÓ GLOBAL (Header) --
-    Home -.->|"Accés Global"| Header["Header (Topbar)"]
-    Header -->|"Notificacions"| Alerts["Alerts / Errors"]
-    Header -->|"Info NVR"| NVRInfo["Panell Info VR"]
-    NVRInfo -->|"Estat Llicència"| License["License Status"]
-    Header -->|"Usuari"| UserInfo["Panell Info Usuari"]
+    Home -.->|"Accés Global"| Header["Header"]
+    Header -->|"Notificacions"| Alerts["Alerts"]
+    Header -->|"Info NVR"| NVRInfo["Panell Info"]
+    NVRInfo -->|"Estat Llicència"| License["License"]
+    Header -->|"Usuari"| UserInfo["Panell Info"]
     UserInfo -->|"Logout"| Login
 
     %% -- SECCIÓ VIDEO --
@@ -48,20 +48,19 @@ flowchart LR
     AlarmDetail -->|"Tanca"| Alarms
 
     %% -- SECCIÓ CONFIGURACIÓ --
-    Home -->|"Rol: Administrador"| Configuration["Grup: Configuration"]
+    Home -->|"Rol: Administrador"| Configuration["Configuration"]
     Configuration --> System["System"]
     Configuration --> Proxy["Web Proxy"]
-    Configuration --> Wizards["Wizards (Legacy)"]
+    Configuration --> Wizards["Wizards"]
     
     %% Detalls del System
-    System --> IPCams["IP Video / Cameres"]
-    System --> Users["Users & Permissions"]
-    System --> OtherConfig["... (Network, I/O, etc)"]
+    System --> IPCams["IP Video"]
+    System --> Users["Users"]
+    System --> OtherConfig["... (Network,I/O,etc)"]
 
     %% -- SECCIÓ MANTENIMENT --
-    Home -->|"Rol: Administrador"| Maintenance["Grup: Maintenance"]
-    Maintenance --> Reports["Reports / Disks"]
-    Maintenance --> Update["Firmware Update"]
-    Maintenance --> SysConfig["System Config"]
+    Home -->|"Rol: Administrador"| Maintenance[" Maintenance"]
+    Maintenance --> Update["Firmware"]
+    Maintenance --> SysConfig["Config"]
     Maintenance --> Logs["Logs"]
     Maintenance --> Docs["Documentation"]

@@ -83,6 +83,7 @@ $int-connectivity-gray: #CCCCCC;
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Aquest desacoblament permet aplicar de manera homogènia els temes de color. Per exemple, els components d'I/O o d'estat de connexió utilitzen aquestes variables semàntiques (\texttt{\$int-connectivity-green}, etc.) per garantir que un mateix canvi d'estat es visualitzi de manera idèntica a qualsevol panell de l'aplicació web.
 
 \subsection{Encapsulació de l'estil}
@@ -113,6 +114,7 @@ S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substi
 }
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
+\medskip
 
 Aquest disseny elàstic permet que els components crítics (com el visor d'alarmes o el llistat lateral de càmeres) es reubiquin, s'escalin o es repleguin automàticament per oferir un espai de treball òptim per a l'operador.
 
@@ -160,7 +162,7 @@ La Figura~\ref{fig:login2} mostra la resposta visual que rep l'operador en intro
   \small Font: Elaboració pròpia.
 \end{figure}
 
-L'estructura de la resposta JSON varia en funció de cada escenari d'autenticació~(Llistat~\ref{lst:auth_responses}):
+L'estructura de la resposta JSON varia en funció de cada escenari d'autenticació\allowbreak{}~(Llistat~\ref{lst:auth_responses}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:auth_responses}, caption={Exemples de resposta segons l'escenari d'autenticació.}]
 // Cas A: Success
@@ -195,6 +197,7 @@ El component de \textit{login} invoca el mètode \texttt{onInitPage()} del serve
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. Aquests es divideixen en un diccionari del costat de client que s'utilitza per mapar les funcionalitats de l'usuari i ocultar o mostrar-les en temps real mitjançant l'ús de \textit{Signals}. Els principals tipus de permisos són:
 
 \begin{itemize}
@@ -224,6 +227,7 @@ El manteniment de la sessió es coordina entre el client i el microservei \textb
 }
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
+\medskip
 
 Si el servidor detecta que el client no ha realitzat un ping durant dos períodes consecutius, invalida el token intern de sessió, garantint que les sessions abandonades per talls de connectivitat o tancaments inesperats del navegador es tanquin de manera segura. Al \textit{frontend}, qualsevol resposta \textbf{HTTP 401 Unauthorized} del servei de KeepAliveSession força la redirecció immediata de l'operador cap a la pantalla de login.
 
@@ -241,6 +245,7 @@ Immediatament després d'un inici de sessió reeixit, l'aplicació obre un canal
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 A partir d'aquest moment, el \textit{backend} propaga asíncronament qualsevol esdeveniment del sistema a tots els clients connectats. El \texttt{UserService} actua com a \textit{dispatcher} centralitzat: tots els missatges rebuts entren per un únic mètode privat que despatxa cada event al servei corresponent a través d'un \textit{switch} sobre el camp \texttt{event} del JSON. Els dos fluxos principals gestionats per aquest canal són:
 
 \textbf{Notificació d'errors globals (\texttt{ERRORS\_NOTIFY}):} Quan \texttt{la-core-notifier} detecta una fallida del maquinari (per exemple, un disc desconnectat o una pèrdua de senyal de vídeo), emet un missatge amb el recompte d'errors actius i pendents de confirmació~(Llistat~\ref{lst:errors_notify_msg}):
@@ -253,6 +258,7 @@ A partir d'aquest moment, el \textit{backend} propaga asíncronament qualsevol e
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 El \textit{dispatcher} deriva la càrrega útil cap a l'\texttt{AlertService}, que actualitza els \textit{Signals} reactius corresponents. Sense interrompre el flux de treball de l'operador, la icona de campana de la capçalera (\texttt{HeaderComponent}) mostra automàticament un \textit{badge} vermell amb el nombre d'alertes pendents.
 
 \textbf{Interrupció per actualització de firmware (\texttt{SOFTWARE\_UPDATE\_NOTIFY}):} Aquest missatge, sense \textit{payload}, s'emet quan un administrador llança un procés d'actualització del microprogramari. A diferència del flux d'errors, l'Angular el tracta com un avís crític i paralitzant: desallotja l'operador de la pantalla on es trobi i el redirigeix forçosament a la ruta \texttt{/firmware} amb l'estat inicial \texttt{UPLOADING}. Aquesta decisió de disseny garanteix que cap operador pugui continuar modificant la configuració del gravador mentre el firmware s'està escrivint a la memòria flash, prevenint possibles corrupcions de dades.
@@ -367,6 +373,7 @@ L'aplicació suporta tres idiomes complets implementats amb la llibreria \textbf
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 \end{minipage}
 \vspace{0.5em}
+\medskip
 
 \textbf{Inicialització i càrrega mandrosa:} La configuració central es declara a \texttt{app.config.ts}, on s'injecta el \texttt{TranslateHttpLoader}. Aquest carregador intercepta la llengua activa del dispositiu i realitza una única petició HTTP GET per descarregar exclusivament el fitxer \texttt{.json} necessari —estalviant amplada de banda al gravador NVR. L'anglès s'estableix com a llengua de reserva (\textit{fallback}) per garantir que cap cadena quedi buida si una traducció manca.
 
@@ -466,7 +473,7 @@ La Figura~\ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\textwidth]{figures/interficies/config5.png}
+  \includegraphics[width=0.95\textwidth]{figures/interficies/config5.png}
   \caption{Diàleg de creació d'un compte d'usuari. Els xips de validació sobre el camp de contrasenya reflecteixen en temps real els requisits de l'esquema (\texttt{\_minLength}, \texttt{\_regex}) que encara no s'han complert.}
   \label{fig:config_create_user}
   \small Font: Elaboració pròpia.
@@ -528,6 +535,7 @@ El Llistat~\ref{lst:schema_json} mostra un fragment real de l'esquema JSON que e
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solapin amb propietats reals del dispositiu. El component \texttt{ConfigInputComponent} llegeix el camp \texttt{\_type} de cada entrada per decidir quin element de la interfície renderitzar: un commutador per a \texttt{"boolean"}, un selector per a \texttt{"list"} usant \texttt{\_allowedValues}, o un camp numèric amb rang per a \texttt{"numeric"} usant \texttt{\_minValue} i \texttt{\_maxValue}.
 
 \subsection{Validació dinàmica}
@@ -542,6 +550,7 @@ Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValu
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Per als formats complexos (adreces IP, màscares i dominis), un \textit{Signal} calculat aplica expressions regulars i retorna el missatge d'error corresponent sense cap petició al servidor.
 
 Per a les contrasenyes, un segon \textit{Signal} independent avalua la política del camp (\texttt{\_policyLevel}) i retorna un vector de criteris que es mostren com a \textit{chips} en temps real~(Llistat~\ref{lst:password_requirements_signal}):
@@ -586,6 +595,7 @@ Si el lock està disponible, el servidor retorna un token d'autorització amb un
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 El \texttt{token} actua com a signatura obligatòria per a totes les operacions d'escriptura posteriors; qualsevol \texttt{PUT} sense token vàlid és rebutjat pel servidor. Si una altra sessió o pestanya ja té el lock, el \textit{backend} retorna \texttt{423 Locked} i el \textit{frontend} commuta automàticament a mode de només lectura via un Signal: l'operador pot consultar tots els paràmetres actuals però no pot modificar cap camp fins que el lock quedi alliberat.
 
 \begin{figure}[htbp]
@@ -613,6 +623,7 @@ saveConfigNode(node: string, data: any): Observable<any> {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 La URL és dinàmica i depèn del node actiu en cada pàgina. Si l'operador edita la xarxa Ethernet, la crida serà \texttt{PUT /config.\allowbreak{}network.\allowbreak{}if.\allowbreak{}eth0}; si edita un usuari del sistema, \texttt{PUT /config.\allowbreak{}users.\allowbreak{}admin}. En tots els casos s'envia l'objecte sencer del node, no un delta incremental.
 
 \textbf{Injecció automàtica del token.} El token del lock no l'afegeix el component ni el servei: ho fa un interceptor HTTP global (\texttt{authInterceptor}). Qualsevol petició a una URL que contingui \texttt{/config.} és interceptada automàticament, i el token s'afegeix com a paràmetre de consulta (\texttt{?token=...}) abans d'arribar al servidor~(Llistat~\ref{lst:auth_interceptor}):
@@ -626,6 +637,7 @@ if (token && isConfigApi && !isLockOrUnlock) {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Gràcies a aquest disseny, cap component de la interfície necessita conèixer ni gestionar el token: l'interceptor garanteix que totes les peticions d'escriptura el portin de forma transparent.
 
 \textbf{Gestió d'errors de validació.} Si el servidor retorna un \texttt{400 Bad Request}, el component actua en tres passos: primer reverteix l'estat local a la còpia original vàlida; després mapeja els camps erronis usant la funció \texttt{parseValidationErrors}; finalment, el Signal \texttt{fieldErrors} propaga els missatges directament als inputs afectats, que es pinten en vermell sense recarregar la pàgina.
@@ -637,6 +649,7 @@ const jsonStr = JSON.stringify(this.config());
 this.originalConfigJson.set(jsonStr);
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
+\medskip
 
 \textbf{Notificació de reinici.} Quan el servidor detecta que el \texttt{PUT} ha tocat un servei crític (com la xarxa), afegeix la capçalera HTTP \texttt{X-Reboot-Required: true} a la resposta; l'\texttt{authInterceptor} la captura i activa un Signal global que renderitza un avís a la barra lateral, des del qual l'operador pot reiniciar el dispositiu quan ho consideri oportú.
 
@@ -693,10 +706,10 @@ El flux tècnic de cada regla implica tres etapes:
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\clearpage
 \section{Visualització multimèdia en directe}
 La visualització de vídeo en directe representa el component més crític de l'operativa de seguretat diària. Per aconseguir un flux de streaming d'alta fidelitat i eliminar l'ús de connectors externs o codi propietari del costat de client, s'ha implementat una arquitectura híbrida de vídeo integrada al sistema operatiu embedded del gravador NXT, utilitzant el protocol de comunicació estàndard \textbf{WebRTC} com a canal de transport principal i \textbf{HLS} (\textit{HTTP Live Streaming}) com a mètode de contingència o \textit{fallback}.
 
+\clearpage
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/interficies/cameras.png}
@@ -769,6 +782,7 @@ export interface StreamingStrategy {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Angular injecta automàticament la implementació correcta en funció del protocol actiu, de manera que el canvi de WebRTC a HLS (o a l'inrevés) no requereix cap modificació al component de visualització.
 
 \subsection{Gestió en temps real de les entrades i sortides digitals}
@@ -787,6 +801,7 @@ export interface IoItem {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 \textbf{Subscripció i recepció d'estats en temps real.} En obrir el panell, el component s'inscriu al WebSocket enviant un missatge \texttt{filter\_update} per rebre els tòpics \texttt{['device/notification', 'io']}. Quan l'estat elèctric d'un dispositiu canvia al \textit{backend}, \textbf{la-core-notifier} emet un esdeveniment \texttt{IO\_NOTIFY} amb el payload~(Llistat~\ref{lst:io_notify_payload}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:io_notify_payload}, caption={Payload de l'esdeveniment \texttt{IO\_NOTIFY} rebut via WebSocket.}]
@@ -797,6 +812,7 @@ export interface IoItem {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 \begin{sloppypar}
 El \texttt{UserService} intercepta l'esdeveniment i delega al \texttt{VideoService.\allowbreak{}updateData()}; aquest localitza l'element per \texttt{id} i \texttt{topic} i actualitza el Signal corresponent. Angular re-renderitza únicament l'indicador afectat sense recarregar la pàgina.
 \end{sloppypar}
@@ -811,6 +827,7 @@ sendActivateO(id: string, data: string) {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Destaca l'ús del verb \textbf{GET} amb tots els paràmetres a la \textit{query string}, sense cos JSON, seguint la convenció de l'\textit{endpoint} CGI heretat. La seguretat final recau en el \textit{backend}: si el compte de sessió no té autorització, el servidor retorna \texttt{403 Forbidden} i l'acció queda anul·lada.
 
 \textbf{Convenció visual dels indicadors.} Cada element pot trobar-se en tres estats visuals: actiu, inactiu o desconnectat. Contràriament a la convenció habitual, el sistema de CCTV utilitza el \textbf{vermell per indicar activitat} (alarma en curs, relé tancat) i el \textbf{verd per indicar repòs} (\textit{idle}, \textit{deactivated}), ja que en seguretat física l'estat "tranquil" és el desitjat. Un símbol d'interrogació gris indica una entrada desconnectada o amb estat desconegut.
@@ -839,9 +856,9 @@ La reproducció de gravacions s'ha dissenyat sota el protocol estàndard de codi
 Quan l'operador selecciona un interval de temps a la interfície d'Angular, el client demana la llista de reproducció realitzant una crida HTTP GET cap a la ruta \texttt{/video-engine/hls-play.\allowbreak{}m3u8?token=...\allowbreak{}\&start=...\allowbreak{}\&end=...}. El servidor de vídeo de l'NVR intercepta la petició mitjançant la funció unificada \texttt{cgi\_hls} i executa el següent algorisme en temps real:
 \begin{enumerate}
   \item \textbf{Cerca de fitxers d'enregistrament:} Mitjançant la biblioteca d'indexació \texttt{lanaccess::searcher}, s'interroga l'historial de gravacions associat al token per localitzar els fitxers d'enregistrament d'FS2 (\textit{File System 2}) que contenen vídeo dins de l'interval indicat pel client.
-  \item {\sloppy\textbf{Anàlisi de l'Índex (\textit{Super Index}):} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega la capçalera unificada en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(\allowbreak{}HD\_BYTES\_PER\_SECTOR,\allowbreak{} ...)}), la qual conté les metadades d'índex de tots els buffers de vídeo que formen el fitxer físic d'enregistrament.\par}
+  \item {\sloppy\textbf{Anàlisi de l'Índex :} Per a cadascun dels fitxers d'enregistrament trobats, l'NVR llegeix i carrega la capçalera unificada en un bloc d'alineació de memòria d'alta velocitat de disc (\texttt{aligned\_alloc(\allowbreak{}HD\_BYTES\_PER\_SECTOR,\allowbreak{} ...)}), la qual conté les metadades d'índex de tots els buffers de vídeo que formen el fitxer físic d'enregistrament.\par}
   \item \textbf{Generació del fitxer de manifest m3u8:} El servidor analitza el timestamp i la durada de cadascun dels buffers de dades i genera de forma dinàmica un fitxer de llista de reproducció que s'ajusta a l'estàndard HLS del W3C.
-  \item \textbf{Gestió de talls de vídeo (\textit{Discontinuity}):} Si l'NVR detecta que el salt temporal entre dos buffers de gravació és superior a 3.0 segons natius (a causa d'una gravació per esdeveniments interrompuda), el servidor injecta de manera automàtica les directives especials \texttt{\#EXT-X-DISCONTINUITY} i \texttt{\#EXT-X-PROGRAM-DATE-TIME}. Això és un requisit crític que informa el reproductor de la interfície d'Angular que la línia temporal s'ha trencat, evitant congelacions en el motor de descodificació de vídeo del client.
+  \item \textbf{Gestió de talls de vídeo:} Si l'NVR detecta que el salt temporal entre dos buffers de gravació és superior a 3.0 segons natius (a causa d'una gravació per esdeveniments interrompuda), el servidor injecta de manera automàtica les directives especials \texttt{\#EXT-X-DISCONTINUITY} i \texttt{\#EXT-X-PROGRAM-DATE-TIME}. Això és un requisit crític que informa el reproductor de la interfície d'Angular que la línia temporal s'ha trencat, evitant congelacions en el motor de descodificació de vídeo del client.
 \end{enumerate}
 
 \subsection{Servidor de segmentació dinàmica}
@@ -964,6 +981,7 @@ static int signal_callback(sd_bus_message *msg, void *userdata, sd_bus_error *re
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Un cop rebut, el missatge es diposita a la cua unificada de tipus \texttt{SafeQueue} anomenada \texttt{global\_alarm\_queue}. Aquesta classe utilitza una variable de condició de la biblioteca estàndard de C++ (\texttt{std::condition\_variable}) i un bloqueig exclusiu mutex (\texttt{std::mutex}) per optimitzar la concurrència sense consum de CPU d'espera activa (\textit{busy-waiting})~(Llistat~\ref{lst:thread_safe_queue}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=C++, label={lst:thread_safe_queue}, caption={Lògica de la cua thread-safe de concurrència d'accessos.}]
@@ -977,6 +995,7 @@ void wait_and_pop(T& value) {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 El fil d'execució de persistència \texttt{db\_client\_thread} es desperta immediatament per processar l'alarma. Aquest fil actua com a client de la base de dades i realitza crides d'alt rendiment mitjançant comunicació binària \textbf{gRPC} cap al servidor local \texttt{la-db-engine}.
 
 Si el canvi és d'estat d'inici de succés (\texttt{status = "start"}), s'efectua una operació d'inserció atòmica. En canvi, si és d'acabament d'incident (\texttt{status = "end"}), l'algorisme fa primer una consulta selectiva per recuperar l'identificador històric original i actualitza la línia de base de dades del registre corresponent, assegurant la correlació exacta dels estats.
@@ -1005,6 +1024,7 @@ END;
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
+\medskip
 Aquesta regla relacional garanteix de forma asíncrona la poda activa del sistema, mantenint l'historial del dispositiu optimitzat amb un màxim estricte de 10.000 registres de manera transparent per al codi del programari d'Angular o de C++.
 
 \subsection{El cicle de vida de les alarmes}
@@ -1034,6 +1054,7 @@ L'operador pot interaccionar amb qualsevol dels registres per tal d'assentir-los
 }
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
+\medskip
 
 El receptor de comandes de la cua del backend \texttt{db\_client\_command\_thread} processa la petició, canvia el flag \texttt{is\_read = 1} al fitxer SQLite3 de forma atòmica i re-emet el senyal d'èxit cap a qualsevol client connectat mitjançant el missatge \texttt{ALARM\_READ\_SUCCESS}, garantint que totes les pantalles d'operadors d'una mateixa instal·lació d'un NVR estiguin sincronitzades i informades en temps real de la recepció de l'incident.
 
@@ -1072,6 +1093,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\clearpage
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.48\textwidth]{figures/interficies/upgrading2.png}
@@ -1082,7 +1104,6 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
   \small Font: Elaboració pròpia.
 \end{figure}
 
-\clearpage
 \section{Configuració global}
 El panell d'accions de configuració unifica les comandes administratives destructives i de salvaguarda de dades (Figura~\ref{fig:ui_configuration_actions}).
 
@@ -1122,6 +1143,7 @@ Per poder treballar amb volums de dades molt grans que poden superar les 500.000
 \section{Ajuda i documentació}
 Un videogravador és un sistema amb una gran quantitat de funcionalitats i paràmetres configurables; és habitual que un operador necessiti consultar la documentació tècnica durant la posada en marxa o davant d'una situació poc freqüent. A més, en entorns industrials o de màxima seguretat, és habitual que els gravadors treballin en una xarxa aïllada físicament del món exterior, on accedir a internet o a servidors corporatius de suport externs és impossible.
 
+\clearpage
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.95\textwidth]{figures/interficies/documentation.png}

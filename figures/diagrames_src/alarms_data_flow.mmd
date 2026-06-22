@@ -15,19 +15,19 @@
 flowchart TD
     subgraph HW["CAPA DE MAQUINARI I SENYALS"]
         Sensor["Sensor / Càmera IP"]
-        DBus["D-Bus\ncom.lanaccess.sysevents"]
+        DBus["D-Bus com.lanaccess.sysevents"]
         Sensor -- "Hardware Interrupt" --> DBus
     end
 
     subgraph ALARM["MICROSERVEI LA-CORE-ALARM"]
         dbus_thread["dbus_listen_alarms_thread"]
-        alarm_queue["global_alarm_queue\n(SafeQueue)"]
+        alarm_queue["global_alarm_queue"]
         db_client["db_client_thread"]
         EmissionQueue["global_emission_queue"]
         WsThread["ws_emit_alarms_thread"]
         dbus_thread -- "Enqueue" --> alarm_queue
         alarm_queue -- "Dequeue & Process" --> db_client
-        db_client -- "Confirmació OK\n(Enqueue EmissionData)" --> EmissionQueue
+        db_client -- "Confirmació OK" --> EmissionQueue
         EmissionQueue --> WsThread
     end
 
