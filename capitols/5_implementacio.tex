@@ -93,7 +93,7 @@ Quant al rendiment visual, totes les microanimacions de la interfície —transi
 \subsection{Adaptabilitat de Disseny}
 Per donar resposta al requisit de compatibilitat multi-terminal (des de tauletes de manteniment de 1024px d'amplada de tècnics de camp, fins a monitors de definició 4K de centres de control), s'ha implementat un disseny totalment adaptatiu utilitzant regles flexibles de \textbf{Flexbox} i \textbf{CSS Grid}.
 
-S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substituint-les per unitats de mesura relatives basades en la mida de font del document (\texttt{rem}) i de l'espai d'execució de la pantalla (\texttt{vh}, \texttt{vw}, \texttt{\%}). Les variacions d'esquema més dràstiques es controlen mitjançant consultes de mitjans (@media queries) enfocades als llindars de resolució següents:
+S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substituint-les per unitats de mesura relatives basades en la mida de font del document (\texttt{rem}) i de l'espai d'execució de la pantalla (\texttt{vh}, \texttt{vw}, \texttt{\%}). Les variacions d'esquema més dràstiques es controlen mitjançant consultes de mitjans (@media queries) enfocades als llindars de resolució següents~(Llistat~\ref{lst:media_query_responsive}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, label={lst:media_query_responsive}, caption={Exemple de Media Query responsiva per a la graella de mosaics del tauler principal.}]
 .camera-grid {
@@ -128,10 +128,10 @@ El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de
   \small Font: Elaboració pròpia.
 \end{figure}
 
-L'API d'autenticació del sistema s'executa com un procés en dues fases coordinat a través del punt d'accés unificat \texttt{/WebLogin}, gestionat pel microservei \textbf{la-core-legacy} i exposat a l'exterior de forma segura mitjançant el proxy invers de NGINX sota el protocol de transport xifrat HTTPS.
+L'API d'autenticació del sistema s'executa com un procés en dues fases coordinat a través del punt d'accés unificat \texttt{/WebLogin}, gestionat pel microservei \textbf{la-core-legacy} i exposat a l'exterior de forma segura mitjançant el proxy invers de NGINX sota el protocol de transport xifrat HTTPS~(Figura~\ref{fig:seq_login}).
 
 \subsection{Verificació de credencials}
-El client envia les credencials introduïdes per l'operador. Tot i que viatgen en text pla dins del JSON, la confidencialitat està garantida pel xifrat de la capa de transport (HTTPS/TLS). S'efectua una petició HTTP POST a \texttt{/WebLogin} enviant el següent payload:
+El client envia les credencials introduïdes per l'operador. Tot i que viatgen en text pla dins del JSON, la confidencialitat està garantida pel xifrat de la capa de transport (HTTPS/TLS). S'efectua una petició HTTP POST a \texttt{/WebLogin} enviant el payload~(Llistat~\ref{lst:plainlogin_request}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:plainlogin_request}, caption={Petició d'enviament de credencials al servidor (PlainLogin).}]
 {
@@ -160,6 +160,8 @@ La Figura~\ref{fig:login2} mostra la resposta visual que rep l'operador en intro
   \small Font: Elaboració pròpia.
 \end{figure}
 
+L'estructura de la resposta JSON varia en funció de cada escenari d'autenticació~(Llistat~\ref{lst:auth_responses}):
+
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:auth_responses}, caption={Exemples de resposta segons l'escenari d'autenticació.}]
 // Cas A: Success
 { "LoginResponse": "success", "RetryCount": null }
@@ -175,7 +177,7 @@ La Figura~\ref{fig:login2} mostra la resposta visual que rep l'operador en intro
 \subsection{Obtenció del context i resolució de permisos}
 Un cop es rep la confirmació d'èxit de la Fase 1, l'aplicació s'ha d'inicialitzar. Com que les dades de sessió no s'emmagatzemen al magatzem local (\textit{LocalStorage}) per evitar atacs de tipus \textit{Cross-Site Scripting} (XSS), el \textit{frontend} de l'aplicació utilitza la comunicació asíncrona validada per la cookie de sessió mantinguda al navegador.
 
-El component de \textit{login} invoca el mètode \texttt{onInitPage()} del servei propi Angular \texttt{UserService}, el qual realitza una nova petició POST cap a \texttt{/WebLogin} sota la comanda de control de context \texttt{GetWhoamI}:
+El component de \textit{login} invoca el mètode \texttt{onInitPage()} del servei propi Angular \texttt{UserService}, el qual realitza una nova petició POST cap a \texttt{/WebLogin} sota la comanda de control de context \texttt{GetWhoamI}~(Llistat~\ref{lst:whoami_request}):
 
 \clearpage
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:whoami_request}, caption={Petició d'obtenció de perfil i permisos del context d'usuari.}]
@@ -214,7 +216,7 @@ Aquesta resposta conté els permisos explícits (\textit{grants}) de l'usuari. A
 \end{figure}
 
 \subsection{Mecanisme de Keep-Alive}
-El manteniment de la sessió es coordina entre el client i el microservei \textbf{la-core-legacy} a través del \textit{Heartbeat} emès periòdicament pel servei \texttt{KeepAliveService}. Cada 60 segons, el client envia una crida POST a l'endpoint de validació de sessió:
+El manteniment de la sessió es coordina entre el client i el microservei \textbf{la-core-legacy} a través del \textit{Heartbeat} emès periòdicament pel servei \texttt{KeepAliveService}. Cada 60 segons, el client envia una crida POST a l'endpoint de validació de sessió~(Llistat~\ref{lst:keepalive_msg}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:keepalive_msg}, caption={Trama de Keep-Alive enviada periòdicament al servidor.}]
 {
@@ -226,7 +228,7 @@ El manteniment de la sessió es coordina entre el client i el microservei \textb
 Si el servidor detecta que el client no ha realitzat un ping durant dos períodes consecutius, invalida el token intern de sessió, garantint que les sessions abandonades per talls de connectivitat o tancaments inesperats del navegador es tanquin de manera segura. Al \textit{frontend}, qualsevol resposta \textbf{HTTP 401 Unauthorized} del servei de KeepAliveSession força la redirecció immediata de l'operador cap a la pantalla de login.
 
 \subsection{Subscripció Asíncrona de Temps Real i Notificacions}
-Immediatament després d'un inici de sessió reeixit, l'aplicació obre un canal de comunicació persistent via \textbf{WebSocket Segur (WSS)} cap al camí \texttt{/ws/la-core\allowbreak{}-notifier/}. La gestió d'aquest canal recau sobre el \texttt{UserService}, que en coordina la connexió a través del \texttt{WebSocketService} com a capa de transport. Un cop establert el canal, el client declara els tòpics als quals es vol subscriure:
+Immediatament després d'un inici de sessió reeixit, l'aplicació obre un canal de comunicació persistent via \textbf{WebSocket Segur (WSS)} cap al camí \texttt{/ws/la-core\allowbreak{}-notifier/}. La gestió d'aquest canal recau sobre el \texttt{UserService}, que en coordina la connexió a través del \texttt{WebSocketService} com a capa de transport. Un cop establert el canal, el client declara els tòpics als quals es vol subscriure~(Llistat~\ref{lst:subscription_msg}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:subscription_msg}, caption={Missatge de subscripció enviat pel client en inicialitzar el canal \texttt{la-core-notifier}.}]
 {
@@ -241,7 +243,7 @@ Immediatament després d'un inici de sessió reeixit, l'aplicació obre un canal
 
 A partir d'aquest moment, el \textit{backend} propaga asíncronament qualsevol esdeveniment del sistema a tots els clients connectats. El \texttt{UserService} actua com a \textit{dispatcher} centralitzat: tots els missatges rebuts entren per un únic mètode privat que despatxa cada event al servei corresponent a través d'un \textit{switch} sobre el camp \texttt{event} del JSON. Els dos fluxos principals gestionats per aquest canal són:
 
-\textbf{Notificació d'errors globals (\texttt{ERRORS\_NOTIFY}):} Quan \texttt{la-core-notifier} detecta una fallida del maquinari (per exemple, un disc desconnectat o una pèrdua de senyal de vídeo), emet un missatge amb el recompte d'errors actius i pendents de confirmació:
+\textbf{Notificació d'errors globals (\texttt{ERRORS\_NOTIFY}):} Quan \texttt{la-core-notifier} detecta una fallida del maquinari (per exemple, un disc desconnectat o una pèrdua de senyal de vídeo), emet un missatge amb el recompte d'errors actius i pendents de confirmació~(Llistat~\ref{lst:errors_notify_msg}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:errors_notify_msg}, caption={Estructura del missatge \texttt{ERRORS\_NOTIFY} rebut pel \textit{frontend}.}]
 {
@@ -312,7 +314,7 @@ Al seu costat, el panell d'usuari (Figura~\ref{fig:ui_home_panels}, dreta) detal
 \subsection{Gestió Multilingüe}
 L'aplicació suporta tres idiomes complets implementats amb la llibreria \textbf{ngx-translate}. L'objectiu no és únicament adaptar els textos de la interfície, sinó dissenyar el sistema perquè el departament de documentació de l'empresa pugui revisar i ampliar traduccions editant un únic fitxer JSON per idioma, sense necessitat de recompilar el codi Angular.
 
-\textbf{Estructura dels diccionaris:} Les cadenes de text estan organitzades jeràrquicament per vistes i mòduls funcionals dins de la carpeta \texttt{/assets/i18n/}. Cada clau segueix la convenció \texttt{modul.seccio.clau}, referenciada directament des de les plantilles HTML amb el \textit{pipe} de traducció: \texttt{\{\{ 'system.dialogs.rebootTitle' | translate \}\}}.
+\textbf{Estructura dels diccionaris:} Les cadenes de text estan organitzades jeràrquicament per vistes i mòduls funcionals dins de la carpeta \texttt{/assets/i18n/}. Cada clau segueix la convenció \texttt{modul.seccio.clau}, referenciada directament des de les plantilles HTML amb el \textit{pipe} de traducció: \texttt{\{\{ 'system.dialogs.rebootTitle' | translate \}\}}~(Llistats~\ref{lst:i18n_en} i~\ref{lst:i18n_es}).
 
 \vspace{0.5em}
 \noindent
@@ -432,6 +434,8 @@ Per evitar l'anomenada \textit{"Configuració Fantasma"} (per exemple, que l'usu
   \item \textbf{Capa Lògica (Dades de Configuració):} Representa l'arbre de configuració real que l'operador decideix aplicar (ex: \textit{"activa la gravació quan l'entrada 3 estigui activa"}).
 \end{enumerate}
 
+La pàgina de configuració de xarxa il·lustra com les tres capes operen en conjunt per garantir que l'operador únicament pugui configurar paràmetres vàlids i aplicables al dispositiu real~(Figura~\ref{fig:config_network}).
+
 \clearpage
 \begin{figure}[htbp]
   \centering
@@ -529,7 +533,7 @@ L'ús de prefixos \texttt{\_} garanteix que les metadades de l'esquema mai solap
 \subsection{Validació Dinàmica}
 La validació de les entrades segueix una estratègia dual que separa els casos senzills dels formats complexos per minimitzar la càrrega sobre el motor de detecció de canvis d'Angular.
 
-Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValue}) i de longitud de text (\texttt{\_maxLength}), el \textit{template} Angular vincula directament els valors de l'esquema als atributs natius de l'\texttt{<input>} HTML5. D'aquesta manera, el navegador s'encarrega de la validació sense que Angular hagi d'executar cap lògica addicional. El component gestiona el cas en què el \textit{backend} pugui enviar indistintament \texttt{\_min} o \texttt{\_minValue} mitjançant un operador ternari al propi \textit{template}:
+Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValue}) i de longitud de text (\texttt{\_maxLength}), el \textit{template} Angular vincula directament els valors de l'esquema als atributs natius de l'\texttt{<input>} HTML5. D'aquesta manera, el navegador s'encarrega de la validació sense que Angular hagi d'executar cap lògica addicional. El component gestiona el cas en què el \textit{backend} pugui enviar indistintament \texttt{\_min} o \texttt{\_minValue} mitjançant un operador ternari al propi \textit{template}~(Llistat~\ref{lst:schema_input_binding}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=HTML, label={lst:schema_input_binding}, caption={Vinculaci\'o de les restriccions num\`eriques de l'esquema als atributs natius de l'\textit{input} HTML5.}]
 <input type="number"
@@ -540,7 +544,7 @@ Per als límits simples de rang numèric (\texttt{\_minValue}, \texttt{\_maxValu
 
 Per als formats complexos (adreces IP, màscares i dominis), un \textit{Signal} calculat aplica expressions regulars i retorna el missatge d'error corresponent sense cap petició al servidor.
 
-Per a les contrasenyes, un segon \textit{Signal} independent avalua la política del camp (\texttt{\_policyLevel}) i retorna un vector de criteris que es mostren com a \textit{chips} en temps real:
+Per a les contrasenyes, un segon \textit{Signal} independent avalua la política del camp (\texttt{\_policyLevel}) i retorna un vector de criteris que es mostren com a \textit{chips} en temps real~(Llistat~\ref{lst:password_requirements_signal}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:password_requirements_signal}, caption={Signal \texttt{passwordRequirements}: avaluaci\'o reactiva dels criteris de la pol\'itica de contrasenya.}]
 passwordRequirements = computed<RequirementStatus[]>(() => {
@@ -571,7 +575,7 @@ Per evitar que dos operadors sobreescriguin els mateixos paràmetres simultània
 
 El paràmetre \texttt{seed} és un identificador únic generat per Angular i persistit a \textit{localStorage} per a cada pestanya del navegador. El seu propòsit és evitar interferències entre pestanyes del mateix dispositiu: si un operador obre la pàgina de configuració en una segona pestanya, el servidor detecta que el \texttt{seed} és diferent del que té el lock i retorna un error \texttt{423 Locked}. D'aquesta manera, el sistema garanteix que en tot moment només hi hagi una única pestanya amb permisos d'escriptura actius.
 
-Si el lock està disponible, el servidor retorna un token d'autorització amb un temps de vida (\texttt{expiresIn}):
+Si el lock està disponible, el servidor retorna un token d'autorització amb un temps de vida (\texttt{expiresIn})~(Llistat~\ref{lst:config_lock_json}):
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:config_lock_json}, caption={Estructura JSON del bloqueig de configuració.}]
 {
   "path": "config",
@@ -599,7 +603,7 @@ El token caduca passat \texttt{expiresIn} segons si el \textit{frontend} no el r
 El desar és sempre explícit: no hi ha autosave ni \textit{debounce}. L'operador ha de prémer el botó \textit{Save Changes} per confirmar les modificacions.
 
 \begin{sloppypar}
-\textbf{Petició HTTP.} Quan l'operador prem \textit{Save}, el component crida \texttt{saveConfigNode}, que envia un \texttt{PUT} a la URL del node actiu:
+\textbf{Petició HTTP.} Quan l'operador prem \textit{Save}, el component crida \texttt{saveConfigNode}, que envia un \texttt{PUT} a la URL del node actiu~(Llistat~\ref{lst:save_config_node}):
 \end{sloppypar}
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:save_config_node}, caption={M\`etode \texttt{saveConfigNode}: petici\'o \texttt{PUT} al node de configuraci\'o actiu.}]
@@ -611,7 +615,7 @@ saveConfigNode(node: string, data: any): Observable<any> {
 
 La URL és dinàmica i depèn del node actiu en cada pàgina. Si l'operador edita la xarxa Ethernet, la crida serà \texttt{PUT /config.\allowbreak{}network.\allowbreak{}if.\allowbreak{}eth0}; si edita un usuari del sistema, \texttt{PUT /config.\allowbreak{}users.\allowbreak{}admin}. En tots els casos s'envia l'objecte sencer del node, no un delta incremental.
 
-\textbf{Injecció automàtica del token.} El token del lock no l'afegeix el component ni el servei: ho fa un interceptor HTTP global (\texttt{authInterceptor}). Qualsevol petició a una URL que contingui \texttt{/config.} és interceptada automàticament, i el token s'afegeix com a paràmetre de consulta (\texttt{?token=...}) abans d'arribar al servidor:
+\textbf{Injecció automàtica del token.} El token del lock no l'afegeix el component ni el servei: ho fa un interceptor HTTP global (\texttt{authInterceptor}). Qualsevol petició a una URL que contingui \texttt{/config.} és interceptada automàticament, i el token s'afegeix com a paràmetre de consulta (\texttt{?token=...}) abans d'arribar al servidor~(Llistat~\ref{lst:auth_interceptor}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:auth_interceptor}, caption={Fragment de \texttt{authInterceptor}: injecci\'o transparent del token de lock a totes les peticions de configuraci\'o.}]
 if (token && isConfigApi && !isLockOrUnlock) {
@@ -626,7 +630,7 @@ Gràcies a aquest disseny, cap component de la interfície necessita conèixer n
 
 \textbf{Gestió d'errors de validació.} Si el servidor retorna un \texttt{400 Bad Request}, el component actua en tres passos: primer reverteix l'estat local a la còpia original vàlida; després mapeja els camps erronis usant la funció \texttt{parseValidationErrors}; finalment, el Signal \texttt{fieldErrors} propaga els missatges directament als inputs afectats, que es pinten en vermell sense recarregar la pàgina.
 
-\textbf{Detecció de canvis i guard de navegació.} El component manté en tot moment una còpia JSON de la configuració carregada des del servidor (\texttt{originalConfigJson}). El Signal \texttt{isDirty} compara aquesta còpia amb l'estat actual en temps real: si difereixen, el botó \textit{Save Changes} apareix a la cantonada inferior dreta de la pàgina (Figura~\ref{fig:config_cameras_save}). Quan el desar té èxit, la còpia de referència s'actualitza per netejar l'estat \textit{dirty}:
+\textbf{Detecció de canvis i guard de navegació.} El component manté en tot moment una còpia JSON de la configuració carregada des del servidor (\texttt{originalConfigJson}). El Signal \texttt{isDirty} compara aquesta còpia amb l'estat actual en temps real: si difereixen, el botó \textit{Save Changes} apareix a la cantonada inferior dreta de la pàgina (Figura~\ref{fig:config_cameras_save}). Quan el desar té èxit, la còpia de referència s'actualitza per netejar l'estat \textit{dirty}~(Llistat~\ref{lst:update_ref_after_save}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:update_ref_after_save}, caption={Actualitzaci\'o de la refer\`encia original despr\'es d'un desat correcte, que neteja l'indicador de canvis pendents.}]
 const jsonStr = JSON.stringify(this.config());
@@ -753,7 +757,7 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 % \end{figure}
 
 \subsection{Orquestració de Vídeo}
-Per desacoblar el component visual del protocol de transport concret, s'ha aplicat el patró de disseny \textbf{Strategy}: tant \texttt{WebRTCService} com \texttt{HlsService} implementen la mateixa interfície \texttt{StreamingStrategy}, de manera que el component de la graella no sap ni necessita saber quin protocol està usant:
+Per desacoblar el component visual del protocol de transport concret, s'ha aplicat el patró de disseny \textbf{Strategy}: tant \texttt{WebRTCService} com \texttt{HlsService} implementen la mateixa interfície \texttt{StreamingStrategy}, de manera que el component de la graella no sap ni necessita saber quin protocol està usant~(Llistat~\ref{lst:streaming_strategy_iface}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:streaming_strategy_iface}, caption={Interfície comuna \texttt{StreamingStrategy}: contracte que han de complir les implementacions WebRTC i HLS.}]
 export interface StreamingStrategy {
@@ -768,7 +772,7 @@ export interface StreamingStrategy {
 Angular injecta automàticament la implementació correcta en funció del protocol actiu, de manera que el canvi de WebRTC a HLS (o a l'inrevés) no requereix cap modificació al component de visualització.
 
 \subsection{Gestió en Temps Real de les Entrades i Sortides Digitals}
-De forma complementària al panell de visualització de càmeres, la vista principal disposa d'un panell lateral dret interactiu de control d'entrades i sortides lògiques (I/O), el \texttt{CamerasIoPanelComponent}. Entrades i sortides es representen amb la mateixa interfície de dades unificada, \texttt{IoItem}:
+De forma complementària al panell de visualització de càmeres, la vista principal disposa d'un panell lateral dret interactiu de control d'entrades i sortides lògiques (I/O), el \texttt{CamerasIoPanelComponent}. Entrades i sortides es representen amb la mateixa interfície de dades unificada, \texttt{IoItem}~(Llistat~\ref{lst:io_item_model}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:io_item_model}, caption={Model unificat \texttt{IoItem} per a entrades i sortides digitals.}]
 export interface IoItem {
@@ -783,7 +787,7 @@ export interface IoItem {
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
-\textbf{Subscripció i recepció d'estats en temps real.} En obrir el panell, el component s'inscriu al WebSocket enviant un missatge \texttt{filter\_update} per rebre els tòpics \texttt{['device/notification', 'io']}. Quan l'estat elèctric d'un dispositiu canvia al \textit{backend}, \textbf{la-core-notifier} emet un esdeveniment \texttt{IO\_NOTIFY} amb el payload:
+\textbf{Subscripció i recepció d'estats en temps real.} En obrir el panell, el component s'inscriu al WebSocket enviant un missatge \texttt{filter\_update} per rebre els tòpics \texttt{['device/notification', 'io']}. Quan l'estat elèctric d'un dispositiu canvia al \textit{backend}, \textbf{la-core-notifier} emet un esdeveniment \texttt{IO\_NOTIFY} amb el payload~(Llistat~\ref{lst:io_notify_payload}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:io_notify_payload}, caption={Payload de l'esdeveniment \texttt{IO\_NOTIFY} rebut via WebSocket.}]
 {
@@ -797,7 +801,7 @@ export interface IoItem {
 El \texttt{UserService} intercepta l'esdeveniment i delega al \texttt{VideoService.\allowbreak{}updateData()}; aquest localitza l'element per \texttt{id} i \texttt{topic} i actualitza el Signal corresponent. Angular re-renderitza únicament l'indicador afectat sense recarregar la pàgina.
 \end{sloppypar}
 
-\textbf{Activació manual d'una sortida.} Si l'operador fa doble clic sobre una sortida, el component comprova que l'element tingui la capacitat \texttt{'activable'} al seu array de \texttt{capabilities}; si no la té, l'acció es descarta silenciosament. En cas que es disposi del permís, es calcula l'estat invers i s'envia la petició al \textit{backend}:
+\textbf{Activació manual d'una sortida.} Si l'operador fa doble clic sobre una sortida, el component comprova que l'element tingui la capacitat \texttt{'activable'} al seu array de \texttt{capabilities}; si no la té, l'acció es descarta silenciosament. En cas que es disposi del permís, es calcula l'estat invers i s'envia la petició al \textit{backend}~(Llistat~\ref{lst:output_activation_req}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:output_activation_req}, caption={Petici\'o d'activaci\'o d'una sortida via \texttt{output-status-set.cgi}.}]
 sendActivateO(id: string, data: string) {
@@ -909,7 +913,7 @@ La gestió, notificació i persistència de dades d'incidents d'alarma constitue
 
 En aquest sentit, s'ha dissenyat i desenvolupat de manera unificada un motor asíncron \textit{multi-capa extrem a extrem}: des del model de subscripció reactiva al costat de client d'Angular~19, passant pels canals de comunicació \textit{full-duplex} de WebSockets i el servei d'orquestració \textit{multithreading} en C++, fins a la capa de persistència relacional de baix nivell al sistema operatiu embedded de l'NVR.
 
-Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el següent diagrama de blocs del recorregut que segueix una alarma des que s'origina fins que es renderitza i es confirma a la pantalla de l'operador:
+Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el diagrama de blocs del recorregut que segueix una alarma des que s'origina fins que es renderitza i es confirma a la pantalla de l'operador~(Figura~\ref{fig:alarms_data_flow}).
 
 \clearpage
 \begin{figure}[htbp]
@@ -960,7 +964,7 @@ static int signal_callback(sd_bus_message *msg, void *userdata, sd_bus_error *re
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Elaboració pròpia.}
 
-Un cop rebut, el missatge es diposita a la cua unificada de tipus \texttt{SafeQueue} anomenada \texttt{global\_alarm\_queue}. Aquesta classe utilitza una variable de condició de la biblioteca estàndard de C++ (\texttt{std::condition\_variable}) i un bloqueig exclusiu mutex (\texttt{std::mutex}) per optimitzar la concurrència sense consum de CPU d'espera activa (\textit{busy-waiting}):
+Un cop rebut, el missatge es diposita a la cua unificada de tipus \texttt{SafeQueue} anomenada \texttt{global\_alarm\_queue}. Aquesta classe utilitza una variable de condició de la biblioteca estàndard de C++ (\texttt{std::condition\_variable}) i un bloqueig exclusiu mutex (\texttt{std::mutex}) per optimitzar la concurrència sense consum de CPU d'espera activa (\textit{busy-waiting})~(Llistat~\ref{lst:thread_safe_queue}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=C++, label={lst:thread_safe_queue}, caption={Lògica de la cua thread-safe de concurrència d'accessos.}]
 void wait_and_pop(T& value) {
@@ -988,7 +992,7 @@ Per assegurar l'atomicitat de les dades (propietats ACID) del servei de persist�
 \end{enumerate}
 
 \subsection{Protecció i Poda de dades Activa}
-Com que el videogravador de seguretat opera de manera ininterrompuda (24/7), el volum d'alarmes i logs emmagatzemats podria provocar un desgast excessiu de la memòria de disc flaix o alentir les cerques. Durant la fase d'inicialització de la base de dades, el motor \texttt{DatabaseManager} actualitza un disparador automàtic relacional o \textbf{Trigger} dins del fitxer de la base de dades que s'executa després de cada inserció de nova alarma:
+Com que el videogravador de seguretat opera de manera ininterrompuda (24/7), el volum d'alarmes i logs emmagatzemats podria provocar un desgast excessiu de la memòria de disc flaix o alentir les cerques. Durant la fase d'inicialització de la base de dades, el motor \texttt{DatabaseManager} actualitza un disparador automàtic relacional o \textbf{Trigger} dins del fitxer de la base de dades que s'executa després de cada inserció de nova alarma~(Llistat~\ref{lst:alarm_prune_trigger}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=SQL, label={lst:alarm_prune_trigger}, caption={Trigger de base de dades per a la poda automatica del registre d'alarmes.}]
 CREATE TRIGGER limit_alarms_trigger
@@ -1016,7 +1020,7 @@ A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva
   \small Font: Elaboració pròpia.
 \end{figure}
 
-L'operador pot interaccionar amb qualsevol dels registres per tal d'assentir-los (\textit{Acknowledgment}) fent clic sobre el botó \textit{Ack} al final de la fila. Aquesta ordre viatja cap a la cua de comandes de \texttt{la-core-alarm} mitjançant el missatge de WebSocket següent:
+L'operador pot interaccionar amb qualsevol dels registres per tal d'assentir-los (\textit{Acknowledgment}) fent clic sobre el botó \textit{Ack} al final de la fila. Aquesta ordre viatja cap a la cua de comandes de \texttt{la-core-alarm} mitjançant el missatge de WebSocket~(Llistat~\ref{lst:alarm_read_msg}):
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=json, label={lst:alarm_read_msg}, caption={Missatge de canvi d'estat d'alarma cap al servidor (ALARM\_READ).}]
 {
