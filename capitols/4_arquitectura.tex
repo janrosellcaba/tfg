@@ -39,7 +39,6 @@ L'aplicació s'organitza en tres àmbits funcionals principals, accessibles des 
 
 La Figura~\ref{fig:flux_navegacio} representa el diagrama de flux de navegació de \textit{Web Core View}. Les transicions principals representen accions explícites de l'usuari (clic en un element de menú, selecció d'una càmera, activació del mode \textit{playback}); les transicions guardades representen canvis d'estat condicionals (\textit{role check}, \textit{timeout} de sessió).
 
-\clearpage
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth, height=0.85\textheight, keepaspectratio]{figures/diagrames/flux_navegacio.png}
@@ -48,6 +47,7 @@ La Figura~\ref{fig:flux_navegacio} representa el diagrama de flux de navegació 
   \small Font: Elaboració pròpia.
 \end{figure}
 
+\clearpage
 El punt d'entrada sempre és la pantalla de \textit{Login}. Un cop autenticat, l'usuari arriba a la pàgina principal, que per als operadors mostra directament la vista de càmeres i per als administradors inclou l'accés complet a tots els mòduls. La sessió es tanca per dues vies: \textit{logout} explícit de l'usuari, o expiració del mecanisme \textit{keep-alive} (RNF-06), que redirigeix automàticament a la pantalla de \textit{Login}. En cas de tancament per \textit{timeout}, el \textit{Config Lock} actiu s'allibera automàticament al backend en un màxim de 120 s (RNF-05), garantint que cap altre administrador no queda bloquejat.
 
 \section{Arquitectura Global del Sistema}

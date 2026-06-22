@@ -1,5 +1,5 @@
 %%{init: {
- 'theme': 'base',
+ 'theme': 'neutral',
  'themeVariables': {
    'background': '#ffffff',
    'primaryColor': '#ffffff',
@@ -8,9 +8,10 @@
    'lineColor': '#000000',
    'secondaryColor': '#ffffff',
    'tertiaryColor': '#ffffff',
-   'edgeLabelBackground': '#ffffff'
+   'noteBkgColor': '#ffffff',
+   'noteTextColor': '#000000'
  },
- 'themeCSS': '.relationshipLabelBox { fill: #ffffff !important; opacity: 1 !important; } .edgeLabel rect { fill: #ffffff !important; stroke: none !important; } .edgeLabel span { background: #ffffff; padding: 0 2px; } .label { color: #000000 !important; }'
+ 'themeCSS': '.outer-path path:first-child { fill: #ffffff !important; } .outer-path path:not(:first-child) { stroke: #000000 !important; } .divider path { stroke: #000000 !important; } .relation { stroke: #000000 !important; } .relationshipLabelBox { fill: #ffffff !important; opacity: 1 !important; } marker path { fill: #000000 !important; stroke: #000000 !important; }'
 }}%%
 
 classDiagram
