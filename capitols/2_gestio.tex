@@ -90,12 +90,15 @@ S'ha estimat una càrrega total de \textbf{540 hores} (18 ECTS). La Taula \ref{t
   \small Font: Elaboració pròpia.
 \end{table}
 
+\clearpage
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{figures/gantt.png}
   \caption{Diagrama de Gantt del projecte.\\\small Font: Elaboració pròpia.}
   \label{fig:gantt}
 \end{figure}
+
+La Figura~\ref{fig:gantt} il·lustra la distribució temporal de les mateixes tasques, on s'aprecia la naturalesa majoritàriament seqüencial del projecte i la dependència encadenada entre les fases principals.
 
 \subsection{Gestió del risc i desviacions reals}
 Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns de videovigilància corporativa comporta un conjunt de riscos que cal monitorar de manera constant. Per respondre de forma preventiva i correctiva, s'ha definit una matriu de gestió de riscos que classifica cada risc per tipologia, probabilitat d'ocurrència (Alta, Mitjana, Baixa) i impacte potencial en el cicle de vida del projecte (Alt, Mitjà, Baix), tal com es recull a la Taula \ref{tab:matriu_riscos}.
@@ -162,6 +165,8 @@ L'estimació econòmica s'ha realitzat assumint rols professionals i preus de me
     Tester             & 13,00                   & 17,55                    & 100            & 1.755,00           \\ \midrule
     \textbf{TOTAL}     &                         &                          & \textbf{540}   & \textbf{13.567,50} \\ \bottomrule
   \end{tabular}
+  \par\smallskip
+  \small Font: Elaboració pròpia
 \end{table}
 
 \subsection{Amortització del maquinari}
@@ -220,7 +225,7 @@ Quan algun indicador supera el llindar del 10\%, s'activa una revisió d'abast i
 
 Un cop completat el cicle de desenvolupament i la redacció de la present memòria, es formalitza el tancament del projecte, amb l'objectiu d'analitzar retrospectivament les desviacions ocorregudes tant en la planificació temporal com en la gestió del pressupost, i de justificar les mesures correctores aplicades.
 
-\subsection{Tancament temporal: Planificació prevista vs. real}
+\subsection{Tancament temporal}
 La càrrega de treball prevista era de \textbf{540 hores}, però les desviacions tècniques acumulades han elevat el total real a \textbf{585 hores}. El sobrecost d'hores resultant ha estat absorbit pel marge de contingència pressupostat.
 
 La Taula~\ref{tab:desviacions_temporal} recull la comparativa entre les hores previstes i les realment consumides per fase.
@@ -251,11 +256,12 @@ Com s'observa en els indicadors, les fases de desenvolupament tècnic pur (\text
     \item \textbf{El motor de configuració dinàmic (fase GV):} El recorregut i la validació recursiva de JSONs amb validacions complexes sobre camps anidats va resultar arquitectònicament més complex del previst.
 \end{enumerate}
 
-\subsection{Tancament econòmic: Pressupost estimat vs. final}
+\subsection{Tancament econòmic}
 La variació de les hores en les tasques de desenvolupament ha repercutit directament sobre els costos de personal. No obstant això, el pressupost global del projecte no s'ha vist compromès.
 
 La Taula~\ref{tab:desviacions_pressupost} detalla la comparativa econòmica per a cadascun dels rols humans definits.
 
+\clearpage
 \begin{table}[htbp]
   \centering
   \caption{Comparativa del cost de recursos humans estimat enfront de l'executat real.}
