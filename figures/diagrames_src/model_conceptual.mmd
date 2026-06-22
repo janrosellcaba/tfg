@@ -7,9 +7,10 @@
    'primaryBorderColor': '#000000',
    'lineColor': '#000000',
    'secondaryColor': '#ffffff',
-   'tertiaryColor': '#ffffff'
+   'tertiaryColor': '#ffffff',
+   'edgeLabelBackground': '#ffffff'
  },
- 'themeCSS': '.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke: #000000 !important; stroke-width: 1px !important; filter: none !important; box-shadow: none !important; } .label { color: #000000 !important; }'
+ 'themeCSS': '.relationshipLabelBox { fill: #ffffff !important; opacity: 1 !important; } .edgeLabel rect { fill: #ffffff !important; stroke: none !important; } .edgeLabel span { background: #ffffff; padding: 0 2px; } .label { color: #000000 !important; }'
 }}%%
 
 classDiagram
@@ -65,6 +66,14 @@ classDiagram
     +expiresIn : 30 | 120
     +ultimaRenovacio : DateTime
   }
+
+  class DispositiuIO {
+    +id : String
+    +nom : String
+    +tipus : Input | Output
+    +estat : Actiu | Inactiu
+  }
+  NVR "1" --> "0..*" DispositiuIO : gestiona
 
   NVR "1" --> "0..151" Camara : conté
   NVR "1" --> "0..*" Alarma : genera (Sistema)
