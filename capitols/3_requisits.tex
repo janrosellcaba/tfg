@@ -361,7 +361,7 @@ Els requisits no funcionals (RNF) defineixen les qualitats observables del siste
     \textbf{Codi}                    & RNF-06 \\ \hline
     \textbf{Descripció}              & La sessió activa ha de mantenir-se viva de forma automàtica durant tot el temps que l'usuari tingui la pestanya oberta, mitjançant un mecanisme de \textit{keep-alive} que refresqui la cookie de sessió cada 60 s. \\ \hline
     \textbf{Justificació}            & Un operador de vigilància pot romandre a la mateixa vista durant hores sense interacció activa. Un \textit{timeout} de sessió forçat interrompria el treball de monitorització i obligaria l'operador a reautenticar-se. \\ \hline
-    \textbf{Criteris d'Acceptació}   & La cookie de sessió es refresca cada $60 \pm 5$ s, verificat per inspecció de les peticions de xarxa al navegador durant 10 min. El servidor invalida la sessió si no rep cap \textit{keep-alive} en $>90$ s. \\ \hline
+    \textbf{Criteris d'Acceptació}   & La cookie de sessió es refresca cada $60 \pm 5$ s, verificat per inspecció de les peticions de xarxa al navegador durant 10 min. El servidor invalida la sessió si no rep cap \textit{keep-alive} en $>120$ s. \\ \hline
   \end{tabular}
   \caption{RNF-06: Keep-alive de sessió.}
   \label{tab:rnf06}
@@ -422,7 +422,7 @@ El model identifica set entitats principals i les seves relacions:
 \begin{description}
   \item[\textbf{NVR (Videogravador):}] Entitat arrel que representa el dispositiu físic. Conté la versió de \textit{firmware} activa i el seu estat de connectivitat. Totes les entitats dependents (càmeres, usuaris) existeixen en el context d'un NVR concret.
 
-  \item[\textbf{Càmera:}] Representa una càmera IP connectada al gravador. Cada càmera té un identificador numèric únic, una adreça IP, el codec de compressió actiu (H.264 o H.265) i un estat de connectivitat. \textbf{Restricció d'integritat:} un NVR pot tenir entre 0 i un màxim de 151 càmeres, determinat per les capacitats del model de maquinari i la llicència activa.
+  \item[\textbf{Càmera:}] Representa una càmera IP connectada al gravador. Cada càmera té un identificador numèric únic, una adreça IP, el codec de compressió actiu (H.264 o H.265) i un estat de connectivitat. \textbf{Restricció d'integritat:} un NVR pot tenir entre 0 i un màxim de 152 càmeres (índexs 0 a 151), determinat per les capacitats del model de maquinari i la llicència activa.
 
   \item[\textbf{Flux (\textit{Stream}):}] Representa un canal de transmissió de vídeo actiu associat a una càmera. El protocol pot ser WebRTC (transport SRTP/UDP) o HLS (transport HTTPS). Una mateixa càmera pot tenir simultàniament un flux WebRTC (en directe) i un flux HLS (\textit{fallback} o \textit{playback}).
 

@@ -91,9 +91,9 @@ La configuració NGINX agrupa les rutes en quatre blocs funcionals:
 
     \item \textbf{Canals de temps real (WSS):} Les connexions WebSocket persistents segueixen dues rutes diferenciades: \texttt{/ws/la-core-notifier/} es deriven cap al port \texttt{60070} (\textbf{la-core-notifier}), i \texttt{/ws/la-core-alarm/} cap al port \texttt{60071} (\textbf{la-core-alarm}). Ambdós serveis envien esdeveniments en temps real al \textit{frontend} —pèrdues de vídeo, activació de relés, alarmes de sensor— sense que el client hagi de fer \textit{polling}.
 
-    \item \textbf{Vídeo en temps real:} S'ofereixen dos mecanismes de \textit{streaming} gestionats per \textbf{MediaMTX}: el camí \texttt{/stream/} (port \texttt{60889}) serveix vídeo via WebRTC, amb senyalització sobre WebSocket i transport de mitjana SRTP/UDP negociat per ICE; el camí \texttt{/hls/} (port \texttt{60888}) serveix el mateix vídeo en format HLS per a clients que no suporten o tenen dificultats amb WebRTC. 
+    \item \textbf{Vídeo en temps real:} S'ofereixen dos mecanismes de \textit{streaming} gestionats per \textbf{MediaMTX}: el camí \texttt{/stream/} (port \texttt{60889}) serveix vídeo via WebRTC, mitjançant negociació SDP via WHEP (HTTP POST) i transport de mitjana SRTP/UDP negociat per ICE; el camí \texttt{/hls/} (port \texttt{60888}) serveix el mateix vídeo en format HLS per a clients que no suporten o tenen dificultats amb WebRTC. 
 
-    \item \textbf{Serveis auxiliars:} El camí \texttt{/video-engine/} enruta directament cap a \textbf{la-video-engine} (port \texttt{60890}) per a operacions de control i consulta del motor de vídeo. El camí \texttt{/db-engine/} connecta amb \textbf{la-db-engine} (port \texttt{60891}) per a consultes de dades històriques. El camí \texttt{/terminal/} connecta amb el servei \textbf{ttyd} (port \texttt{7681}), que ofereix una terminal interactiva accessible directament des del navegador.
+    \item \textbf{Serveis auxiliars:} El camí \texttt{/video-engine/} enruta directament cap a \textbf{la-video-engine} (port \texttt{60890}) per a operacions de control i consulta del motor de vídeo. El camí \texttt{/db-engine/} connecta amb \textbf{la-db-engine} (port \texttt{60891}) per a consultes de dades històriques.
 \end{itemize}
 
 Per tal de sintetitzar la interacció entre els components, a la Taula~\ref{tab:matriu_comunicacio} es detallen els protocols i la naturalesa del trànsit entre el navegador i el gravador:
@@ -111,11 +111,10 @@ Per tal de sintetitzar la interacció entre els components, a la Taula~\ref{tab:
     Navegador & NGINX $\rightarrow$ \textbf{la-core-legacy} & \texttt{/api.rest/}, \texttt{/webprotocol/}, \texttt{*.cgi} & HTTPS & Configuració, autenticació i control del sistema \\
     Navegador & NGINX $\rightarrow$ \textbf{la-core-notifier} & \texttt{/ws/la-core-notifier/} & WSS & Notificacions de sistema en temps real \\
     Navegador & NGINX $\rightarrow$ \textbf{la-core-alarm} & \texttt{/ws/la-core-alarm/} & WSS & Notificacions d'alarmes en temps real \\
-    Navegador & NGINX $\rightarrow$ \textbf{MediaMTX} & \texttt{/stream/} & WSS + SRTP/UDP & Vídeo en directe via WebRTC \\
+    Navegador & NGINX $\rightarrow$ \textbf{MediaMTX} & \texttt{/stream/} & HTTPS + SRTP/UDP & Vídeo en directe via WebRTC \\
     Navegador & NGINX $\rightarrow$ \textbf{MediaMTX} & \texttt{/hls/} & HTTPS & Vídeo en directe via HLS \\
     Navegador & NGINX $\rightarrow$ \textbf{la-video-engine} & \texttt{/video-engine/} & HTTPS & Control i consulta del motor de vídeo \\
     Navegador & NGINX $\rightarrow$ \textbf{la-db-engine} & \texttt{/db-engine/} & HTTPS & Consultes de dades històriques \\
-    Navegador & NGINX $\rightarrow$ \textbf{ttyd} & \texttt{/terminal/} & WSS & Terminal interactiva via navegador \\
     % \textbf{la-core-notifier} / \textbf{la-core-alarm} & \textbf{la-db-engine} & — & gRPC / D-Bus & Comunicació interna del backend \\
     % \textbf{la-video-engine} & \textbf{la-db-engine} & — & Unix Sockets & Persistència al disc (VFS SQLite) \\ \bottomrule
   \end{tabular}
@@ -177,8 +176,6 @@ location /stream/ {
     error_page 401 = @error401;
     proxy_pass http://localhost:60889/stream/;
     proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
 }
 \end{lstlisting}
 \smallskip\par{\small\noindent Font: Codi de producció, repositori \texttt{mantos-rec} (\texttt{sources/\allowbreak{}meta-mantos/\allowbreak{}recipes-httpd/\allowbreak{}nginx/\allowbreak{}la-core.conf}).}
@@ -287,7 +284,7 @@ En lloc de programar pantalles de configuració estàtiques, s'ha creat un intè
 
 Aquest enfocament és especialment valuós quan s'introdueixen noves funcionalitats a la configuració del videogravador. En lloc de programar una nova vista a Angular, el servei de backend simplement actualitza el seu esquema de dades i el \textit{frontend} el renderitza automàticament, reduint el temps de \textit{time-to-market} de noves versions del firmware.
 
-És important destacar que el servei \textbf{la-core-legacy} és el responsable de generar aquest esquema dinàmic. El servei inspecciona les capacitats del maquinari (nombre de canals de vídeo, tipus de ports instal·lats) i construeix el diccionari de metadades JSON en temps real. Això permet que una mateixa versió de la interfície web sigui capaç de gestionar tant un gravador compacte de 4 càmeres com una unitat de rack de 150 càmeres, ja que el \textit{frontend} no té el nombre d'interfícies codificat de manera estàtica, sinó que es limita a renderitzar allò que \textbf{la-core-legacy} li indica.
+És important destacar que el servei \textbf{la-core-legacy} és el responsable de generar aquest esquema dinàmic. El servei inspecciona les capacitats del maquinari (nombre de canals de vídeo, tipus de ports instal·lats) i construeix el diccionari de metadades JSON en temps real. Això permet que una mateixa versió de la interfície web sigui capaç de gestionar tant un gravador compacte de 4 càmeres com una unitat de rack de 152 càmeres, ja que el \textit{frontend} no té el nombre d'interfícies codificat de manera estàtica, sinó que es limita a renderitzar allò que \textbf{la-core-legacy} li indica.
 
 Un dels reptes d'aquest disseny és la \textbf{tolerància a errors en l'esquema}. Si \textbf{la-core-legacy} envia un node de configuració amb un \texttt{\_type} no reconegut, el component \texttt{ConfigInputComponent} no bloqueja el renderitzat de la resta de la pàgina: simplement fa un \textit{fallback} a un camp de text genèric (\texttt{<input type="text">}), de manera que la propietat continua sent editable i la resta de l'interfície no queda afectada.
 
