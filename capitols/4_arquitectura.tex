@@ -63,7 +63,7 @@ L'ecosistema del videogravador (NVR) de Lanaccess es basa en un model de microse
     \item \textbf{MediaMTX:} Servidor multimèdia de codi obert que actua com a motor de \textit{streaming} de vídeo en temps real. Rep els fluxos de les càmeres des de \textbf{la-video-engine} i els redistribueix als clients via dos protocols diferenciats: \textbf{WebRTC}~\cite{webrtc_w3c} (transport SRTP~\cite{rfc3711}/UDP negociat per ICE (Interactive Connectivity Establishment)~\cite{rfc8445}), i \textbf{HLS} (\textit{HTTP Live Streaming}).
 \end{itemize}
 
-Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura \ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy}, i connexions WebSocket segures (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
+Aquests serveis es relacionen entre ells mitjançant diferents protocols i busos de comunicació per garantir un rendiment òptim. Tal com s'il·lustra en el diagrama de la Figura~\ref{fig:arquitectura_serveis}, el \textit{frontend} (\textit{web core view}) interactua amb el backend principalment per dues vies: peticions HTTPS cap a \textbf{la-core-legacy}, i connexions WebSocket segures (\textit{wss}) cap a \textbf{la-core-notifier} i \textbf{la-core-alarm} per rebre notificacions en temps real.
 
 Internament, els microserveis intercanvien informació majoritàriament a través del \textbf{D-Bus} de Linux. Per exemple, quan hi ha un canvi d'estat a nivell de maquinari (com una alarma), es publica al \textit{D-Bus}. Els serveis \textbf{la-core-notifier} i \textbf{la-core-alarm} estan subscrits a aquest bus i, en rebre el senyal, transmeten l'esdeveniment via WebSockets al \textit{frontend}. D'altra banda, \textbf{la-core-alarm} utilitza crides \textbf{gRPC} per comunicar-se de manera ràpida i eficient amb \textbf{la-db-engine}.
 
@@ -96,7 +96,7 @@ La configuració NGINX agrupa les rutes en quatre blocs funcionals:
     \item \textbf{Serveis auxiliars:} El camí \texttt{/video-engine/} enruta directament cap a \textbf{la-video-engine} (port \texttt{60890}) per a operacions de control i consulta del motor de vídeo. El camí \texttt{/db-engine/} connecta amb \textbf{la-db-engine} (port \texttt{60891}) per a consultes de dades històriques. El camí \texttt{/terminal/} connecta amb el servei \textbf{ttyd} (port \texttt{7681}), que ofereix una terminal interactiva accessible directament des del navegador.
 \end{itemize}
 
-Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:matriu_comunicacio} es detallen els protocols i la naturalesa del trànsit entre el navegador i el gravador:
+Per tal de sintetitzar la interacció entre els components, a la Taula~\ref{tab:matriu_comunicacio} es detallen els protocols i la naturalesa del trànsit entre el navegador i el gravador:
 
 \clearpage
 \begin{table}[htbp]
@@ -124,7 +124,7 @@ Per tal de sintetitzar la interacció entre els components, a la Taula \ref{tab:
 \small Font: Elaboració pròpia.
 \end{table}
 
-El Llistat \ref{lst:nginx_routing} mostra els blocs de configuració NGINX que implementen les rutes principals de la plataforma, extrets directament del fitxer \texttt{la-core.conf} del repositori de build \textbf{mantos-rec} (\texttt{sources/\allowbreak{}meta-mantos/\allowbreak{}recipes-httpd/\allowbreak{}nginx/\allowbreak{}nginx/\allowbreak{}la-core.conf}):
+El Llistat~\ref{lst:nginx_routing} mostra els blocs de configuració NGINX que implementen les rutes principals de la plataforma, extrets directament del fitxer \texttt{la-core.conf} del repositori de build \textbf{mantos-rec} (\texttt{sources/\allowbreak{}meta-mantos/\allowbreak{}recipes-httpd/\allowbreak{}nginx/\allowbreak{}nginx/\allowbreak{}la-core.conf}):
 
 \begin{lstlisting}[language=bash, label={lst:nginx_routing}, caption={Fragment de la configuració NGINX (la-core.conf, repositori mantos-rec): rutes principals de la plataforma.}]
 # Aplicacio Angular (SPA) - requereix autenticacio
@@ -241,14 +241,14 @@ Complementàriament, Angular promou l'ús de \textbf{serveis} i \textbf{models} 
   \small Font: Elaboració pròpia.
 \end{figure}
 
-La Figura \ref{fig:angular_components} representa les tres capes internes de l'aplicació Angular i els seus canals de comunicació cap al backend. La \textbf{Capa Shared} agrupa els elements reutilitzables sense estat propi: els \textit{Shared Components} (UI Kit, \textit{pipes} i directives) i els \textbf{Models TypeScript}, que defineixen les estructures de dades (\texttt{Camera}, \texttt{Codec}, \texttt{Schema}, \texttt{Alarm}) i garanteixen la seguretat de tipus en temps de compilació. La \textbf{Core Layer} conté els serveis \textit{singleton} que gestionen el cicle de vida de sessió i les connexions persistents: \texttt{AuthService} i \texttt{AuthGuard} controlen l'autenticació; \texttt{LockService} gestiona l'adquisició i alliberament del \textit{lock} de configuració; \texttt{KeepAliveService} manté la sessió activa amb peticions periòdiques; i \texttt{NotifierService} i \texttt{AlarmService} mantenen les connexions WebSocket obertes per rebre esdeveniments en temps real. Les \textbf{Feature Views} són les tres seccions funcionals de l'aplicació, cadascuna composta pels seus components especialitzats i carregada de forma mandrosa (\textit{lazy loading}).
+La Figura~\ref{fig:angular_components} representa les tres capes internes de l'aplicació Angular i els seus canals de comunicació cap al backend. La \textbf{Capa Shared} agrupa els elements reutilitzables sense estat propi: els \textit{Shared Components} (UI Kit, \textit{pipes} i directives) i els \textbf{Models TypeScript}, que defineixen les estructures de dades (\texttt{Camera}, \texttt{Codec}, \texttt{Schema}, \texttt{Alarm}) i garanteixen la seguretat de tipus en temps de compilació. La \textbf{Core Layer} conté els serveis \textit{singleton} que gestionen el cicle de vida de sessió i les connexions persistents: \texttt{AuthService} i \texttt{AuthGuard} controlen l'autenticació; \texttt{LockService} gestiona l'adquisició i alliberament del \textit{lock} de configuració; \texttt{KeepAliveService} manté la sessió activa amb peticions periòdiques; i \texttt{NotifierService} i \texttt{AlarmService} mantenen les connexions WebSocket obertes per rebre esdeveniments en temps real. Les \textbf{Feature Views} són les tres seccions funcionals de l'aplicació, cadascuna composta pels seus components especialitzats i carregada de forma mandrosa (\textit{lazy loading}).
 
 Quant a la comunicació amb el backend, totes les peticions passen per \textbf{NGINX}, que actua com a \textit{proxy} invers amb TLS. Les peticions HTTPS es deriven cap a \textbf{la-core-legacy} (configuració, autenticació i \textit{schema}); les connexions WebSocket segueixen els camins proxificats \texttt{/ws/la-core-notifier/} i \texttt{/ws/la-core-alarm/} per rebre notificacions i alarmes en temps real; i \texttt{VideoView} estableix connexions WebRTC o HLS directament a través de \textbf{MediaMTX} per a l'streaming de vídeo.
 
 \subsection{Arquitectura i Components}
 S'ha eliminat l'ús de mòduls clàssics d'Angular en favor dels \textit{Standalone Components}. Això redueix el \textit{boilerplate} del codi i millora el temps de càrrega de l'aplicació (\textit{lazy loading}), ja que només es descarreguen al navegador els components necessaris per a la vista actual (per exemple, el mòdul de configuració avançada no es carrega si l'usuari només vol veure vídeo).
 
-L'organització d'aquests elements quant a dependències i estructura de mòduls es presenta gràficament a la Figura \ref{fig:angular_modules}.
+L'organització d'aquests elements quant a dependències i estructura de mòduls es presenta gràficament a la Figura~\ref{fig:angular_modules}.
 
 \clearpage
 \begin{figure}[!htbp]
@@ -259,7 +259,7 @@ L'organització d'aquests elements quant a dependències i estructura de mòduls
   \small Font: Elaboració pròpia.
 \end{figure}
 
-Tal com s'observa a la Figura \ref{fig:angular_modules}, el punt d'entrada de l'aplicació és el fitxer \texttt{app.config.ts}, que registra el \textit{router} mitjançant \texttt{provideRouter} i declara dos camins arrel: la ruta pública del \texttt{LoginComponent} i el conjunt de rutes autenticades. Totes les rutes protegides estan agrupades sota un únic \textit{guard} (\texttt{authGuard}), de manera que un usuari no autenticat és redirigit automàticament al \textit{login} sense necessitat de protegir cada ruta individualment.
+Tal com s'observa a la Figura~\ref{fig:angular_modules}, el punt d'entrada de l'aplicació és el fitxer \texttt{app.config.ts}, que registra el \textit{router} mitjançant \texttt{provideRouter} i declara dos camins arrel: la ruta pública del \texttt{LoginComponent} i el conjunt de rutes autenticades. Totes les rutes protegides estan agrupades sota un únic \textit{guard} (\texttt{authGuard}), de manera que un usuari no autenticat és redirigit automàticament al \textit{login} sense necessitat de protegir cada ruta individualment.
 
 Des d'aquest node arrel, el \textit{router} desplega de forma mandrosa (\textit{lazy loading}) tres seccions funcionals independents: les \textbf{Rutes de Vídeo} (que carreguen \texttt{CamerasComponent}, \texttt{RecordingsComponent} i \texttt{AlarmsComponent}), les \textbf{Rutes de Configuració} (amb \texttt{SystemComponent} per a la configuració general de xarxa i \texttt{IpVideoCamerasComponent} per a la gestió de les càmeres IP) i les \textbf{Rutes de Manteniment} (amb \texttt{StatusComponent} i \texttt{FirmwareComponent}). Cap d'aquests components no es descarrega fins que l'usuari no navega activament cap a la seva ruta, alliberant la càrrega inicial de l'aplicació.
 

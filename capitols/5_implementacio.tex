@@ -60,7 +60,7 @@ Per a la maquetació gràfica de \textit{Web Core View}, s'ha dissenyat una arqu
 Resoldre aquesta dualitat amb un únic \textit{codebase} d'estils coherent va exigir una arquitectura CSS deliberada. La solució adoptada s'articula en tres eixos complementaris: una paleta de variables semàntiques centralitzada que actua com a única font de veritat cromàtica, un model d'encapsulació per component que garanteix l'aïllament d'estils i el rendiment gràfic, i un sistema de disseny adaptatiu basat en unitats relatives i \textit{media queries} que assegura la usabilitat en qualsevol terminal de l'operador.
 
 \subsection{Modularització SCSS}
-La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SCSS (Llistat \ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:
+La consistència cromàtica i de marca de Lanaccess s'ha assegurat centralitzant les definicions sobre el fitxer de configuració global \texttt{\_variables.scss}. Mitjançant l'ús de variables SCSS (Llistat~\ref{lst:scss_variables}), s'ha estructurat una paleta de colors semàntica i controlada:
 
 \begin{lstlisting}[basicstyle=\footnotesize, label={lst:scss_variables}, caption={Fragment del fitxer de definició de variables d'estil SCSS.}]
 // Paleta unificada d'identitat corporativa i estat semàntic
@@ -117,7 +117,7 @@ S'ha evitat l'ús de dimensions d'amplada fixes en píxels (\texttt{px}), substi
 Aquest disseny elàstic permet que els components crítics (com el visor d'alarmes o el llistat lateral de càmeres) es reubiquin, s'escalin o es repleguin automàticament per oferir un espai de treball òptim per a l'operador.
 
 \section{Autenticació, Gestió de Permisos i Cicle de Vida del Core}
-El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de sessió (Figura \ref{fig:login}). A diferència d'altres plataformes de gestió web, en tractar-se d'un sistema \textit{embedded} de seguretat crítica, el flux de treball s'ha dissenyat per minimitzar el consum de recursos al microcontrolador local sense comprometre el control d'accessos ni la robustesa de la sessió.
+El primer punt de contacte de l'usuari amb el sistema és la pantalla d'inici de sessió (Figura~\ref{fig:login}). A diferència d'altres plataformes de gestió web, en tractar-se d'un sistema \textit{embedded} de seguretat crítica, el flux de treball s'ha dissenyat per minimitzar el consum de recursos al microcontrolador local sense comprometre el control d'accessos ni la robustesa de la sessió.
 
 \clearpage
 \begin{figure}[htbp]
@@ -256,7 +256,7 @@ El \textit{dispatcher} deriva la càrrega útil cap a l'\texttt{AlertService}, q
 \textbf{Interrupció per actualització de firmware (\texttt{SOFTWARE\_UPDATE\_NOTIFY}):} Aquest missatge, sense \textit{payload}, s'emet quan un administrador llança un procés d'actualització del microprogramari. A diferència del flux d'errors, l'Angular el tracta com un avís crític i paralitzant: desallotja l'operador de la pantalla on es trobi i el redirigeix forçosament a la ruta \texttt{/firmware} amb l'estat inicial \texttt{UPLOADING}. Aquesta decisió de disseny garanteix que cap operador pugui continuar modificant la configuració del gravador mentre el firmware s'està escrivint a la memòria flash, prevenint possibles corrupcions de dades.
 
 \section{Tauler Principal i Panells d'Informació}
-La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el despatxador de navegació lògic de la plataforma. És la primera interfície que l'operador visualitza un cop el sistema valida correctament les seves credencials en el flux de connexió (Figura \ref{fig:ui_home}).
+La pàgina d'inici (\textit{Home page}) actua com el nucli d'operacions i el despatxador de navegació lògic de la plataforma. És la primera interfície que l'operador visualitza un cop el sistema valida correctament les seves credencials en el flux de connexió (Figura~\ref{fig:ui_home}).
 
 \begin{figure}[htbp]
   \centering
@@ -280,7 +280,7 @@ Per garantir una experiència d'usuari (UX) neta, adaptada al context de treball
 L'aspecte més destacable d'aquest disseny és que el motor de renderitzat del \textit{frontend} avalua de forma immediata el mètode reactiu \texttt{functionalities} derivat de la llista de \textit{grants} de l'usuari a través d'Angular Signals. Si l'operador actual manca d'un permís determinat (com ara l'accés a la modificació d'usuaris o a l'actualització de firmware), els botons i rutes d'aquella secció específica s'exclouen directament del cicle de vida del client. Això no només augmenta la seguretat en l'entorn de treball, sinó que evita la renderització d'elements redundants que l'usuari final no pot utilitzar.
 
 \subsection{Panells d'Informació de Maquinari i Usuari}
-A la part superior dreta de l'aplicació, dins de la barra de capçalera persistent, s'ubiquen els controls d'accés ràpid i els panells flotants en temps real (Figura \ref{fig:ui_home_panels}).
+A la part superior dreta de l'aplicació, dins de la barra de capçalera persistent, s'ubiquen els controls d'accés ràpid i els panells flotants en temps real (Figura~\ref{fig:ui_home_panels}).
 
 \begin{figure}[htbp]
   \centering
@@ -292,7 +292,7 @@ A la part superior dreta de l'aplicació, dins de la barra de capçalera persist
   \small Font: Elaboració pròpia.
 \end{figure}
 
-Fent clic a la icona d'informació de maquinari, es desplega un panell lateral que actua com a diagnòstic ràpid de l'estat de salut del videogravador (Figura \ref{fig:ui_home_panels}, esquerra). Aquest panell mostra paràmetres crítics obtinguts directament del maquinari de forma asíncrona:
+Fent clic a la icona d'informació de maquinari, es desplega un panell lateral que actua com a diagnòstic ràpid de l'estat de salut del videogravador (Figura~\ref{fig:ui_home_panels}, esquerra). Aquest panell mostra paràmetres crítics obtinguts directament del maquinari de forma asíncrona:
 \begin{itemize}
   \item Adreça IP local i adreça física MAC de la interfície \texttt{eth0}.
   \item Versió del firmware del sistema operatiu i model del dispositiu de gravació.
@@ -302,7 +302,7 @@ Fent clic a la icona d'informació de maquinari, es desplega un panell lateral q
 
 Per alimentar aquest panell de diagnòstic, l'aplicació web realitza una petició HTTP GET cap a la ruta d'API xifrada \path{/webprotocol/config_data.xml?requests=system+network}. El microservei \textbf{la-core-legacy} s'encarrega d'analitzar les variables del sistema, unificar les metadades en un fitxer estructurat XML i transmetre'l cap a l'aplicació web, la qual l'interpreta asíncronament sense necessitat de recarregar la pàgina.
 
-Al seu costat, el panell d'usuari (Figura \ref{fig:ui_home_panels}, dreta) detalla el nom de l'operador actiu i el perfil assignat pel sistema, complint amb el requisit d'autenticació basat en rols. Aquest panell unifica tres accions globals clau:
+Al seu costat, el panell d'usuari (Figura~\ref{fig:ui_home_panels}, dreta) detalla el nom de l'operador actiu i el perfil assignat pel sistema, complint amb el requisit d'autenticació basat en rols. Aquest panell unifica tres accions globals clau:
 \begin{enumerate}
   \item \textbf{Tancament de sessió segur:} Un botó d'apagat físic que realitza una petició POST cap a l'endpoint \texttt{/WebLogin} amb l'acció \texttt{Logout}. Aquesta operació destrueix les credencials del servidor de manera immediata i buida completament el Signal privat de la memòria de l'aplicació web per evitar que la sessió quedi accessible.
   \item \textbf{Reinici remot del gravador:} Un botó que executa la comanda de reinici físic del videogravador coordinada pel servei \texttt{MaintenanceService}. Aquesta acció obre un flux de comunicació securitzat amb el backend i mostra un component d'espera que supervisa el procés de reinici físic del maquinari.
@@ -371,7 +371,7 @@ L'aplicació suporta tres idiomes complets implementats amb la llibreria \textbf
 \textbf{Canvi d'idioma i sincronització per URL:} Un aspecte rellevant del disseny és que la llengua activa s'insereix directament a l'URL de navegació (ex: \texttt{/en/home} o \texttt{/es/configuration/network}). Quan l'operador commuta l'idioma des del selector de la capçalera, el \texttt{InfoUsrComponent} realitza dues operacions: primer invoca \texttt{this.translate.use(newLang)}, que descarrega el nou diccionari asíncronament i aplica els textos a tot el DOM de forma reactiva a través del \textit{pipe}; tot seguit, substitueix el primer segment de l'URL pel nou codi de llengua sense perdre la pantalla activa (\texttt{replaceUrl: true}), mantenint la consistència de l'historial del navegador i permetent desar o compartir adreces directes per idioma.
 
 \subsection{Gestió de Llicències}
-Accedint a través del botó del panell d'informació del videogravador (Figura \ref{fig:ui_home_panels}), l'operador és redirigit a la pàgina de llicència (Figura \ref{fig:ui_license}). En aquesta pantalla es mostra el resum de l'estat legal i operatiu del sistema, on s'especifica informació clau com el nombre màxim de canals de vídeo permesos per la llicència actual, i permet procedir a l'activació o renovació de la llicència quan sigui necessari.
+Accedint a través del botó del panell d'informació del videogravador (Figura~\ref{fig:ui_home_panels}), l'operador és redirigit a la pàgina de llicència (Figura~\ref{fig:ui_license}). En aquesta pantalla es mostra el resum de l'estat legal i operatiu del sistema, on s'especifica informació clau com el nombre màxim de canals de vídeo permesos per la llicència actual, i permet procedir a l'activació o renovació de la llicència quan sigui necessari.
 
 \clearpage
 \begin{figure}[htbp]
@@ -383,7 +383,7 @@ Accedint a través del botó del panell d'informació del videogravador (Figura 
 \end{figure}
 
 \subsection{Sistema d'alertes en temps real}
-Un element clau de la capçalera és la icona del triangle d'alerta (Figura \ref{fig:ui_errors}). La seguretat industrial exigeix que qualsevol anomalia física o lògica (com la pèrdua de senyal d'una càmera, una fallida en un disc d'emmagatzematge o un atac contra el sistema de xarxa) es comuniqui a l'instant.
+Un element clau de la capçalera és la icona del triangle d'alerta (Figura~\ref{fig:ui_errors}). La seguretat industrial exigeix que qualsevol anomalia física o lògica (com la pèrdua de senyal d'una càmera, una fallida en un disc d'emmagatzematge o un atac contra el sistema de xarxa) es comuniqui a l'instant.
 
 \clearpage
 \begin{figure}[htbp]
@@ -458,7 +458,7 @@ El component \texttt{ConfigInputComponent} actua com a intèrpret de les definic
   \item \textbf{Cas per defecte:} Si el tipus no coincideix amb cap dels anteriors, es renderitza un camp de text genèric amb el límit \texttt{\_maxLength} de l'esquema, dimensionat per acomodar continguts extensos com ara certificats o claus criptogràfiques.
 \end{itemize}
 
-La Figura \ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el diàleg de creació d'un compte d'usuari nou mostra en temps real els requisits de contrasenya no complerts (longitud mínima, presència de número, minúscula i majúscula) en forma de xips de validació. Cada xip desapareix en el moment en què el camp satisfà el criteri corresponent, sense cap petició al servidor.
+La Figura~\ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el diàleg de creació d'un compte d'usuari nou mostra en temps real els requisits de contrasenya no complerts (longitud mínima, presència de número, minúscula i majúscula) en forma de xips de validació. Cada xip desapareix en el moment en què el camp satisfà el criteri corresponent, sense cap petició al servidor.
 
 \begin{figure}[htbp]
   \centering
@@ -468,7 +468,7 @@ La Figura \ref{fig:config_create_user} il·lustra aquest mecanisme en acció: el
   \small Font: Elaboració pròpia.
 \end{figure}
 
-El Llistat \ref{lst:schema_json} mostra un fragment real de l'esquema JSON que el \textit{backend} retorna per al node de càmeres IP (\texttt{config.video.cam}). L'esquema és un arbre JSON jeràrquic on la clau \texttt{\{camId\}} actua com a plantilla de col·lecció; el camp \texttt{\_rule} defineix el rang d'instàncies vàlides (índexs 0--151, amb farciment de tres dígits), i \texttt{la-core-legacy} expandeix aquesta plantilla en temps real per generar una entrada per a cada càmera instal·lada a l'equip. La convenció de prefixos \texttt{\_} separa les metadades de les propietats reals del dispositiu:
+El Llistat~\ref{lst:schema_json} mostra un fragment real de l'esquema JSON que el \textit{backend} retorna per al node de càmeres IP (\texttt{config.video.cam}). L'esquema és un arbre JSON jeràrquic on la clau \texttt{\{camId\}} actua com a plantilla de col·lecció; el camp \texttt{\_rule} defineix el rang d'instàncies vàlides (índexs 0--151, amb farciment de tres dígits), i \texttt{la-core-legacy} expandeix aquesta plantilla en temps real per generar una entrada per a cada càmera instal·lada a l'equip. La convenció de prefixos \texttt{\_} separa les metadades de les propietats reals del dispositiu:
 
 \begin{lstlisting}[language=JavaScript, caption={Fragment real de l'esquema JSON del node \texttt{config.video.cam}, que inclou la plantilla de col·lecci\'o i cinc tipus de propietat diferents.}, label={lst:schema_json}]
 {
@@ -711,9 +711,9 @@ Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix 
 Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
 
 \subsection{Interfície de Càmeres}
-A la pàgina de Càmeres (Figura \ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$ i $2\times2$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
+A la pàgina de Càmeres (Figura~\ref{fig:ui_cameras}), l'operador disposa de controladors visuals per commutar la distribució de la graella multimèdia (\textit{layouts} de tipus $1\times1$ i $2\times2$). Cadascuna de les cel·les que formen aquest mosaic és un component d'Angular unificat i encapsulat anomenat \texttt{GridVideoPlayerComponent}, el qual gestiona el cicle de vida del seu propi reproductor independent.
 
-La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag and Drop}) nativa integrada amb la llista lateral de càmeres del panell esquerre. L'usuari pot arrossegar qualsevol càmera cap a una cel·la del mosaic. Aquesta acció de drop recupera la identitat del dispositiu d'entrada, demana el seu mètode d'accessibilitat i demana de forma dinàmica la càrrega del flux, seguint el cicle d'activitat descrit a la Figura \ref{fig:activity_video_connection}.
+La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag and Drop}) nativa integrada amb la llista lateral de càmeres del panell esquerre. L'usuari pot arrossegar qualsevol càmera cap a una cel·la del mosaic. Aquesta acció de drop recupera la identitat del dispositiu d'entrada, demana el seu mètode d'accessibilitat i demana de forma dinàmica la càrrega del flux, seguint el cicle d'activitat descrit a la Figura~\ref{fig:activity_video_connection}.
 
 \begin{figure}[htbp]
   \centering
@@ -742,7 +742,7 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 % }
 % \end{lstlisting}
 
-% Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figura \ref{fig:seq_video_streaming} defineix quins còdecs d'escriptura (H.264 o H.265) i resolucions utilitzarà l'enllaç abans d'iniciar el transport segur dels paquets sobre canals UDP.
+% Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figura~\ref{fig:seq_video_streaming} defineix quins còdecs d'escriptura (H.264 o H.265) i resolucions utilitzarà l'enllaç abans d'iniciar el transport segur dels paquets sobre canals UDP.
 
 % \begin{figure}[htbp]
 %   \centering
@@ -814,7 +814,7 @@ Destaca l'ús del verb \textbf{GET} amb tots els paràmetres a la \textit{query 
 \section{Reproducció de Gravacions}
 La cerca, consulta i reproducció de gravacions històriques constitueix una de les funcionalitats més complexes i crítiques del dispositiu, ja que requereix que l'operador pugui navegar per milers d'hores de gravació de càmeres IP d'alta resolució des de qualsevol navegador web sense instal·lar cap connector o extensió (\textit{Plugin-free}).
 
-En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una solució integrada extrem a extrem: des de la capa de backend de \textbf{la-video-engine} ---que s'encarrega de l'emmagatzematge, la segmentació i el servei HLS--- fins al component \textit{Timeline} d'Angular~19 que l'operador utilitza des del navegador (Figura \ref{fig:ui_recordings}).
+En el marc d'aquest projecte, s'ha dissenyat i desenvolupat completament una solució integrada extrem a extrem: des de la capa de backend de \textbf{la-video-engine} ---que s'encarrega de l'emmagatzematge, la segmentació i el servei HLS--- fins al component \textit{Timeline} d'Angular~19 que l'operador utilitza des del navegador (Figura~\ref{fig:ui_recordings}).
 
 \clearpage
 \begin{figure}[htbp]
@@ -864,13 +864,13 @@ En registrar-se la crida de segment, el mètode del backend \texttt{cgi\_segment
 \end{itemize}
 
 \subsection{Línia de Temps Interactiva}
-Al costat del client, el disseny s'estructura en un calendari flotant, un selector lateral de càmeres i una línia de temps interactiva unificada de tipus \textit{Timeline} (Figura \ref{fig:ui_recordings}).
+Al costat del client, el disseny s'estructura en un calendari flotant, un selector lateral de càmeres i una línia de temps interactiva unificada de tipus \textit{Timeline} (Figura~\ref{fig:ui_recordings}).
 
 El cicle de funcionament de la interfície segueix els passos següents:
 \begin{enumerate}
   \item El client demana l'índex de gravacions per a una càmera i data seleccionades. El frontend rep un llistat de metadades que indiquen els intervals de temps en què s'ha registrat vídeo a l'NVR.
   \item El component dibuixa la barra de la línia de temps en temps real utilitzant un codi de colors: verd o blau per a gravació de tipus continu, i vermell o taronja per a dades de gravació disparada per un esdeveniment d'alarma, de moviment o analítica (obtingut mitjançant consultes a l'historial del dispositiu).
-  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el \textit{timestamp} exacte de destí i executa el mètode reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat \ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
+  \item En fer clic o desplaçar el lliscador del timeline, el frontend calcula el \textit{timestamp} exacte de destí i executa el mètode reactiu de càrrega de vídeo \texttt{loadVideo()} (Llistat~\ref{lst:hls_load_code}), inicialitzant de manera immediata el reproductor HLS d'alta definició.
 \end{enumerate}
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, label={lst:hls_load_code}, caption={Càrrega dinàmica de llista de reproducció HLS basada en franges de temps.}]
@@ -933,7 +933,7 @@ Per aclarir la topologia d'aquest flux complex d'informació, s'ha dissenyat el 
 El desacoblament entre fils garanteix que el bloqueig d'un bus (D-Bus, gRPC o WebSocket) no afecti els altres, i que cap senyal es perdi sota alta concurrència.
 
 \subsection{Adquisició de senyals d'alarma}
-El punt d'entrada de qualsevol notificació al microservei \texttt{la-core-alarm} és el fil d'execució asíncron de lectura de D-Bus \texttt{dbus\_listen\_alarms\_thread} (Llistat \ref{lst:dbus_listen_code}). Aquest fil manté una connexió de sistema bloquejant per escoltar de forma passiva qualsevol senyal \texttt{ALARM\_NOTIFY} de la interfície \texttt{com.lanaccess.sysevents}.
+El punt d'entrada de qualsevol notificació al microservei \texttt{la-core-alarm} és el fil d'execució asíncron de lectura de D-Bus \texttt{dbus\_listen\_alarms\_thread} (Llistat~\ref{lst:dbus_listen_code}). Aquest fil manté una connexió de sistema bloquejant per escoltar de forma passiva qualsevol senyal \texttt{ALARM\_NOTIFY} de la interfície \texttt{com.lanaccess.sysevents}.
 
 \begin{lstlisting}[basicstyle=\footnotesize, language=C++, label={lst:dbus_listen_code}, caption={Funció d'escolta i filtrat de senyals del bus D-Bus.}]
 static int signal_callback(sd_bus_message *msg, void *userdata, sd_bus_error *ret_error) {
@@ -1006,7 +1006,7 @@ Aquesta regla relacional garanteix de forma asíncrona la poda activa del sistem
 \subsection{El Cicle de Vida de les Alarmes}
 Un cop es realitza l'escriptura d'una nova alarma en base de dades o el client emet una ordre de canvi, el mòdul del backend llança l'esdeveniment unificat a la cua \texttt{global\_emission\_queue}, des d'on s'extreu per al seu enviament a través del WebSocket d'alta velocitat de notificacions (\texttt{la-core-alarm}).
 
-A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura \ref{fig:ui_alarms}). Cada operació de l'usuari sobre una alarma (marcar com a llegida, arxivar o eliminar) es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
+A la interfície d'Angular, l'estat d'incidents es renderitza de manera reactiva mitjançant l'ús de \textbf{Signals} (Figura~\ref{fig:ui_alarms}). Cada operació de l'usuari sobre una alarma (marcar com a llegida, arxivar o eliminar) es sincronitza a través de notificacions asíncrones de l'estàndard JSON:
 
 \begin{figure}[htbp]
   \centering
@@ -1045,8 +1045,8 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
 \end{figure}
 
 \begin{enumerate}
-  \item \textbf{Càrrega i Validació (Figura \ref{fig:ui_update}):} L'operador selecciona el fitxer binari d'actualització (\texttt{.bin}). El frontend valida en primer lloc la firma, l'extensió i la mida del fitxer al navegador abans d'iniciar una petició POST d'escriptura multipart cap a l'endpoint de \texttt{la-core-legacy}.
-  \item \textbf{Sondeig d'Estat (\textit{Polling} de Flashing):} Un cop completada la pujada del fitxer, l'aplicació web inicia un procés de consulta periòdica de l'estat cap a \texttt{/webprotocol/firmware\_upgrade\_state}. L'aplicació mapeja l'estat rebut a la pantalla de progrés reactiva (Figura \ref{fig:ui_upgrading_flash}):
+  \item \textbf{Càrrega i Validació (Figura~\ref{fig:ui_update}):} L'operador selecciona el fitxer binari d'actualització (\texttt{.bin}). El frontend valida en primer lloc la firma, l'extensió i la mida del fitxer al navegador abans d'iniciar una petició POST d'escriptura multipart cap a l'endpoint de \texttt{la-core-legacy}.
+  \item \textbf{Sondeig d'Estat (\textit{Polling} de Flashing):} Un cop completada la pujada del fitxer, l'aplicació web inicia un procés de consulta periòdica de l'estat cap a \texttt{/webprotocol/firmware\_upgrade\_state}. L'aplicació mapeja l'estat rebut a la pantalla de progrés reactiva (Figura~\ref{fig:ui_upgrading_flash}):
         \begin{itemize}
           \item \texttt{UPLOADING / WAITING:} El fitxer s'està transferint i validant internament.
           \item \texttt{UPDATING:} El sistema escriu el nou binari a la partició activa. La pantalla indica a l'operador que no apagui el dispositiu i mostra el progrés en format $(n/2)$, on $n$ és la partició que s'està actualitzant en aquell moment.
@@ -1055,7 +1055,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
           \item {\sloppy\texttt{ERROR /\allowbreak{} INCONSISTENT:} El procés es cancel·la a causa de dades corrompudes o errors de xarxa; s'activa immediatament la lògica de retorn segur a la partició anterior (\textit{dual-boot rollback}).\par}
         \end{itemize}
         Durant la fase d'escriptura a disc del nou binari, el microservei de \textit{backend} envia un senyal global via D-Bus. El canal persistent de WebSocket intercepta l'esdeveniment i, de forma completament asíncrona, redirigeix tots els usuaris connectats cap a la pantalla d'actualització activa, impedint que es realitzin noves modificacions de configuració durant la reinicialització física de l'equip.
-  \item \textbf{Cicle de Reinici i Verificació (Figura \ref{fig:ui_upgrading_reboot}):} Quan s'inicia el reinici físic del gravador, l'aplicació bloqueja la interfície i s'absté de fer peticions durant 15 segons de marge segur. Transcorregut aquest temps, inicia un sondeig periòdic de \texttt{connectivity.cgi} fins que el dispositiu torna a respondre. Un cop restablerta la connectivitat, el \textit{frontend} torna a consultar l'estat del firmware: si el sistema de \textit{dual-boot} requereix actualitzar una segona partició, l'estat torna a ser \texttt{UPDATING (2/2)} i el cicle d'escriptura i reinici es repeteix. Únicament quan l'estat retornat és \texttt{OK} o \texttt{READY} es considera el procés completat i la pantalla de confirmació d'èxit (Figura \ref{fig:ui_upgrading_reboot}, dreta) ofereix el botó per tornar a l'autenticació.
+  \item \textbf{Cicle de Reinici i Verificació (Figura~\ref{fig:ui_upgrading_reboot}):} Quan s'inicia el reinici físic del gravador, l'aplicació bloqueja la interfície i s'absté de fer peticions durant 15 segons de marge segur. Transcorregut aquest temps, inicia un sondeig periòdic de \texttt{connectivity.cgi} fins que el dispositiu torna a respondre. Un cop restablerta la connectivitat, el \textit{frontend} torna a consultar l'estat del firmware: si el sistema de \textit{dual-boot} requereix actualitzar una segona partició, l'estat torna a ser \texttt{UPDATING (2/2)} i el cicle d'escriptura i reinici es repeteix. Únicament quan l'estat retornat és \texttt{OK} o \texttt{READY} es considera el procés completat i la pantalla de confirmació d'èxit (Figura~\ref{fig:ui_upgrading_reboot}, dreta) ofereix el botó per tornar a l'autenticació.
 \end{enumerate}
 
 \begin{figure}[htbp]
@@ -1080,7 +1080,7 @@ L'actualització de firmware és un procés crític en sistemes embedded de segu
 
 \clearpage
 \section{Configuració Global}
-El panell d'accions de configuració unifica les comandes administratives destructives i de salvaguarda de dades (Figura \ref{fig:ui_configuration_actions}).
+El panell d'accions de configuració unifica les comandes administratives destructives i de salvaguarda de dades (Figura~\ref{fig:ui_configuration_actions}).
 
 \begin{figure}[htbp]
   \centering
@@ -1097,7 +1097,7 @@ El panell d'accions de configuració unifica les comandes administratives destru
 \end{itemize}
 
 \section{Registre d'esdeveniments}
-El visor de registres (Figura \ref{fig:ui_log}) s'ha programat per complir de manera rigorosa amb la normativa de seguretat \textbf{UNE-EN 62676}, que exigeix la traçabilitat absoluta i inalterable d'accions sensibles (com ara qui ha visualitzat quin canal de vídeo històric, en quines dates i hores exactes, o quins intents fallits d'accés s'han produït).
+El visor de registres (Figura~\ref{fig:ui_log}) s'ha programat per complir de manera rigorosa amb la normativa de seguretat \textbf{UNE-EN 62676}, que exigeix la traçabilitat absoluta i inalterable d'accions sensibles (com ara qui ha visualitzat quin canal de vídeo històric, en quines dates i hores exactes, o quins intents fallits d'accés s'han produït).
 
 \begin{figure}[htbp]
   \centering
@@ -1126,4 +1126,4 @@ Un videogravador és un sistema amb una gran quantitat de funcionalitats i parà
   \small Font: Elaboració pròpia.
 \end{figure}
 
-Per resoldre aquesta limitació operativa, la secció de Documentació (Figura \ref{fig:ui_documentation}) s'ha programat per funcionar de manera completament unificada i autosuficient. Tots els manuals d'usuari i fitxes tècniques estan integrats i empaquetats directament en la memòria de l'aplicació de l'equip. En fer clic sobre el botó de descàrrega del fitxer d'ajuda, el frontend envia una ordre cap al servei d'arxiu lògic de \texttt{la-core-legacy} per extreure el fitxer comprimit format \texttt{support\_file.tar.gz} del disc local i descarregar-lo al PC de l'instal·lador, oferint una eina d'ajuda autònoma i sense dependències de serveis externs de xarxa.
+Per resoldre aquesta limitació operativa, la secció de Documentació (Figura~\ref{fig:ui_documentation}) s'ha programat per funcionar de manera completament unificada i autosuficient. Tots els manuals d'usuari i fitxes tècniques estan integrats i empaquetats directament en la memòria de l'aplicació de l'equip. En fer clic sobre el botó de descàrrega del fitxer d'ajuda, el frontend envia una ordre cap al servei d'arxiu lògic de \texttt{la-core-legacy} per extreure el fitxer comprimit format \texttt{support\_file.tar.gz} del disc local i descarregar-lo al PC de l'instal·lador, oferint una eina d'ajuda autònoma i sense dependències de serveis externs de xarxa.
