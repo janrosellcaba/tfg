@@ -94,21 +94,21 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Justificació:} S'ha optat per la solució \textbf{Dinàmica} perquè és la característica diferenciadora del projecte: permet que \textbf{Web Core View} sigui compatible amb qualsevol model futur de la família NXT de Lanaccess sense modificar ni una línia de codi del \textit{frontend}. El format real del \textit{schema} s'explica en detall a l'Annex~A.1 de la memòria.
 \end{itemize}
 
-\subsection{Alternativa de gestió d'estat: NgRx vs. Angular Signals}
+\subsection{Alternativa de gestió d'estat}
 \begin{itemize}
   \item \textbf{NgRx:} Implementació del patró Redux per a l'ecosistema Angular, robusta per a aplicacions gegantines amb estats complexos compartits entre mòduls. Implica un \textit{boilerplate} elevat (accions, \textit{reducers}, efectes, selectors) i un cost d'aprenentatge notable.
   \item \textbf{Angular Signals:} La nova eina nativa d'Angular 19 per a la gestió de la reactivitat granular \cite{angular_signals}. Permet que els components reaccionin exactament als canvis d'estat que els afecten, sense necessitat de \textit{Zone.js}.
   \item \textbf{Justificació:} S'ha seleccionat \textbf{Signals} per la seva lleugeresa i eficiència en el renderitzat. En un entorn \textit{embedded} on la CPU s'ha de prioritzar per al vídeo, la reactivitat nativa de Signals permet prescindir de les comprovacions constants de \textit{Zone.js}, optimitzant el rendiment global del sistema.
 \end{itemize}
 
-\subsection{Alternativa de mecanisme de sessió: JWT vs. Cookies HttpOnly/Secure}
+\subsection{Alternativa de mecanisme de sessió}
 \begin{itemize}
   \item \textbf{JWT (\textit{JSON Web Token}):} Mecanisme d'autenticació sense estat (\textit{stateless}) \cite{rfc7519} que codifica les credencials al mateix \textit{token} signat. La gestió des del \textit{frontend} implica emmagatzemar el \textit{token} a \textit{LocalStorage} o \textit{SessionStorage}, fet que els exposa a atacs XSS (\textit{Cross-Site Scripting}) si hi ha una injecció de codi maliciós.
   \item \textbf{Cookies \texttt{HttpOnly}/\texttt{Secure}:} La \textit{cookie} de sessió és gestionada exclusivament per NGINX: s'estableix al \textit{backend}, s'envia al navegador amb els atributs \texttt{HttpOnly} i \texttt{Secure}, i el JavaScript de l'aplicació no en té accés en cap moment. L'estat de sessió es manté en un Signal privat en memòria al \textit{frontend} (zero-persistència: un F5 equival a tancar sessió).
   \item \textbf{Justificació:} S'ha optat per les \textbf{cookies \texttt{HttpOnly}/\texttt{Secure}} gestionades per NGINX perquè eliminen el vector d'atac XSS sobre les credencials: cap \textit{script} del navegador no pot llegir ni exfiltrar la \textit{cookie}. Aquesta decisió s'alinea amb les recomanacions de seguretat de l'OWASP (Open Web Application Security Project) per a aplicacions en entorns de control d'accés físic.
 \end{itemize}
 
-\subsection{Alternativa de notificacions en temps real: WebSockets vs. SSE vs. Long Polling}
+\subsection{Alternativa de notificacions en temps real}
 \begin{itemize}
   \item \textbf{Long Polling:} El client fa peticions HTTP repetides fins que el servidor disposa de dades noves. Solució senzilla però ineficient: genera múltiples connexions curtes i latències variables, inadequada per a notificacions d'alarmes crítiques.
   \item \textbf{SSE (\textit{Server-Sent Events}):} Connexió HTTP unidireccional (servidor $\rightarrow$ client), lleugera i nativa al navegador. Adequada per a \textit{feeds} de dades en un sol sentit, però no permet enviar comandes del client al servidor per la mateixa connexió.
@@ -116,7 +116,7 @@ Per garantir l'èxit i la sostenibilitat del projecte, s'han avaluat diferents c
   \item \textbf{Justificació:} S'ha escollit \textbf{WebSockets} per la seva naturalesa bidireccional, necessària per als dos canals del sistema: el canal global de notificacions (\texttt{/ws/la-core-\allowbreak{}notifier/}) i el canal d'alarmes (\texttt{/ws/la-core-alarm/}), que requereix tant rebre alertes com confirmar-ne la lectura des del client.
 \end{itemize}
 
-\subsection{Alternativa de proxy invers: NGINX vs. accés directe als microserveis}
+\subsection{Alternativa de proxy invers}
 \begin{itemize}
   \item \textbf{Accés directe als microserveis:} Exposar cada microservei del \textit{backend} en ports independents obliga el navegador a realitzar peticions \textit{cross-origin}, fent necessaris encapçalaments CORS (Cross-Origin Resource Sharing) complexos i impedint l'ús de cookies \texttt{HttpOnly} (que no es transmeten en peticions \textit{cross-origin} per defecte).
   \item \textbf{NGINX com a proxy invers:} Centralitza tots els microserveis sota un únic origen (\textit{same-origin}), enrutant per prefix de ruta. Gestiona el cicle de vida de les \textit{cookies} de sessió de forma transparent i actua com a punt únic de control de seguretat (TLS, capçaleres HTTP de seguretat).
@@ -189,7 +189,7 @@ Per delimitar clarament l'abast, s'especifica el que queda \textbf{fora} d'aques
   \item \textbf{Anàlisi de vídeo intel·ligent:} El sistema no incorpora cap mòdul d'anàlisi de contingut visual: detecció de moviment per visió artificial, reconeixement facial, seguiment d'objectes ni analítica de vídeo basada en aprenentatge automàtic. Aquestes funcions depenen de les capacitats del \textit{firmware} de les càmeres IP connectades.
 \end{itemize}
 
-\section{Actors implicats (Stakeholders)}
+\section{Actors implicats}
 Els actors s'ordenen per proximitat al sistema, de la màxima a la mínima:
 
 \begin{itemize}
