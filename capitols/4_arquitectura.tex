@@ -10,7 +10,7 @@ Abans d'abordar l'arquitectura interna de microserveis, és rellevant descriure 
 
 \subsection{Estructura general de la interfície (\textit{Layout} d'operador)}
 
-El \textit{layout} de \textit{Web Core View} segueix el model estàndard de les aplicacions de gestió industrial (\textit{operator dashboard}): una \textbf{barra de navegació lateral persistent} que agrupa els mòduls per àmbit funcional, i una \textbf{àrea de contingut principal} que renderitza dinàmicament la vista seleccionada. La barra de navegació roman visible en tot moment i indica visualment l'estat del sistema: badge de notificació d'alarmes actives, indicador de sessió i accés ràpid al perfil d'usuari.
+El \textit{layout} de \textit{Web Core View} segueix el model estàndard de les aplicacions de gestió industrial (\textit{operator dashboard}): una \textbf{barra de navegació lateral persistent} que agrupa els mòduls per àmbit funcional, i una \textbf{àrea de contingut principal} que renderitza dinàmicament la vista seleccionada. La barra de navegació roman visible en tot moment i indica visualment l'estat del sistema: badge de notificació d'alarmes actives, indicador de sessió i accés ràpid al perfil d'usuari~(vegeu el flux de navegació a la Figura~\ref{fig:flux_navegacio}).
 
 L'aplicació s'organitza en tres àmbits funcionals principals, accessibles des de la barra de navegació:
 
@@ -82,7 +82,7 @@ Cal destacar que tots aquests microserveis —\textbf{la-core-legacy}, \textbf{l
 \clearpage
 \subsection{Capa de comunicació i Proxy}
 
-Per comunicar la web amb els serveis de manera segura, s'interposa \textbf{NGINX} com a \textit{proxy} invers i porta d'entrada única (\textit{gateway}) al sistema. NGINX escolta als ports \texttt{60080} (HTTP) i \texttt{60443} (HTTPS/SSL) i assumeix quatre responsabilitats principals. Gestiona el xifratge TLS (protocols TLSv1.2 i TLSv1.3, xifrat \texttt{EECDH+AESGCM}), aplica capçaleres de seguretat HTTP (\texttt{Strict-Transport-Security}, \texttt{X-Frame-Options: SAMEORIGIN}, \texttt{X-Content-Type-Options: nosniff}), controla l'autenticació de les rutes protegides mitjançant el mecanisme intern \texttt{auth\_request}, i enruta cada petició cap al microservei intern corresponent en funció de la ruta URL. Des del punt de vista del navegador, tots els serveis queden amagats darrere una única adreça.
+Per comunicar la web amb els serveis de manera segura, s'interposa \textbf{NGINX} com a \textit{proxy} invers i porta d'entrada única (\textit{gateway}) al sistema. NGINX escolta als ports \texttt{60080} (HTTP) i \texttt{60443} (HTTPS/SSL) i assumeix quatre responsabilitats principals. Gestiona el xifratge TLS (protocols TLSv1.2 i TLSv1.3, xifrat \texttt{EECDH+AESGCM}), aplica capçaleres de seguretat HTTP (\texttt{Strict-Transport-Security}, \texttt{X-Frame-Options: SAMEORIGIN}, \texttt{X-Content-Type-Options: nosniff}), controla l'autenticació de les rutes protegides mitjançant el mecanisme intern \texttt{auth\_request}, i enruta cada petició cap al microservei intern corresponent en funció de la ruta URL. Des del punt de vista del navegador, tots els serveis queden amagats darrere una única adreça~(Llistat~\ref{lst:nginx_security}).
 
 La configuració NGINX agrupa les rutes en quatre blocs funcionals:
 
