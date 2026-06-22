@@ -688,7 +688,7 @@ Al maquinari del gravador, l'arquitectura de transmissió de vídeo es divideix 
 
 \begin{enumerate}
   \item \textbf{Motor d'Adquisició i Processat (GStreamer):} Per a cadascuna de les càmeres IP físiques instal·lades, l'NVR inicialitza un pipeline de dades basat en el framework multimèdia industrial \textbf{GStreamer}. Aquest pipeline s'encarrega d'obrir el flux \textit{RTSP} natiu de la càmera, extreure'n els paquets de vídeo, normalitzar el senyal de rellotge i decodificar de forma accelerada per maquinari part dels fotogrames crítics per a la generació de metadades analítiques.
-  \item \textbf{Servidor de Mitjans WebRTC (MediaMTX):} Els fotogrames de vídeo capturats i empaquetats per GStreamer es canalitzen internament en un pipeline d'escriptura cap al servidor multimèdia d'alt rendiment \textbf{MediaMTX} (actuant com a servidor centralitzat de WebRTC i WHEP~\cite{rfc9716}). Aquest servei gestiona la negociació SDP (\textit{Session Description Protocol}), el xifratge de paquets SRTP sobre transport UDP, i serveix el vídeo amb una latència punta a punta inferior a 300 ms natius en qualsevol navegador web actual, recolzant-se en la targeta gràfica (GPU) del dispositiu del client per a la descodificació fina.
+  \item \textbf{Servidor de Mitjans WebRTC (MediaMTX):} Els fotogrames de vídeo capturats i empaquetats per GStreamer es canalitzen internament en un pipeline d'escriptura cap al servidor multimèdia d'alt rendiment \textbf{MediaMTX} (actuant com a servidor centralitzat de WebRTC i WHEP (WebRTC HTTP Egress Protocol)~\cite{rfc9716}). Aquest servei gestiona la negociació SDP (\textit{Session Description Protocol}), el xifratge de paquets SRTP sobre transport UDP, i serveix el vídeo amb una latència punta a punta inferior a 300 ms natius en qualsevol navegador web actual, recolzant-se en la targeta gràfica (GPU) del dispositiu del client per a la descodificació fina.
 \end{enumerate}
 
 Davant de xarxes corporatives on el trànsit UDP pugui estar completament bloquejat pel tallafocs de l'empresa, cosa que impedeix establir el canal de vídeo per defecte d'ICE, el sistema activa de forma transparent un mecanisme de degradació de servei cap a \textbf{HLS} (\textit{HTTP Live Streaming}). Aquesta via de redundància s'estableix a través del proxy invers NGINX mitjançant el port de comunicació de dades estàndard (TCP 443), assegurant la visualització contínua i sense talls del senyal a costa d'un petit increment de la latència que no excedeix el límit operatiu.
@@ -708,7 +708,6 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 
 \clearpage
 % \subsection{Negociació SDP i Establiment del Canal de Streaming}
-% Si la xarxa del client disposa dels canals lliures de comunicació, el frontend i el servidor MediaMTX inicien la negociació SDP mitjançant el protocol d'egress de mitjans unificat \textbf{WHEP} (\textit{WebRTC HTTP Egress Protocol}):
 
 % \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica simplificada de la PeerConnection per WebRTC.}]
 % async startStreaming(cameraId: string) {
