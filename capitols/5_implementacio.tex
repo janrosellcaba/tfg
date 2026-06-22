@@ -954,7 +954,7 @@ El fil d'execució de persistència \texttt{db\_client\_thread} es desperta imme
 Si el canvi és d'estat d'inici de succés (\texttt{status = "start"}), s'efectua una operació d'inserció atòmica. En canvi, si és d'acabament d'incident (\texttt{status = "end"}), l'algorisme fa primer una consulta selectiva per recuperar l'identificador històric original i actualitza la línia de base de dades del registre corresponent, assegurant la correlació exacta dels estats.
 
 \subsection{Arquitectura de \texttt{la-db-engine}}
-Per assegurar l'atomicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional \textbf{SQLite3}. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
+Per assegurar l'atomicitat de les dades (propietats ACID) del servei de persistència, s'ha utilitzat el motor de base de dades relacional \textbf{SQLite3}~\cite{sqlite_spec}. No obstant això, per complir amb les directrius de seguretat més exigents de sistemes embedded i evitar conflictes per concurrència d'accés o fitxers bloquejats, s'ha definit un esquema de persistència altament aïllat:
 
 \begin{enumerate}
   \item \textbf{Aïllament de Processos (\textit{Sandbox}):} El microservei d'orquestració de dades \texttt{la-db-engine} actua com a gestor de la base de dades sqlite i del servei gRPC, però s'executa com un procés separat d'usuari restringit, de manera que no disposa de permisos d'escriptura sobre el disc físic de gravació.

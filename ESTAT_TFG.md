@@ -1,5 +1,5 @@
 # Estat del TFG — Web Core View
-> Actualitzat: 22 juny 2026. Poliment tipogràfic cap. 4, 5, 6, 7 i 8 completat. Memòria 100% polida.
+> Actualitzat: 22 juny 2026. Integrades 8 cites bibliogràfiques fins llavors òrfenes. Compilació neta (133 pàg, 0 warnings). Memòria 100% polida i bibliogràficament completa.
 
 ---
 
