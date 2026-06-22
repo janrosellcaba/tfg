@@ -42,7 +42,7 @@ Es defineixen els següents rols assumits pel desenvolupador al llarg del projec
 \begin{itemize}
   \item \textbf{Cap de Projecte (PM):} Responsable de la planificació temporal, coordinació amb Lanaccess i control econòmic.
   \item \textbf{Analista:} Dissenyador de l'arquitectura de capes, diagrames UML i definició de requisits.
-  \item \textbf{Programador:} Desenvolupador del frontend, dels microserveis embedded, de la configuració de NGINX, i de l'entorn de build amb yocto.
+  \item \textbf{Programador:} Desenvolupador del frontend, dels microserveis embedded, de la configuració de NGINX, i de l'entorn de build amb Yocto.
   \item \textbf{Tester / Validació:} Responsable del disseny de casos de prova, test de càrrega de vídeo i validació de seguretat.
 \end{itemize}
 
@@ -111,7 +111,7 @@ Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns 
     \textbf{Tipus} & \textbf{Risc Identificat} & \textbf{Prob.} & \textbf{Imp.} & \textbf{Pla de Contingència / Acció Correctiva} \\ \midrule
     Tecnològic & Incompatibilitat de descompressió de vídeo H.265 & Mitjana & Alt & Coordinar amb l'equip de firmware per canviar el perfil d'emissió a H.264 com a alternativa compatible. \\ \midrule
     Planificació & Corba d'aprenentatge d'Angular 19 i Signals & Baixa & Mitjà & Ús de sandboxes de prova reduïts, guies oficials de desenvolupament Angular i aprofitament d'arquitectures MVC heretades. \\ \midrule
-    Tecnològic & Degradació del rendiment per configuracions anidades & Mitjana & Mitjà & Implementació d'algorísmia de recorregut asíncron de dades al motor dinàmic de configuració per evitar bloquejos. \\ \midrule
+    Tecnològic & Degradació del rendiment per configuracions niuades & Mitjana & Mitjà & Implementació d'algorísmia de recorregut asíncron de dades al motor dinàmic de configuració per evitar bloquejos. \\ \midrule
     Materials & Manca de disponibilitat de gravadors NVR de prova & Baixa & Alt & Creació d'un entorn de mock-up local mitjançant respostes JSON simulades. \\ \midrule
     Humans & Descoordinació amb el departament de backend & Baixa & Mitjà & Escalada al cap de projecte i sincronització a les reunions diàries per garantir que tots els equips avancen de forma paral·lela i alineada. \\ \bottomrule
   \end{tabular}
@@ -123,7 +123,7 @@ Un desenvolupament tecnològic d'alta enginyeria en sistemes crítics i entorns 
 A nivell de desviacions reals experimentades, durant l'execució del projecte s'han confirmat dos dels riscos recollits en la planificació:
 \begin{enumerate}
   \item \textbf{Complexitat en la integració del còdec H.265:} El comportament de la descodificació nativa en diferents navegadors ha requerit un buffer d'Angular molt més complex per garantir la fluïdesa.
-  \item \textbf{Disseny arquitectònic del motor de configuració dinàmic:} La complexitat teòrica del parseig de metadades JSON per garantir validacions complexes ha consumit més hores del previst inicialment.
+  \item \textbf{Disseny arquitectònic del motor de configuració dinàmic:} La complexitat teòrica del processament de metadades JSON per garantir validacions complexes ha consumit més hores del previst inicialment.
 \end{enumerate}
 Aquestes desviacions i la seva gestió d'impacte es detallen en els següents apartats de rendiment i planificació econòmica.
 

@@ -6,7 +6,7 @@ L'especificació de requisits constitueix la base fonamental del projecte \texti
 En aquest capítol es detallen els actors, les històries d'usuari mitjançant la metodologia \textit{Product Backlog}, i l'especificació detallada dels requisits funcionals i no funcionals.
 
 \section{Metodologia d'extracció de requisits}
-Els requisits aquí exposats s'han obtingut mitjançant un procés iteratiu amb l'equip d'Embedded de Lanaccess. S'han realitzat sessions d'anàlisi sobre l'aplicació web \textit{legacy} existent --- basada en tecnologies obsoletes com ActiveX --- i entrevistes amb tècnics de camp per identificar els ``punts de dolor'' i les limitacions tecnològiques de la plataforma anterior.
+Els requisits aquí exposats s'han obtingut mitjançant un procés iteratiu amb l'equip d'Embedded de Lanaccess. S'han realitzat sessions d'anàlisi sobre l'aplicació web \textit{legacy} existent --- basada en tecnologies obsoletes com ActiveX --- i entrevistes amb tècnics de camp per identificar els ``punts crítics'' i les limitacions tecnològiques de la plataforma anterior.
 
 \section{Identificació d'actors}
 \label{sec:actors}
@@ -157,7 +157,7 @@ Els RNF defineixen les qualitats del sistema i les restriccions tecnològiques.
 \subsection{RNF-1: Rendiment i Eficiència}
 \begin{itemize}
   \item \textbf{RNF-1.1 Utilització de CPU:} Atès que el videogravador té recursos limitats, s'ha optimitzat el trànsit per evitar el \textit{polling} innecessari, substituint-lo per una arquitectura basada en esdeveniments sobre dos canals WebSocket diferenciats: \textbf{la-core-notifier}, obert de forma persistent des del login per a notificacions globals del sistema, i \textbf{la-core-alarm}, actiu exclusivament a la pàgina d'alarmes per a esdeveniments de detecció en temps real.
-  \item \textbf{RNF-1.2 Angular Signals:} La reactivitat de la interfície s'ha de basar en \textit{Angular Signals} per minimitzar les operacions de \textit{Zone.js} i evitar el re-renderitzat innecessari del DOM, especialment crític amb vídeos actius.
+  \item \textbf{RNF-1.2 Angular Signals:} La reactivitat de la interfície s'ha de basar en \textit{Angular Signals} per minimitzar les operacions de \textit{Zone.js} i evitar la renderització repetida innecessària del DOM, especialment crític amb vídeos actius.
 \end{itemize}
 
 \subsection{RNF-2: Robustesa i Disponibilitat}
@@ -293,7 +293,7 @@ Per garantir la integritat i la confidencialitat de les dades, i evitar atacs de
 \subsection{Llei de Seguretat Privada i Norma UNE-EN 62676}
 El disseny tècnic actua com un element facilitador perquè les entitats de seguretat compleixin amb la \textbf{Llei 5/2014 de Seguretat Privada} a Espanya, així com amb l'estàndard tècnic europeu \textbf{UNE-EN 62676} sobre sistemes de videovigilància per a aplicacions de seguretat:
 \begin{itemize}
-  \item \textbf{Control de caducitat i esborrat automàtic:} El sistema permet configurar de manera dinàmica les polítiques d'emmagatzematge per garantir que les gravacions es sobreescriuen automàticament en un període màxim de \textbf{30 dies}, en compliment estricte del límit d'emmagatzematge fixat per la Llei de Seguretat Privada i l'Agència Espanyola de Protecció de Dades (AEPD), excepte en cas de requeriment judicial.
+  \item \textbf{Control de caducitat i esborrat automàtic:} El sistema permet configurar de manera dinàmica les polítiques d'emmagatzematge per garantir que les gravacions se sobreescriuen automàticament en un període màxim de \textbf{30 dies}, en compliment estricte del límit d'emmagatzematge fixat per la Llei de Seguretat Privada i l'Agència Espanyola de Protecció de Dades (AEPD), excepte en cas de requeriment judicial.
   \item \textbf{Registre d'auditoria (Audit Log):} L'aplicació compta amb un servei de registre d'activitat inalterable que monitoritza i audita les accions dels usuaris (qui ha visualitzat quina càmera, en quines dates i hores, i si s'han realitzat descàrregues de vídeo), cosa que assegura la traçabilitat exigida per a la custòdia d'evidències gràfiques.
 \end{itemize}
 Malgrat aquestes facilitats tècniques, el compliment final de la normativa depèn de la configuració i l'ús real que l'entitat de seguretat privada faci del sistema en la instal·lació del client.
