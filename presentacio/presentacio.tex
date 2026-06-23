@@ -1,0 +1,385 @@
+% ============================================================
+%  Presentació TFG — Web Core View
+%  Autor: Jan Rosell Caba
+%  Data:  Juny 2026
+% ============================================================
+\documentclass[aspectratio=169]{beamer}
+
+% ---- Tema i colors ------------------------------------------
+\usetheme{Boadilla}
+\usecolortheme{default}
+
+\definecolor{upcblue}{RGB}{0, 82, 147}
+\definecolor{upclight}{RGB}{224, 237, 252}
+
+\setbeamercolor{palette primary}{bg=upcblue, fg=white}
+\setbeamercolor{palette secondary}{bg=upcblue!80, fg=white}
+\setbeamercolor{palette tertiary}{bg=upcblue!60, fg=white}
+\setbeamercolor{palette quaternary}{bg=upcblue, fg=white}
+\setbeamercolor{structure}{fg=upcblue}
+\setbeamercolor{title}{fg=white, bg=upcblue}
+\setbeamercolor{frametitle}{fg=white, bg=upcblue}
+\setbeamercolor{block title}{bg=upcblue, fg=white}
+\setbeamercolor{block body}{bg=upclight}
+
+% ---- Paquets ------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[catalan]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{pgfpages}
+
+% Activa les notes per a l'orador (comentar per a la versió final sense notes)
+% \setbeameroption{show notes on second screen=right}
+
+% ---- Metadades del document ---------------------------------
+\title[Web Core View]{Web Core View}
+\subtitle{Modernització de la interfície web d'un NVR professional}
+\author[Jan Rosell Caba]{
+  Jan Rosell Caba\\[0.4em]
+  \small\textit{Director:} Fernando Gallego \quad
+  \textit{Ponent:} Carles Farré
+}
+\institute[FIB -- UPC]{
+  Facultat d'Informàtica de Barcelona\\
+  Universitat Politècnica de Catalunya
+}
+\date{Juny 2026}
+
+% ---- Logo al peu de pàgina ----------------------------------
+\logo{%
+  \includegraphics[height=0.55cm]{../figures/logos/upc_complet.png}\hspace{0.3em}%
+  \includegraphics[height=0.55cm]{../figures/logos/fib_complet.png}\hspace{0.3em}%
+  \includegraphics[height=0.55cm]{../figures/logos/lanaccess_complet.png}%
+}
+
+% ============================================================
+\begin{document}
+
+% ============================================================
+% DIAPOSITIVA 1 — Portada
+% ============================================================
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\note{
+  Bon dia/bona tarda. El meu nom és Jan Rosell i avui presentaré el meu TFG:
+  \textit{Web Core View}, un projecte de modernització de la interfície web del
+  NVR professional d'Lanaccess. El treball ha estat dirigit per Fernando Gallego
+  i tutoritzat pel ponent Carles Farré.
+  Tindreu un resum d'uns 12-15 minuts, acabant amb torn de preguntes.
+}
+
+% ============================================================
+% DIAPOSITIVA 2 — El Problema
+% ============================================================
+\begin{frame}{El Problema: Obsolescència d'ActiveX}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \begin{itemize}
+        \item La interfície existent usava \textbf{ActiveX}, tecnologia descontinuada
+        \item Incompatible amb navegadors moderns i sistemes no-Windows
+        \item NVR \textit{standalone}: sense connexió a Internet ni serveis externs
+        \item Necessitat de solució \textbf{100\% web} que funcioni sense núvol
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{Restriccions clau}
+        \begin{itemize}
+          \item Backend en C++ (no Node.js)
+          \item Dispositiu amb recursos limitats
+          \item Sense CDN ni dependències externes
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \note{
+    El punt de partida del projecte és una interfície basada en ActiveX que els
+    navegadors actuals ja no suporten. L'empresa necessitava una solució nova que
+    funcionés completament al navegador, sense requerir cap connexió externa, ja
+    que el dispositiu és un NVR professional que opera en xarxes aïllades.
+    El repte principal no és fer una web qualsevol, sinó fer-la completa i robusta
+    en un entorn molt restringit.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 3 — Arquitectura Global
+% ============================================================
+\begin{frame}{Arquitectura Global: Microserveis i C++}
+  \begin{itemize}
+    \item Backend compost per \textbf{múltiples microserveis} en C++
+    \item Orquestrador central: gestió del cicle de vida de cada servei
+    \item \textbf{NGINX} actua com a proxy revers únic punt d'entrada
+    \item Frontend \textbf{Angular} servit com a fitxers estàtics pel NVR
+  \end{itemize}
+  \begin{block}{Flux de comunicació}
+    Navegador $\rightarrow$ NGINX (443) $\rightarrow$ Microservei específic (port intern)
+  \end{block}
+  \note{
+    L'arquitectura segueix un patró de microserveis: cada funcionalitat (vídeo,
+    alarmes, configuració, autenticació) té el seu propi procés C++. Un orquestrador
+    central els gestiona. NGINX centralitza tot el tràfic extern i actua com a
+    capa de seguretat. El frontend Angular és un conjunt de fitxers estàtics que
+    el NVR serveix directament; no hi ha cap servidor Node.js en producció.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 4 — Seguretat per Disseny
+% ============================================================
+\begin{frame}{Seguretat per Disseny: NGINX i Cookies HttpOnly}
+  \begin{itemize}
+    \item \textbf{Proxy NGINX}: TLS/HTTPS, capçaleres de seguretat (\textit{CSP}, \textit{HSTS})
+    \item Sessió gestionada amb \textbf{cookies HttpOnly + SameSite=Strict}
+    \item El token de sessió \textbf{mai és accessible} des de JavaScript
+    \item Protecció contra \textit{XSS} i \textit{CSRF} per disseny arquitectural
+  \end{itemize}
+  \begin{alertblock}{Decisió clau}
+    Optar per cookies HttpOnly en lloc de \textit{localStorage} elimina
+    la superfície d'atac XSS per al token d'autenticació.
+  \end{alertblock}
+  \note{
+    Una de les decisions de disseny més importants va ser el mecanisme
+    d'autenticació. En lloc d'emmagatzemar el JWT al localStorage (accessible
+    a qualsevol script), el backend escriu el token en una cookie HttpOnly. Això
+    significa que un atac XSS no pot robar el token, perquè JavaScript
+    mai n'obté accés. NGINX afegeix les capçaleres de seguretat HTTP i gestiona
+    la terminació TLS.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 5 — Motor Schema-Driven
+% ============================================================
+\begin{frame}{Motor Schema-Driven: Interfície Generada pel Backend}
+  \begin{itemize}
+    \item El backend exposa un \textbf{JSON Schema} de la configuració del dispositiu
+    \item El frontend interpreta el schema i \textbf{genera el formulari dinàmicament}
+    \item Cap component de configuració es codifica manualment al frontend
+    \item Noves opcions del firmware $\Rightarrow$ UI actualitzada \textbf{automàticament}
+  \end{itemize}
+  \begin{block}{Benefici principal}
+    Desacoplament total entre firmware i frontend: el NVR pot evolucionar
+    sense requerir canvis al codi Angular.
+  \end{block}
+  \note{
+    Aquest és potser l'aspecte més innovador del projecte. En lloc de codificar
+    cada camp de configuració al frontend, el backend envia un JSON Schema que
+    descriu l'estructura, els tipus, els valors permesos i les dependències.
+    Angular interpreta aquest schema en temps d'execució i renderitza el formulari
+    corresponent. Quan el firmware del NVR s'actualitza amb noves opcions, la UI
+    s'adapta sola, sense cap canvi de codi al frontend.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 6 — Control de Concurrència
+% ============================================================
+\begin{frame}{Control de Concurrència: Pessimistic Lock}
+  \begin{itemize}
+    \item Risc: dos usuaris editant la mateixa configuració simultàniament
+    \item Implementació de \textbf{Pessimistic Locking} al backend C++
+    \item El primer usuari \textbf{adquireix el lock}; els altres reben error 423
+    \item Lock alliberat en guardar, cancel·lar o per \textbf{timeout automàtic}
+  \end{itemize}
+  \begin{block}{Flux del lock}
+    \texttt{GET /lock} $\rightarrow$ Edició exclusiva $\rightarrow$ \texttt{PUT /config} + alliberament
+  \end{block}
+  \note{
+    En un dispositiu on poden connectar-se múltiples administradors,
+    calen mecanismes per evitar col·lisions d'escriptura. El Pessimistic Lock
+    garanteix exclusivitat: mentre un usuari edita una secció, cap altre pot
+    fer-ho. El timeout automàtic és fonamental perquè si el navegador es tanca
+    sense alliberar el lock, aquest s'expira sol i el sistema no queda bloquejat.
+    S'ha escollit aquest model davant l'Optimistic Lock perquè les operacions
+    de configuració de l'NVR poden ser llargues i la col·lisió seria molt frustrant.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 7 — Transmissió de Vídeo Híbrida
+% ============================================================
+\begin{frame}{Transmissió de Vídeo Híbrida: WebRTC (WHEP) vs HLS}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{WebRTC / WHEP (Live)}
+        \begin{itemize}
+          \item Latència $<$ 500 ms
+          \item Protocol estàndard W3C
+          \item Visualització en \textbf{temps real}
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{HLS (Gravacions)}
+        \begin{itemize}
+          \item Reproducció de \textit{playback}
+          \item Alta compatibilitat de navegadors
+          \item Segmentat en fitxers \texttt{.ts}
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  \begin{itemize}
+    \item Decisió de protocol basada en el \textbf{cas d'ús}: live vs. arxiu
+    \item Implementació pura al navegador, \textbf{sense plugins} de tercers
+  \end{itemize}
+  \note{
+    La transmissió de vídeo es gestiona de forma híbrida: WebRTC via WHEP per
+    al vídeo en directe, on la latència és crítica, i HLS per a la reproducció
+    de gravacions. WHEP és l'estàndard emergent de WebRTC per a ingestió
+    unidireccional i simplifica enormement la senyalització respecte a l'ús
+    tradicional de WebRTC. HLS, en canvi, ofereix màxima compatibilitat per
+    a la reproducció d'arxius.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 8 — El Repte del Còdec H.265
+% ============================================================
+\begin{frame}{El Repte del Còdec H.265: Trans-muxing al Backend}
+  \begin{itemize}
+    \item H.265 (HEVC) \textbf{no és suportat} nativament pels navegadors actuals
+    \item Solució: \textbf{trans-muxing} al backend — reempaquetament sense re-encoding
+    \item El flux H.265 es converteix a \textbf{MP4/fMP4} compatible amb MSE
+    \item Estalvi computacional: \textit{trans-muxing} és $\gg$ més barat que \textit{transcoding}
+  \end{itemize}
+  \begin{alertblock}{Distinció clau}
+    \textbf{Trans-muxing}: canvi de contenidor, mateix còdec.\\
+    \textbf{Transcoding}: canvi de còdec (molt costós en CPU).
+  \end{alertblock}
+  \note{
+    Les càmeres professionals graven en H.265 per la seva eficiència de compressió.
+    El problema és que els navegadors no el descodifiquen nativament. La solució
+    és fer trans-muxing: el backend agafa els paquets H.265, els reempaqueta en
+    un contenidor fMP4 que el navegador entén via Media Source Extensions,
+    però sense canviar els fotogrames en si. Això és molt més eficient que
+    re-encodar tot el vídeo, i permet visualitzar les gravacions H.265 al
+    navegador sense perdre qualitat ni carregar la CPU del NVR.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 9 — Gestió Reactiva d'Alarmes
+% ============================================================
+\begin{frame}{Gestió Reactiva d'Alarmes: WebSockets i VFS SQLite}
+  \begin{itemize}
+    \item Les alarmes s'emmagatzemen en una \textbf{base de dades SQLite} al NVR
+    \item Backend notifica el frontend via \textbf{WebSocket} en temps real
+    \item SQLite amb \textit{Virtual File System} (VFS) per a entorn \textit{embedded}
+    \item Frontend actualitza la UI sense \textit{polling}: \textbf{push reactiu}
+  \end{itemize}
+  \begin{block}{Avantatge del WebSocket}
+    Elimina el \textit{polling} periòdic → menys tràfic de xarxa i
+    resposta immediata a l'alarma.
+  \end{block}
+  \note{
+    La gestió d'alarmes és un cas d'ús on la latència és crítica: l'operador
+    ha de saber immediatament si salta una alarma. El sistema usa WebSockets
+    per notificar el frontend en el moment en que el backend detecta un event.
+    SQLite amb VFS personalitzat permet operar en l'entorn embedded del NVR,
+    on el sistema de fitxers pot tenir restriccions. L'alternativa de polling
+    cada N segons era menys eficient i menys responsiva.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 10 — Validació i Rendiment
+% ============================================================
+\begin{frame}{Validació i Rendiment: Angular Signals}
+  \begin{itemize}
+    \item Migració de \textbf{Zone.js} (detecció de canvis global) a \textbf{Signals}
+    \item Signals: actualitzacions de la UI \textbf{granulars i síncrones}
+    \item Reducció de cicles de \textit{change detection} innecessaris
+    \item Millora de latència de renderitzat i \textbf{reducció de CPU} al client
+  \end{itemize}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Zone.js (anterior)}
+        Check de tot l'arbre de components\\
+        davant qualsevol event asíncron
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Signals (nou)}
+        Actualització \textit{fine-grained}:\\
+        només el component afectat
+      \end{block}
+    \end{column}
+  \end{columns}
+  \note{
+    Angular Signals és la nova primitiva reactiva d'Angular 17+. Amb Zone.js,
+    cada event asíncron (clic, resposta HTTP, timer) desencadena un recorregut
+    de tot l'arbre de components per detectar canvis. Amb Signals, Angular sap
+    exactament quins components depenen de quines dades, i només actualitza
+    els estrictament necessaris. En un dashboard amb vídeo en directe, alarmes
+    i múltiples gràfics en temps real, aquesta optimització es tradueix en
+    una reducció notable del CPU del navegador.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 11 — Conclusions i Treball Futur
+% ============================================================
+\begin{frame}{Conclusions i Treball Futur}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \textbf{Assoliments}
+      \begin{itemize}
+        \item Substitució completa d'ActiveX per stack web modern
+        \item Arquitectura segura, escalable i desacoplada
+        \item Motor schema-driven que redueix la dependència frontend/firmware
+        \item Vídeo H.265 al navegador sense plugins ni re-encoding
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \textbf{Treball Futur}
+      \begin{itemize}
+        \item Suport de còdecs AV1 / H.266
+        \item Internacionalització (i18n) completa
+        \item \textit{Progressive Web App} (PWA) per a mòbil
+        \item Tests end-to-end automatitzats (Playwright)
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \note{
+    El projecte ha assolit tots els objectius marcats: l'interfície ActiveX
+    ha estat substituïda per una aplicació Angular moderna, segura i mantenible.
+    El motor schema-driven és l'aportació tècnica més diferencial. Com a treball
+    futur, el suport de nous còdecs, la internacionalització i la conversió a PWA
+    ampliarien significativament el valor del producte. Els tests e2e automatitzats
+    amb Playwright millorarien la fiabilitat de les futures iteracions.
+  }
+\end{frame}
+
+% ============================================================
+% DIAPOSITIVA 12 — Tancament i Torn de Preguntes
+% ============================================================
+\begin{frame}
+  \begin{center}
+    \vspace{1.5em}
+    {\Huge \textbf{Gràcies}}\\[1em]
+    {\large Torn de preguntes}\\[2em]
+    \begin{tabular}{rl}
+      \textbf{Autor:}   & Jan Rosell Caba \\
+      \textbf{Correu:}  & jan.rosell@lanaccess.com \\
+      \textbf{Director:}& Fernando Gallego \\
+      \textbf{Ponent:}  & Carles Farré \\
+    \end{tabular}\\[2em]
+    \includegraphics[height=1.0cm]{../figures/logos/upc_complet.png}\hspace{1em}%
+    \includegraphics[height=1.0cm]{../figures/logos/fib_complet.png}\hspace{1em}%
+    \includegraphics[height=1.0cm]{../figures/logos/lanaccess_complet.png}
+  \end{center}
+  \note{
+    Moltes gràcies per la vostra atenció. Estic a la vostra disposició per
+    respondre qualsevol pregunta sobre el disseny tècnic, les decisions
+    d'arquitectura o qualsevol altre aspecte del projecte.
+  }
+\end{frame}
+
+\end{document}

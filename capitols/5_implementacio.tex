@@ -741,33 +741,6 @@ La interfície implementa una lògica d'arrossegar i deixar anar (\textit{Drag a
 \end{figure}
 
 \clearpage
-% \subsection{Negociació SDP i Establiment del Canal de Streaming}
-
-% \begin{lstlisting}[basicstyle=\footnotesize, language=JavaScript, caption={Lògica simplificada de la PeerConnection per WebRTC.}]
-% async startStreaming(cameraId: string) {
-%   const pc = new RTCPeerConnection(this.config);
-  
-%   // Generacio de l'oferta local de presentacio
-%   const offer = await pc.createOffer();
-%   await pc.setLocalDescription(offer);
-  
-%   // Enviament al servidor MediaMTX a traves de la-video-engine
-%   this.videoService.sendOffer(cameraId, offer).subscribe(answer => {
-%     // Aplicacio de la resposta del servidor (Answer) per establir el canal
-%     pc.setRemoteDescription(answer);
-%   });
-% }
-% \end{lstlisting}
-
-% Aquest intercanvi de metadades descrit en el diagrama de seqüència de la Figura~\ref{fig:seq_video_streaming} defineix quins còdecs d'escriptura (H.264 o H.265) i resolucions utilitzarà l'enllaç abans d'iniciar el transport segur dels paquets sobre canals UDP.
-
-% \begin{figure}[htbp]
-%   \centering
-%   \includegraphics[width=0.7\textwidth]{figures/seq_video_streaming.png}
-%   \caption{Diagrama de seqüència de l'establiment de streaming de vídeo (SDP).}
-%   \label{fig:seq_video_streaming}
-%   \small Font: Elaboració pròpia.
-% \end{figure}
 
 \subsection{Orquestració de vídeo}
 Per desacoblar el component visual del protocol de transport concret, s'ha aplicat el patró de disseny \textbf{Strategy}: tant \texttt{WebRTCService} com \texttt{HlsService} implementen la mateixa interfície \texttt{StreamingStrategy}, de manera que el component de la graella no sap ni necessita saber quin protocol està usant~(Llistat~\ref{lst:streaming_strategy_iface}):
