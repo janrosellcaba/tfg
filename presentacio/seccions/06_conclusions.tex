@@ -1,0 +1,76 @@
+% ============================================================
+% BLOC 8: TANCAMENT  (diapositives 26–27)
+% ============================================================
+
+% ---  DIAPOSITIVA 26 — Conclusions  ---
+\begin{frame}{Conclusions: Objectius Assolits}
+  \vspace{0.2em}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{lc}
+        \toprule
+        \textbf{Objectiu} & \textbf{Resultat} \\
+        \midrule
+        Plataforma 100\% web (sense plugins) & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        Latència vídeo $<$ 300 ms & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        Motor Schema-Driven & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        Seguretat OWASP Top 10 & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        Reducció de CPU (35\%) & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        Desplegament autònom (standalone) & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        Pressupost i terminis & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+
+    \begin{column}{0.40\textwidth}
+      \textbf{Línies de futur}
+      \begin{itemize}
+        \item Dashboard de reports en temps real.
+        \item \textit{Snapshot} automàtic en alarma.
+        \item App mòbil (PWA / Ionic).
+        \item Anàlisi de vídeo amb IA (bounding boxes).
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \note{
+    El projecte ha complert tots els seus objectius en la seva totalitat. La plataforma ActiveX és un llegat tancat. Els clients de Lanaccess ara poden accedir als gravadors NXT des de qualsevol navegador modern, en qualsevol sistema operatiu, sense instal·lar res.
+
+    Les mètriques tècniques validen les decisions de disseny: 150-300 ms de latència en directe, 35\% menys de CPU, 85.6 en el test SUS. I tot dins del pressupost.
+
+    La contribució duradora per a la companyia és el motor Schema-Driven: ha creat una fundació sobre la qual es podran construir nous models de firmware sense cap cost de frontend. Cada versió futura de l'NVR neix ja compatible amb la interfície web.
+
+    Pel que fa al futur, he identificat quatre línies d'expansió natural: un dashboard de reports en temps real, la captura automàtica de fotogrames en el moment d'una alarma, una aplicació mòbil basada en PWA per als tècnics de camp, i a llarg termini, l'anàlisi de vídeo amb intel·ligència artificial.
+  }
+\end{frame}
+
+% ---  DIAPOSITIVA 27 — Tancament  ---
+\begin{frame}[plain]
+  \begin{center}
+    \vspace{1.2em}
+    {\Huge \textbf{\textcolor{upcblue}{Moltes gràcies}}}\\[0.8em]
+    {\large Quedo a la disposició del tribunal per a qualsevol pregunta}\\[1.8em]
+
+    \begin{tabular}{rl}
+      \textbf{Autor:}    & Jan Rosell Caba \\
+      \textbf{Director:} & Fernando Gallego \\
+      \textbf{Ponent:}   & Carles Farré \\[0.5em]
+      \textbf{Latència WebRTC:} & 150--300 ms \\
+      \textbf{Reducció CPU:}    & 35\% \\
+      \textbf{SUS:}             & 85.6 / 100 \\
+    \end{tabular}\\[1.5em]
+
+    \includegraphics[height=1.2cm]{../figures/logos/upc_complet.png}\hspace{1em}
+    \includegraphics[height=1.2cm]{../figures/logos/fib_complet.png}\hspace{1em}
+    \includegraphics[height=1.2cm]{../figures/logos/lanaccess_complet.png}
+  \end{center}
+
+  \note{
+    Moltes gràcies al tribunal per la seva atenció. Estic preparat per iniciar el torn de preguntes.
+
+    Si m'ho permeteu, a mode de recordatori ràpid de les xifres clau: latència WebRTC entre 150 i 300 mil·lisegons, un 35\% de reducció de CPU gràcies als Signals, i una puntuació de 85.6 sobre 100 en el test d'usabilitat SUS.
+
+    Espero les vostres preguntes.
+  }
+\end{frame}

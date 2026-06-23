@@ -1,0 +1,143 @@
+% ============================================================
+% BLOC 7: ASPECTES TRANSVERSALS  (diapositives 23–25)
+% ============================================================
+
+% ---  DIAPOSITIVA 23 — Planificació i Desviacions  ---
+\begin{frame}{Planificació: Desviacions i Gestió del Risc}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{lcc}
+        \toprule
+        \textbf{Fase} & \textbf{Previst} & \textbf{Executat} \\
+        \midrule
+        Gestió i Formació & 40 h & 40 h \\
+        Auth \& Core & 60 h & 60 h \\
+        Manteniment Base & 70 h & 70 h \\
+        Alarmes \& Vídeo & 120 h & \textbf{145 h} \\
+        Gravacions \& Config & 170 h & \textbf{190 h} \\
+        Finalització & 80 h & 80 h \\
+        \midrule
+        \textbf{Total} & \textbf{540 h} & \textbf{585 h} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+
+    \begin{column}{0.40\textwidth}
+      \textbf{Causes de la desviació (+45 h):}
+      \begin{itemize}
+        \item H.265: SPS/PPS/VPS injection $\to$ \textbf{+25 h}.
+        \item Motor Schema-Driven $\to$ \textbf{+20 h}.
+      \end{itemize}
+
+      \vspace{0.5em}
+      \begin{exampleblock}{Resultat}
+        \small Desviació absorbida dins del \textbf{10\% de contingència} previst. Cap feita tallada.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+
+  \note{
+    La planificació del projecte va ser bastant precisa en la majoria de fases. Les desviacions es van concentrar en dos punts, que curiosament coincideixen amb les dues aportacions tècniques més innovadores del projecte.
+
+    La primera desviació de 25 hores va ser la integració de l'H.265. Inicialment estimàvem que bastaria amb canviar el contenidor, però la realitat del sistema de fitxers FS2 ---que no desa les capçaleres SPS/PPS/VPS en cada segment--- va requerir un algorisme de recuperació de capçaleres des del keyframe anterior. Això no estava previst i va ser complexe.
+
+    La segona desviació de 20 hores va ser el disseny del motor Schema-Driven. A mesura que avançàvem, vam adonar-nos que el nombre de tipus de camp necessaris era superior a l'estimat ---llistes dinàmiques, camps condicionats, adreces IP en formats múltiples. Va valer la pena cada hora extra.
+
+    En total, +45 hores sobre les 540 previstes: un 8.3\% de desviació, que cau perfectament dins del marge de contingència del 10\% que havíem reservat. El resultat és que cap funcionalitat va ser retallada ni ajornada.
+  }
+\end{frame}
+
+% ---  DIAPOSITIVA 24 — Pressupost  ---
+\begin{frame}{Pressupost: Cost Previst vs Executat}
+  \vspace{0.3em}
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{lcc}
+        \toprule
+        \textbf{Partida} & \textbf{Previst} & \textbf{Executat} \\
+        \midrule
+        Personal (hores) & 13.567,50 \euro & 14.701,50 \euro \\
+        Amortització HW & 210,00 \euro & 210,00 \euro \\
+        Costos indirectes & 1.150,00 \euro & 1.150,00 \euro \\
+        Contingència (10\%) & 1.492,75 \euro & 1.134,00 \euro \\
+        \midrule
+        \textbf{Total} & \textbf{16.420,25 \euro} & \textbf{16.061,50 \euro} \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+
+    \begin{column}{0.40\textwidth}
+      \begin{exampleblock}{\centering Estalvi net}
+        \centering \textbf{358,75 \euro} per sota del pressupost.\\[0.4em]
+        \small La contingència s'ha usat parcialment (76\%), no al 100\%.
+      \end{exampleblock}
+
+      \vspace{0.5em}
+      \begin{block}{Perfil de cost}
+        \small $>$90\% és cost de personal. El HW és amortitzat de maquinari de desenvolupament existent.
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \note{
+    El pressupost final és de 16.061 euros, per sota dels 16.420 euros previstos. Com veiem a la taula, el cost de personal va pujar degut a les 45 hores extra, però la contingència que havíem reservat no va caldre consumir-la completament.
+
+    El perfil de costos és el típic d'un projecte de software: més del 90\% del cost és personal. El maquinari és amortització d'equipament de desenvolupament existent i representa una fracció petita.
+
+    Cal destacar que la contingència s'ha usat de forma parcial ---el 76\%--- per cobrir les desviacions de les fases de vídeo i configuració. Que no s'hagi exhaurit completament és un bon indicador de gestió: la contingència existeix per ser usada davant de riscos materialitzats, no per ser conservada com un trofeu.
+
+    El projecte ha entregat tot l'abast previst, a temps, i per sota del pressupost màxim.
+  }
+\end{frame}
+
+% ---  DIAPOSITIVA 25 — Sostenibilitat  ---
+\begin{frame}{Sostenibilitat i Impacte Social}
+  \begin{columns}[T]
+    \begin{column}{0.3\textwidth}
+      \begin{block}{Ambiental}
+        \begin{itemize}
+          \item[\small$\bullet$] 35\% menys CPU $\to$ menys consum elèctric.
+          \item[\small$\bullet$] Gestió remota $\to$ menys desplaçaments de tècnics.
+          \item[\small$\bullet$] Hardware existent reutilitzat.
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.3\textwidth}
+      \begin{block}{Social}
+        \begin{itemize}
+          \item[\small$\bullet$] UI clara redueix estrès en torns 24/7.
+          \item[\small$\bullet$] Accessibilitat multiplataforma (Linux, Mac).
+          \item[\small$\bullet$] Privadesa per disseny (RGPD).
+        \end{itemize}
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.3\textwidth}
+      \begin{block}{Econòmica}
+        \begin{itemize}
+          \item[\small$\bullet$] Schema-driven: zero cost per nou firmware.
+          \item[\small$\bullet$] PWA futura: diagnòstic offline en mòbils.
+          \item[\small$\bullet$] Vida útil prolongada del producte NXT.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.5em}
+  \begin{center}
+    \textit{No es guarda cap dada biométrica. Cap decisió automatitzada sense supervisió humana. Les dades d'imatge mai surten de la xarxa local.}
+  \end{center}
+
+  \note{
+    Analitzem les tres dimensions de sostenibilitat.
+
+    Des del punt de vista ambiental, la reducció de CPU del 35\% té un impacte directe en el consum energètic dels terminals de vigilància que funcionen 24 hores al dia, 7 dies a la setmana. A escala de flota, la suma és significativa. A més, el sistema de gestió remota permet als tècnics fer moltes tasques de manteniment sense desplaçar-se físicament fins a la instal·lació.
+
+    Des del punt de vista social, la interfície moderna i accessible millora les condicions de treball dels operadors de seguretat que passen hores davant d'una pantalla. I la compatibilitat multiplataforma permet que professionals que treballen en Mac o Linux tinguin accés complet al sistema, que abans era exclusivament Windows.
+
+    Des del punt de vista ètic i de privadesa: el sistema compleix el RGPD per disseny. Les imatges mai surten de la xarxa local del client. No es guarda informació biomètrica. I totes les decisions de seguretat ---arxivar una alarma, bloquejar un accés--- les pren sempre una persona.
+  }
+\end{frame}
