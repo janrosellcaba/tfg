@@ -45,20 +45,29 @@
 \setbeamercolor{block title example}{bg=accentgreen!70!black, fg=white}
 \setbeamercolor{block body example}{bg=accentgreen!10, fg=textdark}
 
-% Footer net i discret
-\setbeamertemplate{footline}{
+% Color per a la línia separadora del footer
+\setbeamercolor{footline separator}{bg=gray!35}
+
+% Footer ultra-minimalista: línia grisa prima + text net
+\setbeamertemplate{footline}{%
   \leavevmode%
-  \hbox{%
-  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=3ex,dp=1.5ex,left,leftskip=2ex]{}%
-    \textcolor{gray}{\small Jan Rosell Caba}
-  \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=3ex,dp=1.5ex,center]{}%
-    \textcolor{gray}{\small Web Core View}
-  \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=3ex,dp=1.5ex,right,rightskip=2ex]{}%
-    \textcolor{gray}{\small \insertframenumber{} / \inserttotalframenumber}
-  \end{beamercolorbox}}%
-  \vskip0pt%
+  \vbox{%
+    \hbox{%
+      \begin{beamercolorbox}[wd=\paperwidth,ht=0.5pt,dp=0pt]{footline separator}%
+      \end{beamercolorbox}%
+    }%
+    \hbox{%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1.2ex,left,leftskip=2ex]{}%
+        \textcolor{gray!80}{\footnotesize Jan Rosell Caba}%
+      \end{beamercolorbox}%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1.2ex,center]{}%
+        \textcolor{gray!80}{\footnotesize Web Core View}%
+      \end{beamercolorbox}%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1.2ex,right,rightskip=2ex]{}%
+        \textcolor{gray!80}{\footnotesize \insertframenumber{} / \inserttotalframenumber}%
+      \end{beamercolorbox}%
+    }%
+  }%
 }
 
 % ---- Paquets ------------------------------------------------
@@ -71,11 +80,7 @@
 \usepackage{tikz}
 \usepackage{eurosym}
 
-% Logos petits a la cantonada inferior dreta (ocults en frames [plain])
-\logo{%
-  \includegraphics[height=0.45cm]{../figures/logos/upc_icona.png}\hspace{0.15em}%
-  \includegraphics[height=0.45cm]{../figures/logos/lanaccess_icona.png}\hspace{0.4em}%
-}
+% Logos: únicament a la portada i a l'última diapositiva (via \begin{frame}[plain])
 
 % Activa les notes per a l'orador (comentar per a la versió final del PDF públic)
 % \setbeameroption{show notes on second screen=right}

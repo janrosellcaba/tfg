@@ -8,7 +8,7 @@
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth,keepaspectratio]{../figures/interficies/cameras.png}
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{../figures/interficies/cameras.png}
       \end{center}
     \end{column}
 
@@ -40,17 +40,17 @@
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth,keepaspectratio]{../figures/interficies/recordings.png}
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{../figures/interficies/recordings.png}
       \end{center}
     \end{column}
 
     \begin{column}{0.43\textwidth}
-      \textbf{Sota el capó:}
+      \small\textbf{Sota el capó:}
       \begin{itemize}
-        \item Gravacions en \textbf{FS2}: blocs bruts sense contenidor. Cap reproductor web els llegeix directament.
-        \item \textbf{Trans-muxing} a \texttt{la-video-engine}: llegeix FS2 → recupera \textbf{SPS/PPS/VPS} → empaqueta \textbf{MPEG-TS} → HLS/TCP.
-        \item \textit{Trans-muxing} $\neq$ \textit{transcoding}: canviem l'embolcall, no el bitstream. \textbf{CPU quasi zero}.
-        \item \textbf{H.265}: \textbf{50\% menys disc} que H.264. Crític en gravadors 24/7.
+        \item \textbf{FS2}: blocs bruts sense contenidor. Cap reproductor web els llegeix.
+        \item \textbf{Trans-muxing} (\texttt{la-video-engine}): llegeix FS2 → recupera \textbf{SPS/PPS/VPS} → empaqueta \textbf{MPEG-TS}.
+        \item $\neq$ \textit{transcoding}: canviem l'embolcall, no el bitstream. \textbf{CPU quasi zero}.
+        \item \textbf{H.265}: \textbf{50\% menys disc} que H.264.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -69,20 +69,16 @@
 % ---  DIAPOSITIVA 11 — Pàgina d'Alarmes  ---
 \begin{frame}{Pàgina d'Alarmes: Push i Persistència}
   \begin{columns}[T]
-    \begin{column}{0.54\textwidth}
+    \begin{column}{0.42\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth,keepaspectratio]{../figures/interficies/alarms.png}
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{../figures/interficies/alarms.png}
       \end{center}
     \end{column}
 
-    \begin{column}{0.43\textwidth}
-      \textbf{Sota el capó:}
-      \begin{itemize}
-        \item \texttt{la-core-alarm}: push \textbf{WSS} persistent. Sensor salta → icona actualitzada en $<$ \textbf{1 s}. Signals: s'actualitza \textbf{una} icona.
-        \item Reconnexió amb \textbf{backoff exponencial} (1s, 2s, 4s, 8s...): protegeix la CPU d'allaus de reconnexions.
-        \item \textbf{SQLite VFS} (\texttt{remote\_vfs}): escriptures via Unix Socket al \texttt{la-db-engine}, sectors \textbf{512 bytes} atòmics.
-        \item Mode \textbf{WAL} + \texttt{synchronous=NORMAL}: garanties \textbf{ACID}. Zero corrupció en talls elèctrics.
-      \end{itemize}
+    \begin{column}{0.54\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]{../figures/diagrames/alarms_data_flow.png}
+      \end{center}
     \end{column}
   \end{columns}
 
@@ -100,18 +96,18 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth,keepaspectratio]{../figures/interficies/configuration.png}
+        \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]{../figures/diagrames/seq_config_lock.png}
       \end{center}
     \end{column}
 
     \begin{column}{0.44\textwidth}
       \begin{block}{Motor Schema-Driven}
-        \small Backend envia metadades: \texttt{\_type}, \texttt{\_allowedValues}, \texttt{\_min}, \texttt{\_max}. Angular \textbf{auto-genera} el formulari.\\[0.2em]
-        \texttt{ipaddr} $\to$ input regex IP $\cdot$ \texttt{list} $\to$ \texttt{<select>} $\cdot$ \texttt{integer} $\to$ rang [min,max]\\[0.2em]
+        \small Backend envia metadades: \texttt{\_type}, \texttt{\_allowedValues}, \texttt{\_min}, \texttt{\_max}. Angular \textbf{auto-genera} el formulari.\\[0.1em]
+        \texttt{ipaddr} $\to$ IP $\cdot$ \texttt{list} $\to$ \texttt{<select>} $\cdot$ \texttt{integer} $\to$ rang\\[0.1em]
         Nou firmware $\Rightarrow$ \textbf{zero canvis al frontend}.
       \end{block}
 
-      \vspace{0.3em}
+      \vspace{0.15em}
 
       \begin{alertblock}{Config Lock Pessimista}
         \small POST \texttt{/lock} $\to$ token \textbf{32-char hex}.\\
