@@ -25,12 +25,13 @@
 
 ### [0:30 — 30s] Slide 2: Lanaccess i els Gravadors NVR
 
-**Objectiu d'impacte:** Fixar la restricció de disseny més important: tot ha de córrer **sense Internet**, dins d'un dispositiu embegut.
+**Objectiu d'impacte:** Fixar la restricció de disseny més important: tot ha de córrer **sense infraestructura centralitzada**, dins del propi gravador.
 
 **Speaking points:**
-- Lanaccess fabrica gravadors NVR professionals: fins a **152 càmeres** simultànies per unitat.
-- El maquinari és un **SoC ARM NXP** amb Linux Yocto: recursos limitats, sense connexió a núvol.
-- La paraula clau és **standalone**: l'NVR és l'únic servidor disponible.
+- Lanaccess Telecom, SA fabrica gravadors NVR professionals — la família **NXT** — per a gestió de videovigilància IP.
+- La solució s'executa **directament al hardware del gravador**: zero servidors externs, zero núvol.
+- La restricció clau: la CPU del dispositiu és **compartida** entre la descodificació de vídeo, l'escriptura a disc i el servei de la interfície web. Cada cicle compta.
+- La paraula clau és **standalone**: el gravador NXT és l'únic servidor disponible.
 
 **Transició:** "Ara bé, fins al 2022, per accedir a aquest dispositiu calia un plugin d'una tecnologia que Microsoft va tancar."
 
@@ -64,7 +65,7 @@
 ---
 
 ## BLOC 2: ESPECIFICACIÓ I DISSENY
-### Temps total: 4 minuts (Slides 5–12)
+### Temps total: 3 min 40s (Slides 5–8)
 
 ---
 
@@ -75,250 +76,142 @@
 **Speaking points:**
 - Tres actors: **Administrador** (configuració total), **Operador** (vigilància dia a dia), i el propi **Sistema NVR** com a actor actiu.
 - El NVR emet alarmes, dicta l'esquema JSON i gestiona els *config locks*: no és passiu.
-- Sis casos d'ús derivats: autenticació, vídeo directe, gravacions, alarmes, configuració dinàmica, administració.
+- Set casos d'ús derivats: autenticació, actualització de firmware, gravacions, vídeo directe, alarmes, configuració dinàmica, administració.
 
 **Transició:** "D'aquests actors vam derivar els requisits no funcionals crítics, que van determinar tota l'arquitectura."
 
 ---
 
-### [3:20 — 40s] Slide 6: Requisits Crítics — Rendiment i Vídeo
+### [3:20 — 1:10] Slide 6: Requisits Crítics — Rendiment, Vídeo i Seguretat
 
-**Objectiu d'impacte:** Els RNF no eren aspiracionals: eren **restriccions de disseny dures** que van forçar decisions concretes.
-
-**Speaking points:**
-- **RNF-01**: latència de vídeo **< 300 ms** en P50, < 350 ms en P95. Motiu: en una sala de control activa, 2 segons de retard és inacceptable per a seguretat.
-- **RNF-02**: si UDP bloquejat, **fallback automàtic a HLS en ≤ 5 segons** — transparent per l'operador.
-- **RNF-03**: zero polling HTTP, actualitzacions granulars. La CPU de l'NVR ARM és limitada.
-- **RNF-04**: WebSocket amb **reconexió ≤ 30 s** amb backoff exponencial.
-
-**Transició:** "Igual d'importants eren els requisits de seguretat, que vam imposar-nos com a criteri d'acceptació."
-
----
-
-### [4:00 — 30s] Slide 7: Requisits Crítics — Seguretat i Privadesa
-
-**Objectiu d'impacte:** La seguretat és una **restricció de disseny**, no una capa afegida al final.
+**Objectiu d'impacte:** Els RNF no eren aspiracionals: eren **restriccions de disseny dures** que van forçar decisions concretes tant de rendiment com de seguretat.
 
 **Speaking points:**
-- **Zero LocalStorage** per a credencials: qualsevol XSS al navegador podria robar-les. Vam optar per cookies **HttpOnly + Secure + SameSite=Strict**.
-- **TLS 1.2/1.3** amb AESGCM: tot el tràfic xifrat, inclosos els WebSockets (WSS).
-- **Privacy by Design**: les dades sensibles només existeixen a RAM. Un F5 buida la sessió completament — zero persistència.
-- Compliment **OWASP Top 10** i **RGPD** com a criteri d'acceptació formal.
+- **RNF-01**: latència de vídeo **< 300 ms** en P50, < 350 ms en P95. En una sala de control activa, 2 segons de retard és inacceptable.
+- **RNF-02**: si UDP bloquejat, **fallback automàtic a HLS en ≤ 5 s** — transparent per l'operador.
+- **RNF-03**: zero polling HTTP, actualitzacions granulars via Signals. La CPU compartida del dispositiu no admet overhead innecessari.
+- **Zero LocalStorage** per a credencials: cookies **HttpOnly + Secure + SameSite=Strict**. La seguretat és una restricció de disseny, no una capa afegida al final.
+- **TLS 1.2/1.3**, **Privacy by Design** i compliment **OWASP Top 10** com a criteri d'acceptació formal.
 
 **Transició:** "Amb els requisits clars, dissenyem l'arquitectura que els satisfà."
 
 ---
 
-### [4:30 — 50s] Slide 8: Arquitectura Global
+### [4:30 — 1:20] Slide 7: Arquitectura Global i Microserveis
 
-**Objectiu d'impacte:** L'arquitectura no és una llista de tecnologies; és una **resposta deliberada a les restriccions de recursos**.
-
-**Speaking points:**
-- Separació en dos mons: la **SPA Angular** s'executa al navegador del client — allibera la CPU del gravador embegut.
-- Al backend, **microserveis C++ especialitzats**: cada procés és propietari d'un domini aïllat. Si el motor de vídeo falla, la configuració segueix funcionant.
-- **NGINX** com a únic punt d'entrada al port 443: imposa les regles de seguretat a tota la plataforma, oculta els ports interns.
-
-**Transició:** "Vegem quins processos específics corren dins del gravador."
-
----
-
-### [5:20 — 30s] Slide 9: Els Microserveis al Dispositiu
-
-**Objectiu d'impacte:** Demostrar que hi ha un disseny de responsabilitats pensat, no un monòlit disfressat.
+**Objectiu d'impacte:** L'arquitectura no és una llista de tecnologies; és una **resposta deliberada a les restriccions de recursos** del dispositiu.
 
 **Speaking points:**
-- Capa de comunicació: **`la-core-legacy`** (Config API, Auth), **`la-db-engine`** (SQLite via gRPC), **`la-core-notifier`** i **`la-core-alarm`** (WebSockets push).
-- Capa de vídeo: **`la-video-engine`** (captura, disc, HLS) + **MediaMTX** (WebRTC/WHEP).
+- La **SPA Angular** s'executa al navegador del client: allibera la CPU del gravador per a vídeo i disc.
+- Al backend, **microserveis C++ especialitzats**: `la-core-legacy` (Config API, Auth), `la-db-engine` (SQLite via gRPC), `la-core-notifier` i `la-core-alarm` (WebSockets push), `la-video-engine` + **MediaMTX** (WebRTC/WHEP i HLS). Si un procés falla, la resta segueixen funcionant.
 - Comunicació interna per **Unix Domain Sockets**: el canal IPC més ràpid de Linux, sense passar per NGINX.
-- Tots gestionats per **systemd** sobre Yocto Linux.
+- **NGINX** com a únic punt d'entrada al port 443: imposa les regles de seguretat a tota la plataforma i oculta els ports interns. Tots gestionats per **systemd** sobre Linux.
 
-**Transició:** "NGINX és la capa que unifica tot i que imposa la seguretat."
-
----
-
-### [5:50 — 30s] Slide 10: NGINX — La Frontera de Seguretat
-
-**Objectiu d'impacte:** NGINX és la raó per la qual l'arquitectura és **segura per disseny**, no per configuració.
-
-**Speaking points:**
-- Port **443** com a únic punt d'entrada: `GET /stream/` va a MediaMTX, `GET /ws/` va als notificadors. Cap port intern és visible.
-- NGINX gestiona les cookies amb **HttpOnly + SameSite=Strict**: el JavaScript de l'aplicació mai pot llegir la sessió.
-- Elimina d'arrel la vulnerabilitat **OWASP A07** (Identification & Authentication Failures). Cap JWT al LocalStorage.
-
-**Transició:** "Hi havia un altre problema de disseny que NGINX no pot resoldre sol: la concurrència en configuració."
+**Transició:** "NGINX és la frontera de seguretat. Vegem ara com s'implementa tota la lògica de configuració i vídeo."
 
 ---
 
-### [6:20 — 20s] Slide 11: El Problema de Concurrència en Configuració
+### [5:50 — 50s] Slide 8: NGINX com a Frontera de Seguretat i el Problema de Concurrència
 
-**Objectiu d'impacte:** El *race condition* és **real** i la seva conseqüència és la corrupció silenciosa de la configuració del dispositiu.
-
-**Speaking points:**
-- Dos admins editen simultàniament la IP del gravador: sense control, **s'aplica l'últim que escriu** i els canvis de l'altre s'esfumen.
-- En xarxes de seguretat amb múltiples tècnics, aquesta col·lisió no és teòrica; ocorre.
-- El resultat: dispositiu en **estat inconsistent**, possiblement inaccessible per xarxa.
-
-**Transició:** "La solució és un mecanisme de *Pessimistic Lock* inspirat en la gestió de transaccions de bases de dades."
-
----
-
-### [6:40 — 20s] Slide 12: Disseny del Config Lock Pessimista
-
-**Objectiu d'impacte:** El *lock* és **tolerant a fallades** — no pot bloquejar el sistema indefinidament.
+**Objectiu d'impacte:** NGINX garanteix la **seguretat per disseny**, i la concurrència en configuració és un *race condition* real amb conseqüències greus.
 
 **Speaking points:**
-- **POST `/lock`** retorna un token de **32 caràcters hex** únic: qualsevol escriptura posterior ha d'incloure'l.
-- Expiració automàtica en **60-120 s** sense renovació: si el tècnic tanca el portàtil, el cadenat caduca sol. Cap procés queda bloquejat per sempre.
-- Mentre el lock és actiu, HTTP **423 Locked** posa altres usuaris en mode lectura automàticament.
-- La renovació del *keep-alive* va **fora del cicle de Zone.js**: no genera cap re-render innecessari.
+- Port **443** com a únic punt d'entrada: NGINX gestiona les cookies amb **HttpOnly + SameSite=Strict** — el JavaScript mai pot llegir la sessió. Elimina d'arrel **OWASP A07**.
+- Problema de concurrència: dos admins editen simultàniament la IP del gravador. Sense control, **s'aplica l'últim que escriu** i els canvis de l'altre s'esfumen silenciosament.
+- En xarxes de seguretat amb múltiples tècnics, aquesta col·lisió no és teòrica: ocorre. Resultat: dispositiu en **estat inconsistent**, possiblement inaccessible per xarxa.
 
-**Transició:** "Amb l'arquitectura dissenyada, passem al cor del projecte: la implementació."
+**Transició:** "Amb l'arquitectura i el perímetre de seguretat dissenyats, passem al cor de la implementació."
 
 ---
 
 ## BLOC 3: IMPLEMENTACIÓ
-### Temps total: 6 minuts (Slides 13–19)
+### Temps total: 6 min 20s (Slides 9–12)
 
 ---
 
-### [7:00 — 50s] Slide 13: El Motor Schema-Driven
+### [6:40 — 1:40] Slide 9: Pàgina de Directe — Vídeo en Temps Real
 
-**Objectiu d'impacte:** Aquesta és la **contribució duradora** del projecte per a Lanaccess: el frontend que s'adapta sol.
+**Objectiu d'impacte:** El mosaic de càmeres és la pàgina més crítica: latència imperceptible o el sistema és inútil en una sala de control.
 
 **Speaking points:**
-- El problema estructural de l'antiga plataforma: **cada canvi de firmware requeria un canvi de frontend**. Fre al mercat.
-- La solució: el backend no envia dades, envia **metadades**. Cada camp porta `_type`, `_allowedValues`, `_min`, `_max`, `_default`.
-- Angular llegeix l'esquema i **renderitza el formulari complet automàticament**: inputs, selects, checkboxes, validació.
-- Impacte empresarial directe: un nou model de NVR amb 20 paràmetres nous → **zero canvis al frontend**. Zero PR, zero deploy.
+- Quan l'operador obre la pàgina de directe, Angular fa un **POST a `/stream/<cam>/whep`**. Res més: **WHEP** (RFC 9716) estandaritza la negociació WebRTC *egress* amb una sola crida HTTP.
+- Transport: **SRTP/UDP + DTLS** per xifrat, **ICE** (RFC 8445) per travessia de NATs i tallafocs. Resultat: **150–300 ms** de latència. L'antiga plataforma ActiveX: **800–2000 ms**. Els rangs **no se solapen**: el pitjor cas de WebRTC és millor que el millor cas d'ActiveX.
+- Si UDP és bloquejat per un firewall corporatiu: **fallback automàtic a HLS en ≤ 5 s**, transparent per l'operador. TCP/HTTPS passa qualsevol restricció de xarxa.
+- **Angular Signals**: quan arriba un frame de la càmera 3, s'actualitza **únicament** el component d'aquella càmera. Zone.js hauria rellegit tot el DOM. Resultat mesurat: **35% menys CPU** en un terminal Intel Core i3-8100T, Windows 10 IoT, 4 càmeres en continu.
 
-**Transició:** "Vegem un exemple concret de com l'esquema JSON es tradueix a components Angular."
+**Transició:** "El directe resolt. La pàgina de gravacions presenta un repte diferent: servir H.265 a un navegador estàndard."
 
 ---
 
-### [7:50 — 40s] Slide 14: L'Esquema JSON en Acció
+### [8:20 — 1:20] Slide 10: Pàgina de Gravacions — Timeline i H.265
 
-**Objectiu d'impacte:** El mecanisme és **concret i auditable**: no és màgia, és un *parser* de metadades determinista.
+**Objectiu d'impacte:** La **línia de temps interactiva** sembla simple per l'operador; darrere hi ha un repte de trans-muxing no trivial.
 
 **Speaking points:**
-- Exemple real: `ip_address` amb `_type: "ipaddr"` → Angular genera un input amb **expressió regular de validació IP**.
-- `codec` amb `_type: "list"` i `_allowedValues: ["H264","H265"]` → genera un **`<select>`** amb exactament aquelles opcions.
-- `max_cameras` amb `_type: "integer"`, `_min: 1`, `_max: 152` → input numèric amb rang **[1, 152]** ja configurat.
-- El motor gestiona **10 tipus de camp** que cobreixen el 100% de la configuració del firmware.
+- L'operador selecciona un segment i reprodueix. El que veu és fluid; el que passa al darrere és complex.
+- Les gravacions al disc estan en format **FS2 propietari**: blocs bruts sense contenidor, sense capçaleres estàndard. Cap reproductor web pot llegir-los directament.
+- El microservei `la-video-engine` fa **trans-muxing** en temps real: llegeix el bloc FS2, recupera les capçaleres **SPS/PPS/VPS** del keyframe anterior, i empaqueta tot com **MPEG-TS** per servir-lo via HLS/TCP.
+- **Trans-muxing ≠ transcoding**: no descomprimim ni recomprimim. Canviem l'embolcall, no el bitstream. **CPU quasi zero** al gravador. El transcoding hauria estat inviable en hardware embegut.
+- H.265 (HEVC): **50% menys disc** que H.264 per la mateixa qualitat. Factor crític en gravadors que funcionen 24/7.
 
-**Transició:** "A més d'un formulari intel·ligent, el sistema necessitava ser eficient en temps real. Aquí és on entren els Signals."
+**Transició:** "Amb el vídeo resolt, la pàgina d'alarmes és la que exigeix la màxima fiabilitat: cap alerta es pot perdre."
 
 ---
 
-### [8:30 — 50s] Slide 15: D'RxJS a Angular Signals
+### [9:40 — 1:10] Slide 11: Pàgina d'Alarmes — Push i Persistència
 
-**Objectiu d'impacte:** La decisió de migrar a Signals no era una moda; era una **solució directa a un problema mesurat de CPU**.
+**Objectiu d'impacte:** **Cap alarma es pot perdre**, ni en talls de corrent. Dos mecanismes independents en garanteixen la fiabilitat.
 
 **Speaking points:**
-- El problema amb **Zone.js**: intercepta *tots* els events del navegador (clics, timers, WebSockets) i llança una revisió completa de l'arbre de components. Amb 152 càmeres i alarmes constants, la CPU no donava l'abast.
-- **Angular 19 Signals** implementa reactivitat *fine-grained*: Angular sap exactament quins components depenen de quins valors. Si un relé canvia d'estat → s'actualitza **una icona**, no tot el DOM.
-- Resultat mesurat en un terminal **Intel Core i3-8100T** sota Windows 10 IoT: **35% de reducció de CPU** en ús continu.
-- Per a un operador amb la pantalla oberta 8 hores al dia en un torn de seguretat, la diferència és substancial.
+- Quan un sensor salta, `la-core-alarm` fa un **push WSS** (WebSocket segur) persistent a tots els operadors connectats. La icona canvia **en < 1 s** sense que l'operador faci res. Gràcies a Signals, s'actualitza **una icona**, no tot el DOM.
+- Reconnexió automàtica amb **backoff exponencial** (1s, 2s, 4s, 8s...): protegeix la CPU del gravador d'allaus de reconnexions simultànies si cau la xarxa.
+- **Persistència**: driver VFS personalitzat per a **SQLite** (`remote_vfs`). Les escriptures van per **Unix Domain Socket** al `la-db-engine`. Sectors alineats a **512 bytes**: atomicitat garantida davant talls de corrent.
+- Mode **WAL + `synchronous=NORMAL`**: propietats **ACID** completes, verificades en simulacions de tall elèctric forçat. Zero corrupció en tots els escenaris provats.
 
-**Transició:** "L'eficiència al navegador estava resolta. El repte de vídeo era diferent: calia latència < 300 ms."
+**Transició:** "I la quarta pàgina conté la contribució arquitectònica més innovadora del projecte."
 
 ---
 
-### [9:20 — 50s] Slide 16: Orquestració de Vídeo — WebRTC/WHEP (Directe)
+### [10:50 — 2:10] Slide 12: Pàgina de Configuració — Schema-Driven i Config Lock
 
-**Objectiu d'impacte:** **WebRTC via WHEP** és la decisió que permet latències perceptualment imperceptibles en una sala de control.
-
-**Speaking points:**
-- La restricció: < 300 ms imposa **UDP**. TCP afegeix overhead de retransmissions que l'escenari de vigilància no permet.
-- **WHEP** (RFC 9716): estandarditza la negociació *egress* de WebRTC amb una sola crida **HTTP POST** a `/stream/<cam>/whep`. Integra perfectament amb MediaMTX.
-- Transport: **SRTP/UDP + DTLS** per al xifrat, **ICE** (RFC 8445) per a la travessia de NATs i tallafocs.
-- Resultat: latència **150–300 ms** en LAN, fins a **10× millor** que ActiveX+RTSP (800–2000 ms). Els rangs no se solapen.
-
-**Transició:** "Però molts entorns corporatius bloquen UDP. Calia un pla B que no comprometés l'experiència."
-
----
-
-### [10:10 — 40s] Slide 17: Orquestració de Vídeo — HLS (Fallback i Gravacions)
-
-**Objectiu d'impacte:** La **dualitat WebRTC/HLS** garanteix vídeo en qualsevol xarxa sense configuració manual.
+**Objectiu d'impacte:** El formulari que l'usuari veu és **100% generat automàticament**. Cap enginyer de frontend ha escrit cap camp de configuració.
 
 **Speaking points:**
-- HLS té **dos rols**: protocol principal per a **gravacions** (línia de temps interactiva), i *fallback* automàtic per a directe si UDP és bloquejat.
-- Transport **TCP/HTTPS**: passa qualsevol tallafocs corporatiu sense configuració de xarxa.
-- Commuta automàticament en **≤ 5 s** si no es rep cap frame WebRTC. El canvi és **transparent** per l'operador.
-- Latència HLS: 2-5 s — acceptable per a playback de gravacions, menys ideal per a directe però garanteix sempre imatge.
+- El problema de la plataforma legacy: **cada canvi de firmware requeria modificar el frontend** manualment. Fre directe al time-to-market.
+- La solució — **motor Schema-Driven**: el backend no envia dades, envia **metadades**. Cada camp porta `_type`, `_allowedValues`, `_min`, `_max`, `_default`. Angular llegeix l'esquema i renderitza el formulari complet.
+- Exemple real: `ip_address` amb `_type: "ipaddr"` → input amb **regex de validació IP**. `codec` amb `_allowedValues: ["H264","H265"]` → **`<select>`** automàtic. `max_cameras` amb `_min: 1`, `_max: 152` → input numèric [1,152] ja configurat. **10 tipus de camp** que cobreixen el 100% del firmware.
+- **Config Lock pessimista**: quan un tècnic entra a configurar, **POST `/lock`** retorna un token **32-char hex**. Tota escriptura posterior ha d'incloure'l. Si tanca el portàtil, el lock **expira en 60-120 s** sol — cap sistema bloquejat per sempre. Altres usuaris reben **HTTP 423 Locked** i resten en mode lectura automàticament.
+- Impacte: nou model NVR amb 20 paràmetres nous → **zero canvis al frontend**. Zero PR, zero deploy, zero cost.
 
-**Transició:** "Fins aquí els protocols. Però per servir H.265 al navegador, calia resoldre un repte tècnic no trivial."
-
----
-
-### [10:50 — 1:10] Slide 18: El Repte H.265 — Trans-muxing al Backend
-
-**Objectiu d'impacte:** El trans-muxing és **l'aportació tècnica original** del projecte: estalvi de disc sense cap cost de CPU.
-
-**Speaking points:**
-- H.265 (HEVC) ocupa un **50% menys de disc** que H.264 per la mateixa qualitat: requisit crític en gravadors 24/7 de 152 càmeres.
-- El problema: les gravacions FS2 estan en **blocs bruts sense contenidor** al disc. I molts navegadors no suporten H.265 directament.
-- La solució: **trans-muxing** al microservei `la-video-engine`. No és *transcoding* (descomprimir + recomprimir: alta CPU). És canviar l'**embolcall**, no el *bitstream*.
-- El procés concret: llegir el bloc FS2 → **injectar les capçaleres SPS/PPS/VPS** (que el FS2 no emmagatzema en cada segment, cal recuperar-les del keyframe anterior) → empaquetar com **MPEG-TS** per a HLS.
-- Resultat: **CPU quasi zero** al gravador ARM. Aquesta complexitat va costar **+25 hores** sobre la planificació inicial.
-
-**Transició:** "Resolts el vídeo i la configuració, queda el tercer pilar: les alarmes en temps real."
-
----
-
-### [12:00 — 1:00] Slide 19: Gestió d'Alarmes — WebSockets i SQLite VFS
-
-**Objectiu d'impacte:** **Cap alarma es pot perdre**, ni quan hi ha un tall de corrent. Dos mecanismes independents en garanteixen la fiabilitat.
-
-**Speaking points:**
-- **Notificació (WebSockets push)**: zero polling. Connexió WSS persistent. Quan un sensor salta, el push arriba en **< 1 s** a tots els operadors connectats simultàniament.
-- **Persistència (`remote_vfs`)**: driver VFS personalitzat per a SQLite. Les escriptures van per **Unix Domain Socket** al `la-db-engine`, l'únic procés amb permisos de disc. Sectors alineats a **512 bytes**: atomicitat garantida davant talls de corrent.
-- Mode **WAL (Write-Ahead Logging)** + `synchronous=NORMAL`: propietats **ACID** completes verificades en simulacions de tall elèctric forçat.
-- Reconnexió automàtica del WebSocket amb **backoff exponencial** (1s, 2s, 4s, 8s...): protegeix la CPU embeguda d'un allau de reconnexions.
-
-**Transició:** "Tenim el sistema construït. Ara calen dades. Vegem els resultats de la validació."
+**Transició:** "Quatre pàgines, quatre problemes resolts. Vegem ara les dades que validen que tot funciona."
 
 ---
 
 ## BLOC 4: PROVES I VALIDACIÓ
-### Temps total: 2 minuts (Slides 20–21)
+### Temps total: 2 minuts (Slide 13)
 
 ---
 
-### [13:00 — 1:00] Slide 20: Validació — Latència
+### [13:00 — 2:00] Slide 13: Validació — Latència, Rendiment i Usabilitat
 
-**Objectiu d'impacte:** La millora de latència és **objectivament irrefutable**: els rangs de les dues tecnologies no se solapen.
-
-**Speaking points:**
-- ActiveX+RTSP (legacy): **800–2000 ms**. WebRTC/WHEP: **150–300 ms**. Els rangs no se solapen. El pitjor cas de WebRTC (300 ms) és millor que el millor cas d'ActiveX (800 ms).
-- La causa és estructural: RTSP usa **TCP** amb retransmissions. WebRTC usa **UDP** amb SRTP, on cada paquet va pel camí més ràpid.
-- **RNF-01 assolit** amb marge: < 300 ms P50, < 350 ms P95. Validat en entorn LAN amb Intel i3-8100T.
-- HLS *fallback*: 2-5 s, acceptable per a playback de gravacions.
-
-**Transició:** "La latència valida el protocol. Vegem ara el rendiment de CPU i l'acceptació dels usuaris."
-
----
-
-### [14:00 — 1:00] Slide 21: Validació — Rendiment i Usabilitat
-
-**Objectiu d'impacte:** Les dades tancuen el cercle: el sistema és **eficient, robust i percebut com excel·lent** pels usuaris reals.
+**Objectiu d'impacte:** Les dades tancuen el cercle: la millora de latència és **objectivament irrefutable**, i el sistema és **eficient i percebut com excel·lent** pels usuaris reals.
 
 **Speaking points:**
-- **CPU**: 35% de reducció gràcies als Signals. Validat en streaming WebRTC de **2 hores** sense fuites de memòria. Oscil·lació saludable de **45–65 MB** de RAM (el *garbage collector* de V8 fent el seu treball).
+- **Latència**: ActiveX+RTSP (legacy): **800–2000 ms**. WebRTC/WHEP: **150–300 ms**. Els rangs no se solapen: el pitjor cas de WebRTC (300 ms) és millor que el millor cas d'ActiveX (800 ms). **RNF-01 assolit** amb marge.
+- **CPU**: 35% de reducció gràcies als Signals. Validat en streaming WebRTC de **2 hores** sense fuites de memòria. Oscil·lació saludable de **45–65 MB** de RAM.
 - **SUS**: **85.6 / 100** — categoria *Excellent* (> 80 = Bo, > 70 = Acceptable). 8 participants: tècnics d'instal·lació i operadors de seguretat reals de Lanaccess.
-- **40% de reducció de temps** per actualitzar firmware. Cap participant va necessitar suport tècnic per configurar una alarma.
-- Connexions concurrents: **25 simultànies** validades amb ApacheBench. Zero corrupció VFS en talls elèctrics simulats.
+- **40% de reducció de temps** per actualitzar firmware. **25 connexions concurrents** validades. Zero corrupció VFS en talls elèctrics simulats.
 
 **Transició:** "Passem ara a la demostració, on veureu tot això en funcionament real."
 
 ---
 
 ## BLOC 5: DEMOSTRACIÓ EN DIRECTE
-### Temps total: 5 minuts (Slide 22)
+### Temps total: 5 minuts (Slide 14)
 
 ---
 
-### [15:00 — 5:00] Slide 22: Demostració en Directe
+### [15:00 — 5:00] Slide 14: Demostració en Directe
 
 **Objectiu d'impacte:** Fer visible i tangible el sistema: **veure** la latència, **veure** el formulari Schema-Driven, **veure** les alarmes push — en viu.
 
@@ -345,11 +238,11 @@
 ---
 
 ## BLOC 6: TRANSVERSALS I CONCLUSIONS
-### Temps total: 5 minuts (Slides 23–27)
+### Temps total: 5 minuts (Slides 15–19)
 
 ---
 
-### [20:00 — 1:00] Slide 23: Planificació — Desviacions i Gestió del Risc
+### [20:00 — 1:00] Slide 15: Planificació — Desviacions i Gestió del Risc
 
 **Objectiu d'impacte:** Les desviacions van recaure **exactament** en les aportacions tècniques més innovadores. Això prova que el risc estava ben localitzat.
 
@@ -363,40 +256,40 @@
 
 ---
 
-### [21:00 — 45s] Slide 24: Pressupost — Cost Previst vs Executat
+### [21:00 — 45s] Slide 16: Pressupost — Cost Previst vs Executat
 
 **Objectiu d'impacte:** El projecte ha entregat **tot l'abast, a temps, i per sota del pressupost màxim**.
 
 **Speaking points:**
 - Total executat: **16.061,50 €** vs 16.420,25 € previstos. **Estalvi net: 358,75 €**.
 - Perfil de costos típic de software: >**90% és personal**. El hardware és amortització d'equips existents.
-- La contingència del **10%** va absorbir les 45 hores extra sense esgotar-se. Que no s'hagi exhaurit no és un objectiu en si: existia per ser usada.
+- La contingència del **10%** va absorbir les 45 hores extra sense esgotar-se.
 
 **Transició:** "Més enllà dels números, el projecte té un impacte real en tres dimensions de sostenibilitat."
 
 ---
 
-### [21:45 — 45s] Slide 25: Sostenibilitat i Impacte Social
+### [21:45 — 45s] Slide 17: Sostenibilitat i Impacte Social
 
 **Objectiu d'impacte:** La sostenibilitat no és un exercici acadèmic: les dades tècniques del projecte **generen impacte mesurable**.
 
 **Speaking points:**
 - **Ambiental**: el **35% de reducció de CPU** en terminals que funcionen 24/7 es tradueix directament en estalvi energètic a escala de flota. La gestió remota elimina desplaçaments de tècnics.
-- **Social**: accessibilitat multiplataforma — Linux, Mac, Chrome OS. Operadors que treballaven exclusivament en Windows ara no tenen restriccions. La interfície clara redueix l'estrès en torns de vigilància.
-- **Ètica i RGPD**: les imatges mai surten de la xarxa local del client. Cap emmagatzematge biometria. **Cap decisió automatitzada sense supervisió humana**: totes les accions de seguretat les pren sempre una persona.
+- **Social**: accessibilitat multiplataforma — Linux, Mac, Chrome OS. La interfície clara redueix l'estrès en torns de vigilància.
+- **Ètica i RGPD**: les imatges mai surten de la xarxa local del client. **Cap decisió automatitzada sense supervisió humana**: totes les accions de seguretat les pren sempre una persona.
 
 **Transició:** "Tanquem repasant si hem complert el que ens vam proposar."
 
 ---
 
-### [22:30 — 1:30] Slide 26: Conclusions — Objectius Assolits
+### [22:30 — 1:30] Slide 18: Conclusions — Objectius Assolits
 
 **Objectiu d'impacte:** No és una llista de *checkboxes*: cada ítem representa un **problema real que ara no existeix**.
 
 **Speaking points:**
 - **Plataforma 100% web** sense plugins: un client amb Mac o Linux ja pot accedir als NVR NXT. Internet Explorer ja no és un requisit.
-- **Latència < 300 ms**: el requisit de vigilància activa és complert. Les sales de control ja no experimenten el retard de 2 segments de l'antiga plataforma.
-- **Motor Schema-Driven**: la contribució arquitectònica duradora. Cada futura versió de firmware del NVR és compatible amb la interfície web des del primer moment.
+- **Latència < 300 ms**: el requisit de vigilància activa és complert. Les sales de control ja no experimenten el retard de l'antiga plataforma.
+- **Motor Schema-Driven**: la contribució arquitectònica duradora. Cada futura versió de firmware és compatible amb la interfície web des del primer moment.
 - **Seguretat OWASP Top 10** i **35% de reducció de CPU**: validats amb dades, no com a estimació.
 - Quatre línies de futur identificades: dashboard de reports en temps real, snapshot automàtic en alarma, app mòbil PWA, i anàlisi de vídeo amb IA.
 
@@ -404,7 +297,7 @@
 
 ---
 
-### [24:00 — 1:00] Slide 27: Gràcies — Torn de Preguntes
+### [24:00 — 1:00] Slide 19: Gràcies — Torn de Preguntes
 
 **Objectiu d'impacte:** Tancar amb **autoritat i calma**: domines el tema, estàs preparat per a qualsevol pregunta.
 
@@ -420,12 +313,12 @@
 | Bloc | Slides | Temps | Total |
 |------|--------|-------|-------|
 | 1 · Context i Problema | 1–4 | 0:00–3:00 | 3 min |
-| 2 · Especificació i Disseny | 5–12 | 3:00–7:00 | 4 min |
-| 3 · Implementació | 13–19 | 7:00–13:00 | 6 min |
-| 4 · Proves i Validació | 20–21 | 13:00–15:00 | 2 min |
-| 5 · Vídeo Demo | 22 | 15:00–20:00 | 5 min |
-| 6 · Transversals i Conclusions | 23–27 | 20:00–25:00 | 5 min |
-| **TOTAL** | **27 slides** | | **25 min** |
+| 2 · Especificació i Disseny | 5–8 | 3:00–6:40 | 3 min 40s |
+| 3 · Implementació | 9–12 | 6:40–13:00 | 6 min 20s |
+| 4 · Proves i Validació | 13 | 13:00–15:00 | 2 min |
+| 5 · Vídeo Demo | 14 | 15:00–20:00 | 5 min |
+| 6 · Transversals i Conclusions | 15–19 | 20:00–25:00 | 5 min |
+| **TOTAL** | **19 slides** | | **25 min** |
 
 ---
 
@@ -441,7 +334,7 @@
 > "JWT al LocalStorage és trivial de robar per XSS: qualsevol script injectat pot fer `localStorage.getItem('token')`. Una cookie HttpOnly és *invisible* per a JavaScript: cap codi pot llegir-la. En un sistema de seguretat amb accés a càmeres d'infraestructura crítica, no accepto aquell risc."
 
 ### "La reducció del 35% de CPU no és una dada massa genèrica?"
-> "No. És una dada mesura en un hardware concret: Intel Core i3-8100T, 4 nuclis a 3.10 GHz, 8 GB RAM, Windows 10 IoT, streaming de 4 càmeres simultànies amb alertes WebSocket actives. Comparat amb un prototip equivalent basat en Zone.js + RxJS en el mateix hardware, la reducció és del 35% en el fil principal del navegador."
+> "No. És una dada mesurada en un hardware concret: Intel Core i3-8100T, 4 nuclis a 3.10 GHz, 8 GB RAM, Windows 10 IoT, streaming de 4 càmeres simultànies amb alertes WebSocket actives. Comparat amb un prototip equivalent basat en Zone.js + RxJS en el mateix hardware, la reducció és del 35% en el fil principal del navegador."
 
 ### "H.265 als navegadors no és un problema de patents?"
 > "El problema de patents és real però ortogonal al nostre cas: el *transcoding* H.265 requeriria una llicència HEVC. El *trans-muxing* no recodifica: simplement canvia el contenidor. El client que descodifica és el navegador o el sistema operatiu del client, que ja gestiona les llicències de descodificació per compte propi."
