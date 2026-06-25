@@ -15,15 +15,14 @@
     {\small \textit{Director:} Fernando Gallego \quad|\quad \textit{Ponent:} Carles Farré}\\[0.2em]
     {\small Juny 2026}\\[1.5em]
 
-    \includegraphics[height=1.2cm]{../figures/logos/upc_complet.png}\hspace{0.8cm}
-    \includegraphics[height=1.2cm]{../figures/logos/fib_complet.png}\hspace{0.8cm}
+    \includegraphics[height=1.2cm]{../figures/logos/upc_complet.png}\hspace{1.2cm}
     \includegraphics[height=1.2cm]{../figures/logos/lanaccess_complet.png}
   \end{center}
 
   \note{
-    Bon dia a tothom. El meu nom és Jan Rosell i avui presentaré el meu Treball de Fi de Grau: \textit{Web Core View}. Un projecte d'arquitectura web i modernització tecnològica per als gravadors de videovigilància professionals de Lanaccess.
+    Bon dia a tothom. El meu nom és Jan Rosell i avui presentaré el meu Treball de Fi de Grau: \textit{Web Core View}. Un projecte real, en producció, per a una empresa real de videovigilància professional.
 
-    Tenim 20 minuts, així que aneu molt enrere, que la presentació serà dinàmica. Acabaré amb una demostració en vídeo de 5 minuts del sistema funcionant en viu.
+    Tenim 20 minuts de presentació i 5 de demostració en directe. Comencem.
   }
 \end{frame}
 
@@ -31,19 +30,19 @@
 \begin{frame}{Lanaccess i els Gravadors NVR}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{L'empresa}
+      \textbf{L'empresa i el producte}
       \begin{itemize}
         \item Lanaccess Telecom, SA: videovigilància professional.
-        \item Producte estrella: família de gravadors \textbf{NXT}.
-        \item Clients: empreses, institucions públiques, infraestructura crítica.
+        \item Família de gravadors \textbf{NXT}: captura, gravació i gestió de càmeres IP.
+        \item Clients: empreses, institucions i infraestructura crítica.
       \end{itemize}
 
-      \vspace{0.5em}
-      \textbf{El dispositiu}
+      \vspace{0.6em}
+      \textbf{La restricció de disseny fonamental}
       \begin{itemize}
-        \item Fins a \textbf{152 càmeres} per unitat.
-        \item SoC ARM (NXP i.MX), Linux Yocto.
-        \item Desplegament \textit{standalone}: \textbf{sense Internet}.
+        \item Execució \textbf{standalone}: zero servidors externs, zero núvol.
+        \item CPU compartida entre descodificació de vídeo, escriptura a disc i servei web.
+        \item L'NVR és \textbf{l'únic servidor disponible}.
       \end{itemize}
     \end{column}
 
@@ -55,9 +54,9 @@
   \end{columns}
 
   \note{
-    Lanaccess és una empresa especialitzada en seguretat electrònica i videovigilància professional. El seu producte de referència és la família de gravadors NVR \textit{NXT}: dispositius que graven fins a 152 càmeres simultàniament. Funcionen sobre un processador ARM de NXP, corren Linux Yocto, i s'instal·len a les xarxes dels clients, que sovint no tenen sortida a Internet.
+    Lanaccess és una empresa especialitzada en seguretat electrònica i videovigilància professional. El seu producte de referència és la família de gravadors NVR NXT: dispositius que capturen, graven i gestionen càmeres IP.
 
-    Aquí hi ha la paraula clau: \textit{standalone}. Tot ha de funcionar sense dependre d'un servidor extern ni del núvol. L'NVR és l'únic servidor disponible.
+    La restricció de disseny més important és que el sistema és \textit{standalone}: tot ha de funcionar sense dependre d'un servidor extern ni del núvol. L'NVR és l'únic servidor disponible. A més, la seva CPU és compartida entre tres tasques intensives: descodificar el vídeo de les càmeres, escriure al disc, i servir la interfície web. Cada cicle de CPU compta.
   }
 \end{frame}
 
@@ -67,17 +66,17 @@
     \begin{column}{0.55\textwidth}
       \begin{alertblock}{L'herència: ActiveX (anys 90)}
         \begin{itemize}
-          \item Plag dependent d'\textbf{Internet Explorer 11}.
+          \item Plugin dependent d'\textbf{Internet Explorer 11}.
           \item Microsoft tanca IE el \textbf{Juny 2022}.
-          \item Incompatible amb macOS, Linux i mòbils.
+          \item Incompatible amb macOS, Linux, Chrome, mòbils.
           \item Vectors de seguretat documentats (OWASP).
         \end{itemize}
       \end{alertblock}
 
       \vspace{0.5em}
       \begin{itemize}
-        \item Interfície estàtica: \textbf{sense reactivitat} ni temps real.
-        \item Cada versió de firmware requeria canvis al frontend.
+        \item Interfície rígida: \textbf{cada canvi de firmware requeria modificar el frontend} manualment.
+        \item Fre directe al \textit{time-to-market} del producte.
       \end{itemize}
     \end{column}
 
@@ -94,22 +93,20 @@
   \end{columns}
 
   \note{
-    La situació de partida era crítica. Lanaccess tenia una plataforma web construïda als anys 90 basada en tecnologia ActiveX de Microsoft. El problema és que Internet Explorer 11, l'únic navegador que suportava ActiveX, va arribar al final de la seva vida el juny del 2022. I amb ell, va morir qualsevol possibilitat d'accedir als gravadors NXT des d'un Mac, un Linux, un mòbil, o simplement des de Chrome.
+    La situació de partida era crítica. Lanaccess tenia una plataforma web construïda als anys 90 basada en tecnologia ActiveX de Microsoft. El problema és que Internet Explorer 11 va arribar al final de la seva vida el juny del 2022. I amb ell, va morir qualsevol possibilitat d'accedir als gravadors NXT des d'un Mac, un Linux, un mòbil, o simplement des de Chrome.
 
-    A més, l'arquitectura era rígida: si el firmware canviava un paràmetre de configuració, un enginyer havia de modificar el frontend manualment. Això generava un deute tècnic creixent i una velocitat d'iteració molt lenta.
-
-    La pressió del mercat era clara: els clients demandaven accés web modern, i la competència ja l'oferia.
+    A més, l'arquitectura era rígida: si el firmware canviava un paràmetre de configuració, un enginyer havia de modificar el frontend manualment. Això generava deute tècnic creixent i una velocitat d'iteració molt lenta. La competència ja oferia interfícies web natives. Els clients ho demanaven.
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 4 — L'Objectiu: Equip Autònom  ---
+% ---  DIAPOSITIVA 4 — L'Objectiu: Sistema Web Autònom  ---
 \begin{frame}{L'Objectiu: Un Sistema Web Autònom}
 
   \begin{center}
     \begin{tikzpicture}
       \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (browser) at (0,0) {\textbf{Navegador}\\\small Chrome/Firefox/Safari};
-      \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (nvr) at (6,0) {\textbf{NVR NXT}\\\small Serveix tot};
-      \draw[->, thick, upcblue] (browser.east) -- node[above]{\small HTTPS/WSS/WebRTC} (nvr.west);
+      \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (nvr) at (7,0) {\textbf{NVR NXT}\\\small Serveix tot};
+      \draw[->, thick, upcblue] (browser.east) -- node[above]{\small HTTPS / WSS / WebRTC} (nvr.west);
     \end{tikzpicture}
   \end{center}
 
@@ -127,16 +124,14 @@
     \end{column}
     \begin{column}{0.3\textwidth}
       \begin{exampleblock}{Escalable}
-        Nous firmwares no requereixen canvis al frontend.
+        Nous firmwares sense canvis al frontend.
       \end{exampleblock}
     \end{column}
   \end{columns}
 
   \note{
-    L'objectiu del projecte es pot resumir en una frase: construir una aplicació 100\% web, basada en Angular 19, que s'executi de forma autònoma dins del propi gravador NVR, sense dependre de cap servidor extern ni plugin.
+    L'objectiu del projecte es pot resumir en tres paraules: 100\% web, autònom i escalable. Una SPA Angular 19 que es descarrega des del propi gravador i s'executa al navegador del client.
 
-    Quan un operador obre el navegador i escriu la IP del gravador, l'NVR li serveix l'aplicació Angular, li ofereix els streams de vídeo i li envia les alarmes en temps real. Tot des del mateix dispositiu.
-
-    I hi havia un tercer requisit diferencial: que l'aplicació fos escalable. Que si demà surten nous models de firmware amb noves opcions, el frontend s'adapti sol, sense que cap enginyer de software hagi de tocar el codi de la web.
+    El tercer punt és la innovació diferencial: que l'aplicació sigui escalable. Si demà surten nous models de firmware amb noves opcions, el frontend s'adapti sol, sense que cap enginyer de software hagi de tocar el codi de la web. Això és el que fa el motor Schema-Driven, del qual parlarem a la implementació.
   }
 \end{frame}

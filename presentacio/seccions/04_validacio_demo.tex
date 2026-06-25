@@ -1,107 +1,72 @@
 % ============================================================
-% BLOC 5: PROVES I VALIDACIÓ  (diapositives 20–21)
-% BLOC 6: DEMOSTRACIÓ  (diapositiva 22)
+% BLOC 4: PROVES I VALIDACIÓ  (diapositiva 13)
+% BLOC 5: DEMOSTRACIÓ  (diapositiva 14)
 % ============================================================
 
-% ---  DIAPOSITIVA 20 — Validació: Latència  ---
-\begin{frame}{Validació: Latència --- ActiveX vs WebRTC}
-  \vspace{0.3em}
+% ---  DIAPOSITIVA 13 — Validació: Latència, Rendiment i Usabilitat (merged)  ---
+\begin{frame}{Validació: Latència, Rendiment i Usabilitat}
   \begin{columns}[T]
-    \begin{column}{0.55\textwidth}
-      \begin{center}
-        \renewcommand{\arraystretch}{1.4}
-        \begin{tabular}{lcc}
-          \toprule
-          \textbf{Protocol} & \textbf{Latència} & \textbf{Estabilitat} \\
-          \midrule
-          ActiveX + RTSP (legacy) & 800--2000 ms & Baixa \\
-          \textbf{WebRTC / WHEP} & \textbf{150--300 ms} & Alta \\
-          HLS (fallback) & 2--5 s & Molt alta \\
-          \bottomrule
-        \end{tabular}
-      \end{center}
+    \begin{column}{0.50\textwidth}
+      \renewcommand{\arraystretch}{1.35}
+      \begin{tabular}{lcc}
+        \toprule
+        \textbf{Protocol} & \textbf{Latència} & \textbf{RNF} \\
+        \midrule
+        ActiveX + RTSP (legacy) & 800--2000 ms & --- \\
+        \textbf{WebRTC / WHEP} & \textbf{150--300 ms} & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        HLS (fallback/gravacions) & 2--5 s & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
+        \bottomrule
+      \end{tabular}
 
       \vspace{0.5em}
-      \textbf{Millora:} \textbf{5--10$\times$} menys latència que la plataforma legacy.
+      \begin{itemize}
+        \small
+        \item \textbf{35\% menys CPU} (Signals vs Zone.js). Streaming de 2h: zero fuites de memòria. RAM estable: 45--65 MB.
+        \item \textbf{25 connexions concurrents} validades.
+      \end{itemize}
     \end{column}
 
-    \begin{column}{0.40\textwidth}
-      \begin{exampleblock}{RNF-01 assolit}
-        \centering $<$ 300 ms de latència amb WebRTC. $<$ 350 ms P95.\\[0.4em]
-        \small Validat en xarxa LAN amb Intel i3-8100T com a client.
+    \begin{column}{0.46\textwidth}
+      \begin{exampleblock}{\centering SUS: \textbf{85.6 / 100} --- Excel·lent}
+        \small 8 participants reals (tècnics d'instal·lació + operadors de seguretat).\\[0.2em]
+        Benchmark: $>$80 = Bo $\cdot$ $>$70 = Acceptable.\\[0.3em]
+        \textbf{40\% menys temps} per actualitzar firmware.
+      \end{exampleblock}
+
+      \vspace{0.4em}
+      \begin{exampleblock}{\centering Altres validacions}
+        \small Zero corrupció VFS en talls elèctrics simulats $\cdot$ WS reconnecta $\leq$ 30 s
       \end{exampleblock}
     \end{column}
   \end{columns}
 
   \note{
-    Els resultats de latència superen les expectatives. Amb WebRTC en xarxa local, hem obtingut una latència d'entre 150 i 300 mil·lisegons, que és fins a 10 vegades millor que la plataforma ActiveX basada en RTSP, que oscil·lava entre 800 ms i 2 segments.
+    Els resultats de latència superen les expectatives. Amb WebRTC en xarxa local, hem obtingut entre 150 i 300 mil·lisegons. L'antiga plataforma ActiveX basada en RTSP oscil·lava entre 800 ms i 2 segments. Els rangs no se solapen: el pitjor cas de WebRTC és millor que el millor cas d'ActiveX. El requisit RNF-01 és complert amb marge.
 
-    L'origen de la millora és estructural: ActiveX usava RTSP sobre TCP, que afegeix overhead de control de flux i retransmissions. WebRTC fa servir UDP amb SRTP, on cada paquet va pel camí més ràpid i no espera confirmació dels anteriors. La latència de percepció en sala de control ha passat de "clarament visible" a "pràcticament imperceptible".
+    En termes de CPU, la migració a Signals ha donat una reducció del 35\% de consum computacional al navegador. I en el test de streaming WebRTC de dues hores, no s'han detectat fuites de memòria.
 
-    El fallback HLS té 2-5 segments de latència, cosa que és completament acceptable per a visualitzar gravacions. Per a directe en xarxes restrictives, és menys ideal però garanteix que sempre hi ha imatge.
-
-    El requisit RNF-01 és complert amb marge.
-  }
-\end{frame}
-
-% ---  DIAPOSITIVA 21 — Validació: CPU i Usabilitat (SUS)  ---
-\begin{frame}{Validació: Rendiment i Usabilitat}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Eficiència de CPU (Signals)}
-        \begin{itemize}
-          \item \textbf{35\% de reducció} de CPU al client.
-          \item Zero fuites de memòria (streaming 2h validat).
-          \item Rang estable: 45--65 MB de RAM.
-          \item Neteja correcta del \texttt{RTCPeerConnection}.
-        \end{itemize}
-      \end{block}
-    \end{column}
-
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Test d'Usabilitat SUS}
-        \begin{itemize}
-          \item \textbf{Puntuació: 85.6 / 100} (categoria \textit{Excel·lent}).
-          \item 8 participants: tècnics i operadors reals.
-          \item Benchmark: $>$80 = Bo, $>$70 = Acceptable.
-          \item Firmwares actualitzats un \textbf{40\% més ràpid}.
-        \end{itemize}
-      \end{block}
-    \end{column}
-  \end{columns}
-
-  \vspace{0.5em}
-  \begin{exampleblock}{\centering Tots els RNF tècnics i d'usabilitat: assolits}
-    \centering WS reconnecta en $\leq$ 30 s $\cdot$ 25 connexions concurrents $\cdot$ zero corrupció VFS en talls de corrent
-  \end{exampleblock}
-
-  \note{
-    Passem als resultats de rendiment i usabilitat. En termes de CPU, la migració a Signals ha donat una reducció del 35\% de consum computacional al navegador. I en el test de streaming WebRTC de dues hores, no s'han detectat fuites de memòria: la memòria oscil·la de forma saludable entre 45 i 65 MB amb el garbage collector de V8 fent el seu treball.
-
-    Per a la usabilitat, vam aplicar el System Usability Scale, el test de referència en enginyeria de software. Amb 8 participants ---tècnics d'instal·lació i operadors de seguretat reals--- hem obtingut 85.6 sobre 100, que entra a la categoria d'Excel·lent. El punt de referència és que 70 és "acceptable" i 80 és "bo". La nostra puntuació és per sobre de les dues.
-
-    Destaca especialment la dada dels firmwares: els tècnics van ser capaços d'actualitzar el firmware en un 40\% menys de temps que amb la plataforma legacy, gràcies a la interfície guiada i al sistema de validació en temps real.
+    Per a la usabilitat, vam aplicar el System Usability Scale amb 8 participants reals de Lanaccess. Hem obtingut 85.6 sobre 100, categoria Excel·lent. Destaca la dada dels firmwares: els tècnics van ser capaços d'actualitzar el firmware en un 40\% menys de temps que amb la plataforma legacy.
 
     En resum: tots els requisits no funcionals estan validats amb dades.
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 22 — Demo en Directe  ---
+% ---  DIAPOSITIVA 14 — Demostració en Directe  ---
 \begin{frame}{Demostració en Directe}
   \vspace{0.4em}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{Seqüència de demostració}
+    \begin{column}{0.52\textwidth}
+      \textbf{Seqüència (5 minuts)}
       \begin{enumerate}
         \item \textbf{Login}: cookie HttpOnly, zero LocalStorage.
         \item \textbf{Mosaic WebRTC}: 4 càmeres, latència $<$ 300 ms.
         \item \textbf{Timeline HLS}: cerca en gravacions passades.
-        \item \textbf{Alarma push}: sensor salta $\to$ UI actualitza en $<$ 1 s.
-        \item \textbf{Schema-Driven}: formulari auto-generat des del JSON.
+        \item \textbf{Alarma push}: sensor salta $\to$ UI en $<$ 1 s, dos navegadors simultanis.
+        \item \textbf{Configuració Schema-Driven}: formulari auto-generat des del JSON.
       \end{enumerate}
     \end{column}
 
-    \begin{column}{0.45\textwidth}
+    \begin{column}{0.44\textwidth}
       \begin{exampleblock}{Entorn real}
         \centering
         NVR NXT en xarxa local.\\[0.3em]
@@ -110,27 +75,24 @@
       \end{exampleblock}
 
       \vspace{0.5em}
-      \begin{block}{Temps estimat}
-        \centering \textbf{5 minuts}
+      \begin{block}{Pla B}
+        \small Screenshots de cada pas preparats si cau la connexió.
       \end{block}
     \end{column}
   \end{columns}
 
   \note{
-    DEMO EN DIRECTE. Preparació prèvia (fer ABANS d'iniciar la presentació):
+    DEMO EN DIRECTE --- Preparació prèvia (fer ABANS d'iniciar la presentació):
     - Navegador obert a https://<ip-nvr>/ en una finestra separada, minimitzada.
-    - NVR connectat a la xarxa local de la sala i accessible.
-    - Credencials d'admin preparades.
-    - Un segon navegador en pestanya incògnit per simular el segon operador (pel Config Lock).
+    - NVR connectat a la xarxa local de la sala.
+    - Un segon navegador en pestanya incògnit per simular el segon operador.
+    - Carpeta de screenshots com a pla B.
 
     Seqüència (5 min en directe):
-    1. Login: "La URL és la IP directa del gravador. No hi ha cap servidor intermedi ni núvol."
-    2. Mosaic WebRTC: obrir 4 càmeres. "Fixeu-vos en la latència: moure un objecte davant la càmera."
-    3. Timeline HLS: "Aquí la línia de temps. Busco un moment d'ahir..." Fer un seek i reproduir.
-    4. Alarma push: activar un sensor o relay manual. Mostrar la sincronització amb el segon navegador.
-    5. Schema-Driven: Configuració > Xarxa. "Aquest formulari l'ha generat Angular automàticament
-       a partir del JSON Schema del firmware. Cap enginyer de frontend l'ha escrit a mà."
-
-    PLA B si falla la connexió: tenir screenshots de cada pas preparats en una carpeta d'imatges.
+    1. Login: "La URL és la IP directa del gravador. No hi ha cap servidor intermedi ni núvol." Si el tribunal pregunta per les cookies: F12 → Application → Cookies → mostrar HttpOnly = true.
+    2. Mosaic WebRTC: obrir 4 càmeres. "Fixeu-vos en la latència: moure un objecte davant la càmera. La imatge respon en menys de 300 ms. L'antiga plataforma tardava entre 800 ms i 2 segments."
+    3. Timeline HLS: navegar a gravacions. "Aquí la línia de temps interactiva. Busco un moment d'ahir..." Fer un seek i reproduir uns segments.
+    4. Alarma push: activar un sensor o relay manual. "Sense que l'operador faci res, la icona canvia en temps real." Passar al segon navegador. "Si hi ha un segon operador connectat, tots dos ho veuen alhora."
+    5. Schema-Driven: Configuració → Xarxa. "El formulari que veieu --- IP, màscara, gateway, DNS --- no l'ha escrit cap enginyer de frontend. Angular l'ha generat automàticament a partir del JSON Schema del firmware."
   }
 \end{frame}
