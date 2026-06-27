@@ -3,8 +3,48 @@
 % Cada slide: pàgina real de l'aplicació + explicació sota el capó
 % ============================================================
 
+% ---  DIAPOSITIVA — Pàgina de Configuració  ---
+\begin{frame}{Configuració de Sistema}
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Motor Schema-Driven}
+        \small Backend: \texttt{\_type}, \texttt{\_allowedValues} $\to$ Angular \textbf{auto-genera} formulari.\\[0.1em]
+        Nou firmware $\Rightarrow$ \textbf{zero canvis al frontend}.
+      \end{block}
+
+      \vspace{0.4em}
+      \begin{itemize}
+        \item \texttt{ipaddr}, \texttt{list}, \texttt{integer}\ldots \textbf{10 tipus}.
+        \item 100\% de la config coberta.
+      \end{itemize}
+
+      \vspace{0.4em}
+      \begin{alertblock}{Config Lock Pessimista}
+        \small \textbf{POST /lock} $\to$ token $\cdot$ expira \textbf{60--120 s}.\\
+        Concurrents: \textbf{HTTP 423 Locked}.
+      \end{alertblock}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth, keepaspectratio]{../figures/interficies/config1.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+
+  \note{
+    El formulari que l'usuari veu és 100\% generat automàticament. Cap enginyer de frontend ha escrit cap camp de configuració.
+
+    El motor Schema-Driven funciona així: el backend no envia només dades, envia metadades. Cada camp porta el tipus, els valors permesos, els límits. Angular llegeix l'esquema i renderitza el formulari complet. Un camp de tipus ipaddr genera un input amb regex de validació IP. Un camp de tipus list genera un select amb exactament les opcions permeses. Un integer genera un input numèric amb rang ja configurat. El motor té 10 tipus de camp que cobreixen el 100\% de la configuració.
+
+    L'impacte empresarial és directe: un nou model de NVR amb 20 paràmetres nous → zero canvis al frontend. Zero PR, zero deploy.
+
+    El Config Lock pessimista resol el problema de concurrència. Quan un tècnic entra a configurar, fa POST a /lock i obté un token de 32 caràcters hexadecimals. Tota escriptura posterior ha d'incloure'l. Si tanca el portàtil, el lock expira en 60-120 segments sol. Altres usuaris reben HTTP 423 i resten en mode lectura automàticament.
+  }
+\end{frame}
+
 % ---  DIAPOSITIVA 9 — Pàgina de Directe  ---
-\begin{frame}{Pàgina de Directe: Vídeo en Temps Real}
+\begin{frame}{Vídeo en Directe}
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \begin{center}
@@ -35,7 +75,7 @@
 \end{frame}
 
 % ---  DIAPOSITIVA 10 — Pàgina de Gravacions  ---
-\begin{frame}{Pàgina de Gravacions: Timeline i H.265}
+\begin{frame}{Gravacions}
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \begin{center}
@@ -66,7 +106,7 @@
 \end{frame}
 
 % ---  DIAPOSITIVA 11 — Gestió Reactiva d'Alarmes  ---
-\begin{frame}{Gestió Reactiva d'Alarmes}
+\begin{frame}{Alarmes}
   \begin{columns}[T]
     \begin{column}{0.45\textwidth}
       \textbf{Push i Persistència:}
@@ -81,7 +121,7 @@
 
     \begin{column}{0.5\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth, keepaspectratio]{../figures/diagrames/alarms_data_flow.png}
+        \includegraphics[width=\textwidth, height=0.7\textheight, keepaspectratio]{../figures/interficies/alarms.png}
       \end{center}
     \end{column}
   \end{columns}
@@ -95,65 +135,3 @@
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 12a — Pàgina de Configuració: Schema-Driven  ---
-\begin{frame}{Pàgina de Configuració: Schema-Driven}
-  \begin{columns}[T]
-    \begin{column}{0.45\textwidth}
-      \begin{block}{Motor Schema-Driven}
-        \small Backend: \texttt{\_type}, \texttt{\_allowedValues} $\to$ Angular \textbf{auto-genera} formulari.\\[0.1em]
-        Nou firmware $\Rightarrow$ \textbf{zero canvis al frontend}.
-      \end{block}
-
-      \vspace{0.5em}
-      \begin{itemize}
-        \item \texttt{ipaddr} $\to$ input IP validat.
-        \item \texttt{list} $\to$ \texttt{<select>} dinàmic.
-        \item \texttt{integer} $\to$ rang configurat.
-        \item \textbf{10 tipus} cobreixen el 100\% de la config.
-      \end{itemize}
-    \end{column}
-
-    \begin{column}{0.5\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth, keepaspectratio]{../figures/interficies/config1.png}
-      \end{center}
-    \end{column}
-  \end{columns}
-
-  \note{
-    El formulari que l'usuari veu és 100\% generat automàticament. Cap enginyer de frontend ha escrit cap camp de configuració.
-
-    El motor Schema-Driven funciona així: el backend no envia només dades, envia metadades. Cada camp porta el tipus, els valors permesos, els límits. Angular llegeix l'esquema i renderitza el formulari complet. Un camp de tipus ipaddr genera un input amb regex de validació IP. Un camp de tipus list genera un select amb exactament les opcions permeses. Un integer genera un input numèric amb rang ja configurat. El motor té 10 tipus de camp que cobreixen el 100\% de la configuració.
-
-    L'impacte empresarial és directe: un nou model de NVR amb 20 paràmetres nous → zero canvis al frontend. Zero PR, zero deploy.
-  }
-\end{frame}
-
-% ---  DIAPOSITIVA 12b — Control de Concurrència: Config Lock  ---
-\begin{frame}{Control de Concurrència: Config Lock}
-  \begin{columns}[T]
-    \begin{column}{0.45\textwidth}
-      \begin{alertblock}{Config Lock Pessimista}
-        \small \textbf{POST /lock} $\to$ token hex $\cdot$ expira \textbf{60--120 s}.\\
-        Concurrents: \textbf{HTTP 423 Locked}.
-      \end{alertblock}
-
-      \vspace{0.5em}
-      \begin{itemize}
-        \item Dos admins editen $\to$ \textbf{last-write-wins}.
-        \item Lock caduca sol si el tècnic desconnecta.
-        \item Mode lectura automàtic per als altres.
-      \end{itemize}
-    \end{column}
-
-    \begin{column}{0.5\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth, keepaspectratio]{../figures/diagrames/seq_config_lock.png}
-      \end{center}
-    \end{column}
-  \end{columns}
-
-  \note{
-    El Config Lock pessimista resol el problema de concurrència que vam plantejar al disseny. Quan un tècnic entra a configurar, fa POST a /lock i obté un token de 32 caràcters hexadecimals. Tota escriptura posterior ha d'incloure'l. Si tanca el portàtil, el lock expira en 60-120 segments sol. Altres usuaris reben HTTP 423 i resten en mode lectura automàticament.
-  }
-\end{frame}

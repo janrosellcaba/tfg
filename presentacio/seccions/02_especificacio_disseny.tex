@@ -3,7 +3,7 @@
 % ============================================================
 
 % ---  DIAPOSITIVA 5 — Els Actors del Sistema  ---
-\begin{frame}{Els Actors del Sistema}
+\begin{frame}{Actors}
   \vspace{0.2em}
   \begin{columns}[T]
     \begin{column}{0.3\textwidth}
@@ -50,7 +50,7 @@
 \end{frame}
 
 % ---  DIAPOSITIVA 6 — Requisits Crítics: Rendiment i Seguretat (merged)  ---
-\begin{frame}{Requisits Crítics: Rendiment i Seguretat}
+\begin{frame}{Requisits}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textbf{Rendiment i Vídeo}
@@ -88,68 +88,36 @@
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 7a — Arquitectura Global: Mapa de Serveis  ---
-\begin{frame}{Arquitectura Global: Mapa de Serveis}
-  \begin{center}
-    \includegraphics[height=0.85\textheight, keepaspectratio]{../figures/diagrames/arquitectura_serveis.png}
-  \end{center}
+% ---  DIAPOSITIVA 7 — Arquitectura Global  ---
+\begin{frame}{Arquitectura}
+  \begin{columns}[T]
+    \begin{column}{0.38\textwidth}
+      \begin{itemize}
+        \item \texttt{la-core-legacy}
+        \item \texttt{la-db-engine}
+        \item \texttt{la-core-alarm}
+        \item \texttt{la-video-engine}
+        \item \texttt{NGINX}
+      \end{itemize}
+
+      \vspace{0.8em}
+      \begin{block}{}
+        \small\textbf{SPA Angular}: CPU al navegador $\cdot$ \textbf{UDS} intern $\cdot$ \textbf{systemd}.
+      \end{block}
+    \end{column}
+
+    \begin{column}{0.59\textwidth}
+      \begin{flushright}
+        \includegraphics[height=0.85\textheight, keepaspectratio]{../figures/diagrames/arquitectura_serveis.png}
+      \end{flushright}
+    \end{column}
+  \end{columns}
 
   \note{
     El disseny arquitectònic respon directament als requisits de recursos limitats. L'Angular és una Single-Page Application: es descarrega una vegada i s'executa completament al navegador del client. Això significa que el processament de la interfície recau al PC de l'operador, no en la CPU del gravador.
 
     Al backend, quatre microserveis C++ especialitzats: la-core-legacy gestiona la configuració i l'autenticació; la-db-engine exposa SQLite; la-core-alarm emet les alarmes per WebSocket; i la-video-engine conjuntament amb MediaMTX gestionen tot el pipeline de vídeo. Cada procés gestiona un domini aïllat: si el motor de vídeo falla, la configuració continua funcionant.
 
-    La comunicació interna va per Unix Domain Sockets: el canal IPC més ràpid de Linux. NGINX és l'únic punt d'entrada visible des de l'exterior.
-  }
-\end{frame}
-
-% ---  DIAPOSITIVA 7b — Arquitectura Global: Orquestració i C++  ---
-\begin{frame}{Arquitectura Global: Orquestració i C++}
-  \begin{itemize}
-    \item \texttt{la-core-legacy} --- Config API + Autenticació.
-    \item \texttt{la-db-engine} --- SQLite via Unix Domain Socket.
-    \item \texttt{la-core-alarm} --- Alarmes per WebSocket push.
-    \item \texttt{la-video-engine} + MediaMTX --- WebRTC/WHEP i HLS.
-  \end{itemize}
-
-  \vspace{1em}
-  \begin{block}{}
-    \textbf{SPA Angular}: CPU al navegador $\cdot$ \textbf{UDS} intern $\cdot$ \textbf{systemd}.
-  \end{block}
-
-  \note{
-    Cada microservei C++ té un domini aïllat: si el motor de vídeo falla, la configuració continua funcionant. La comunicació interna va per Unix Domain Sockets, el canal IPC més ràpid de Linux. NGINX és l'únic punt d'entrada visible des de l'exterior, concentrant tots els serveis sota el port 443.
-  }
-\end{frame}
-
-% ---  DIAPOSITIVA 8 — NGINX i el Problema de Concurrència (merged)  ---
-\begin{frame}{NGINX: Frontera de Seguretat i Concurrència}
-  \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{NGINX com a proxy invers (port 443)}
-      \begin{itemize}
-        \item Únic punt d'entrada: ports interns ocults.
-        \item \textbf{TLS 1.2/1.3} + AESGCM. \textit{Routing} als microserveis.
-        \item Cookies \textbf{HttpOnly+Secure}: cap JS llegeix sessió. Elimina \textbf{OWASP A07}.
-      \end{itemize}
-    \end{column}
-
-    \begin{column}{0.46\textwidth}
-      \begin{alertblock}{El problema de concurrència}
-        \small Dos admins editen simultàniament $\to$ \textbf{last-write-wins}. Dispositiu en \textbf{estat inconsistent}.
-      \end{alertblock}
-
-      \vspace{0.4em}
-      \small $\Rightarrow$ Col·lisió \textbf{real} en xarxes multi-tècnic.\\
-      \small $\Rightarrow$ \textit{Solució: Config Lock pessimista.}
-    \end{column}
-  \end{columns}
-
-  \note{
-    NGINX és molt més que un servidor web: és la nostra capa de seguretat per disseny. Primer, actua com a proxy invers unificant tots els serveis sota el port 443. Cap port intern dels microserveis és accessible directament des de l'exterior.
-
-    Segon, NGINX és qui gestiona les cookies de sessió amb HttpOnly i Secure. Això significa que el navegador les envia automàticament però cap línia de JavaScript de l'aplicació Angular pot llegir-les ni modificar-les. Si un atacant injecta codi maliciós a la pàgina, no pot robar la sessió. Eliminem d'arrel la vulnerabilitat OWASP A07.
-
-    I aquí sorgeix el problema de concurrència: en entorns amb múltiples administradors, dos tècnics poden editar simultàniament la configuració de xarxa del gravador. Sense control, s'aplica l'últim en escriure i el dispositiu queda en un estat inconsistent. La solució la veurem a la implementació.
+    La comunicació interna va per Unix Domain Sockets: el canal IPC més ràpid de Linux. NGINX és l'únic punt d'entrada visible des de l'exterior, concentrant tots els serveis sota el port 443.
   }
 \end{frame}
