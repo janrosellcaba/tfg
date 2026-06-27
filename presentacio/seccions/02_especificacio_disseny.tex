@@ -55,10 +55,9 @@
     \begin{column}{0.48\textwidth}
       \textbf{Rendiment i Vídeo}
       \begin{itemize}
-        \item \textbf{RNF-01:} latència $<$ \textbf{300 ms} (P50), $<$ 350 ms (P95).\\
-              \small En sala de control activa, 2 s de retard és inacceptable.
-        \item \textbf{RNF-02:} fallback HLS en $\leq$ \textbf{5 s} si UDP bloquejat. Transparent per l'operador.
-        \item \textbf{RNF-03:} zero \textit{polling} HTTP, actualitzacions push granulars.
+        \item \textbf{RNF-01:} latència $<$ \textbf{300 ms} (P50), $<$ 350 ms (P95).
+        \item \textbf{RNF-02:} fallback HLS $\leq$ \textbf{5 s} si UDP bloquejat.
+        \item \textbf{RNF-03:} zero \textit{polling}, push granular.
       \end{itemize}
     \end{column}
 
@@ -68,7 +67,7 @@
         \item \textbf{Zero LocalStorage}: cookies \textbf{HttpOnly + Secure + SameSite=Strict}.
         \item Xifratge \textbf{TLS 1.2/1.3} i WSS.
         \item \textbf{Privacy by Design}: dades sensibles mai al disc del client.
-        \item Compliment \textbf{OWASP Top 10} com a \textit{criteri d'acceptació} formal.
+        \item \textbf{OWASP Top 10}: criteri d'acceptació formal.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -89,30 +88,11 @@
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 7 — Arquitectura Global i Microserveis (merged)  ---
-\begin{frame}{Arquitectura Global i Microserveis}
-  \begin{columns}[T]
-    \begin{column}{0.58\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]{../figures/diagrames/arquitectura_serveis.png}
-      \end{center}
-    \end{column}
-
-    \begin{column}{0.38\textwidth}
-      \small
-      \begin{itemize}
-        \item \texttt{la-core-legacy} --- Config API + Auth.
-        \item \texttt{la-db-engine} --- SQLite via Unix Socket.
-        \item \texttt{la-core-alarm} --- alarmes WebSocket push.
-        \item \texttt{la-video-engine} + MediaMTX --- WebRTC/WHEP i HLS.
-      \end{itemize}
-
-      \vspace{0.5em}
-      \begin{block}{}
-        \small \textbf{SPA Angular} al navegador: allibera la CPU del gravador. Comunicació interna per \textbf{Unix Domain Sockets}. Orquestrat per \textbf{systemd}.
-      \end{block}
-    \end{column}
-  \end{columns}
+% ---  DIAPOSITIVA 7a — Arquitectura Global: Mapa de Serveis  ---
+\begin{frame}{Arquitectura Global: Mapa de Serveis}
+  \begin{center}
+    \includegraphics[height=0.85\textheight, keepaspectratio]{../figures/diagrames/arquitectura_serveis.png}
+  \end{center}
 
   \note{
     El disseny arquitectònic respon directament als requisits de recursos limitats. L'Angular és una Single-Page Application: es descarrega una vegada i s'executa completament al navegador del client. Això significa que el processament de la interfície recau al PC de l'operador, no en la CPU del gravador.
@@ -123,26 +103,45 @@
   }
 \end{frame}
 
+% ---  DIAPOSITIVA 7b — Arquitectura Global: Orquestració i C++  ---
+\begin{frame}{Arquitectura Global: Orquestració i C++}
+  \begin{itemize}
+    \item \texttt{la-core-legacy} --- Config API + Autenticació.
+    \item \texttt{la-db-engine} --- SQLite via Unix Domain Socket.
+    \item \texttt{la-core-alarm} --- Alarmes per WebSocket push.
+    \item \texttt{la-video-engine} + MediaMTX --- WebRTC/WHEP i HLS.
+  \end{itemize}
+
+  \vspace{1em}
+  \begin{block}{}
+    \textbf{SPA Angular}: CPU al navegador $\cdot$ \textbf{UDS} intern $\cdot$ \textbf{systemd}.
+  \end{block}
+
+  \note{
+    Cada microservei C++ té un domini aïllat: si el motor de vídeo falla, la configuració continua funcionant. La comunicació interna va per Unix Domain Sockets, el canal IPC més ràpid de Linux. NGINX és l'únic punt d'entrada visible des de l'exterior, concentrant tots els serveis sota el port 443.
+  }
+\end{frame}
+
 % ---  DIAPOSITIVA 8 — NGINX i el Problema de Concurrència (merged)  ---
 \begin{frame}{NGINX: Frontera de Seguretat i Concurrència}
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
       \textbf{NGINX com a proxy invers (port 443)}
       \begin{itemize}
-        \item Únic punt d'entrada: oculta tots els ports interns.
-        \item TLS 1.2/1.3 --- AESGCM. \textit{Routing} cap als microserveis.
-        \item Cookies \textbf{HttpOnly + Secure + SameSite=Strict}: cap script JS pot llegir la sessió. Elimina \textbf{OWASP A07}.
+        \item Únic punt d'entrada: ports interns ocults.
+        \item \textbf{TLS 1.2/1.3} + AESGCM. \textit{Routing} als microserveis.
+        \item Cookies \textbf{HttpOnly+Secure}: cap JS llegeix sessió. Elimina \textbf{OWASP A07}.
       \end{itemize}
     \end{column}
 
     \begin{column}{0.46\textwidth}
       \begin{alertblock}{El problema de concurrència}
-        \small Dos admins editen la IP del gravador simultàniament. Sense control: \textbf{l'últim en escriure guanya}. L'altre perd els canvis. Dispositiu en \textbf{estat inconsistent}, possiblement inaccessible per xarxa.
+        \small Dos admins editen simultàniament $\to$ \textbf{last-write-wins}. Dispositiu en \textbf{estat inconsistent}.
       \end{alertblock}
 
       \vspace{0.4em}
-      \small $\Rightarrow$ En xarxes de seguretat amb múltiples tècnics, aquesta col·lisió \textbf{no és teòrica}: ocorre.\\
-      \small $\Rightarrow$ \textit{Solució a la implementació: Config Lock pessimista.}
+      \small $\Rightarrow$ Col·lisió \textbf{real} en xarxes multi-tècnic.\\
+      \small $\Rightarrow$ \textit{Solució: Config Lock pessimista.}
     \end{column}
   \end{columns}
 

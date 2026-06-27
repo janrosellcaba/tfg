@@ -15,11 +15,10 @@
     \begin{column}{0.43\textwidth}
       \textbf{Sota el capó:}
       \begin{itemize}
-        \item \textbf{WHEP} (RFC 9716): POST \texttt{/stream/<cam>/whep} → SRTP/UDP + DTLS + ICE.
-        \item Latència: \textbf{150--300 ms}. ActiveX+RTSP: 800--2000 ms.\\
-              \small Els rangs \textbf{no se solapen}.
-        \item Fallback \textbf{HLS automàtic} en $\leq$ 5 s si UDP bloquejat. Transparent per l'operador.
-        \item \textbf{Angular Signals}: frame càmera 3 → actualitza \textit{un} component. \textbf{35\% menys CPU} (i3-8100T, Windows 10 IoT).
+        \item \textbf{WHEP} (RFC 9716): UDP/SRTP + DTLS + ICE.
+        \item Latència \textbf{150--300 ms} vs 800--2000 ms (ActiveX).
+        \item Fallback \textbf{HLS} en $\leq$ 5 s (UDP bloquejat).
+        \item \textbf{Angular Signals}: \textbf{35\% menys CPU} (i3-8100T).
       \end{itemize}
     \end{column}
   \end{columns}
@@ -47,9 +46,9 @@
     \begin{column}{0.43\textwidth}
       \small\textbf{Sota el capó:}
       \begin{itemize}
-        \item \textbf{FS2}: blocs bruts sense contenidor. Cap reproductor web els llegeix.
-        \item \textbf{Trans-muxing} (\texttt{la-video-engine}): llegeix FS2 → recupera \textbf{SPS/PPS/VPS} → empaqueta \textbf{MPEG-TS}.
-        \item $\neq$ \textit{transcoding}: canviem l'embolcall, no el bitstream. \textbf{CPU quasi zero}.
+        \item \textbf{FS2}: format propietari, cap reproductor web.
+        \item \textbf{Trans-muxing}: FS2 $\to$ SPS/PPS/VPS $\to$ MPEG-TS.
+        \item $\neq$ transcoding: embolcall, no bitstream. \textbf{CPU $\approx$ 0}.
         \item \textbf{H.265}: \textbf{50\% menys disc} que H.264.
       \end{itemize}
     \end{column}
@@ -66,18 +65,23 @@
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 11 — Pàgina d'Alarmes  ---
-\begin{frame}{Pàgina d'Alarmes: Push i Persistència}
+% ---  DIAPOSITIVA 11 — Gestió Reactiva d'Alarmes  ---
+\begin{frame}{Gestió Reactiva d'Alarmes}
   \begin{columns}[T]
-    \begin{column}{0.42\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{../figures/interficies/alarms.png}
-      \end{center}
+    \begin{column}{0.45\textwidth}
+      \textbf{Push i Persistència:}
+      \begin{itemize}
+        \item \textbf{WebSocket push}: sensor $\to$ operadors en temps real.
+        \item Reconnexió: \textbf{backoff exponencial}.
+        \item \textbf{remote\_vfs}: SQLite via Unix Domain Socket.
+        \item Atomicitat: alineació a \textbf{512 B}.
+        \item Mode \textbf{WAL}: ACID verificat en talls elèctrics.
+      \end{itemize}
     \end{column}
 
-    \begin{column}{0.54\textwidth}
+    \begin{column}{0.5\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]{../figures/diagrames/alarms_data_flow.png}
+        \includegraphics[width=\textwidth, keepaspectratio]{../figures/diagrames/alarms_data_flow.png}
       \end{center}
     \end{column}
   \end{columns}
@@ -91,30 +95,28 @@
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 12 — Pàgina de Configuració  ---
-\begin{frame}{Pàgina de Configuració: Schema-Driven i Lock}
+% ---  DIAPOSITIVA 12a — Pàgina de Configuració: Schema-Driven  ---
+\begin{frame}{Pàgina de Configuració: Schema-Driven}
   \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \begin{center}
-        \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]{../figures/diagrames/seq_config_lock.png}
-      \end{center}
-    \end{column}
-
-    \begin{column}{0.44\textwidth}
+    \begin{column}{0.45\textwidth}
       \begin{block}{Motor Schema-Driven}
-        \small Backend envia metadades: \texttt{\_type}, \texttt{\_allowedValues}, \texttt{\_min}, \texttt{\_max}. Angular \textbf{auto-genera} el formulari.\\[0.1em]
-        \texttt{ipaddr} $\to$ IP $\cdot$ \texttt{list} $\to$ \texttt{<select>} $\cdot$ \texttt{integer} $\to$ rang\\[0.1em]
+        \small Backend: \texttt{\_type}, \texttt{\_allowedValues} $\to$ Angular \textbf{auto-genera} formulari.\\[0.1em]
         Nou firmware $\Rightarrow$ \textbf{zero canvis al frontend}.
       \end{block}
 
-      \vspace{0.15em}
+      \vspace{0.5em}
+      \begin{itemize}
+        \item \texttt{ipaddr} $\to$ input IP validat.
+        \item \texttt{list} $\to$ \texttt{<select>} dinàmic.
+        \item \texttt{integer} $\to$ rang configurat.
+        \item \textbf{10 tipus} cobreixen el 100\% de la config.
+      \end{itemize}
+    \end{column}
 
-      \begin{alertblock}{Config Lock Pessimista}
-        \small POST \texttt{/lock} $\to$ token \textbf{32-char hex}.\\
-        Expiració automàtica \textbf{60--120 s}.\\
-        Altres usuaris: \textbf{HTTP 423 Locked}.\\
-        Si el tècnic tanca el portàtil: el lock caduca sol.
-      \end{alertblock}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth, keepaspectratio]{../figures/interficies/config1.png}
+      \end{center}
     \end{column}
   \end{columns}
 
@@ -124,7 +126,34 @@
     El motor Schema-Driven funciona així: el backend no envia només dades, envia metadades. Cada camp porta el tipus, els valors permesos, els límits. Angular llegeix l'esquema i renderitza el formulari complet. Un camp de tipus ipaddr genera un input amb regex de validació IP. Un camp de tipus list genera un select amb exactament les opcions permeses. Un integer genera un input numèric amb rang ja configurat. El motor té 10 tipus de camp que cobreixen el 100\% de la configuració.
 
     L'impacte empresarial és directe: un nou model de NVR amb 20 paràmetres nous → zero canvis al frontend. Zero PR, zero deploy.
+  }
+\end{frame}
 
+% ---  DIAPOSITIVA 12b — Control de Concurrència: Config Lock  ---
+\begin{frame}{Control de Concurrència: Config Lock}
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \begin{alertblock}{Config Lock Pessimista}
+        \small \textbf{POST /lock} $\to$ token hex $\cdot$ expira \textbf{60--120 s}.\\
+        Concurrents: \textbf{HTTP 423 Locked}.
+      \end{alertblock}
+
+      \vspace{0.5em}
+      \begin{itemize}
+        \item Dos admins editen $\to$ \textbf{last-write-wins}.
+        \item Lock caduca sol si el tècnic desconnecta.
+        \item Mode lectura automàtic per als altres.
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth, keepaspectratio]{../figures/diagrames/seq_config_lock.png}
+      \end{center}
+    \end{column}
+  \end{columns}
+
+  \note{
     El Config Lock pessimista resol el problema de concurrència que vam plantejar al disseny. Quan un tècnic entra a configurar, fa POST a /lock i obté un token de 32 caràcters hexadecimals. Tota escriptura posterior ha d'incloure'l. Si tanca el portàtil, el lock expira en 60-120 segments sol. Altres usuaris reben HTTP 423 i resten en mode lectura automàticament.
   }
 \end{frame}

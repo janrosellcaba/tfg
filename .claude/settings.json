@@ -15,7 +15,12 @@
       "Bash(echo \"Exit status: $?\")",
       "Bash(latexmk -pdf -f -interaction=nonstopmode main.tex)",
       "Bash(python3 -c ' *)",
-      "Bash(python3)"
+      "Bash(python3)",
+      "Bash(latexmk -pdf presentacio.tex)",
+      "Bash(git stash *)",
+      "Bash(kpsewhich babel-catalan.tex)",
+      "Bash(kpsewhich catalan.ldf)",
+      "Bash(pdflatex --version)"
     ],
     "additionalDirectories": [
       "/tmp"
