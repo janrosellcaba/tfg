@@ -301,9 +301,8 @@ export interface StreamingStrategy {
       \vspace{0.8em}
       \begin{itemize}
         \item Navegar per la \textbf{línia de temps} interactiva.
-        \item Reproduir qualsevol moment des del navegador.
-        \item \textbf{Descarregar} segments de vídeo.
-        \item Accés simultani a \textbf{múltiples càmeres}.
+        \item Reproduir qualsevol moment i qualsevol càmera i stream des del navegador.
+        \item Fins a \textbf{x8} de velocitat.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -318,117 +317,82 @@ export interface StreamingStrategy {
 \end{frame}
 
 % ---  DIAPOSITIVA — Gravacions 2/3  ---
-\begin{frame}[fragile]{Gravacions \small\textit{2/3}}
+\begin{frame}{Gravacions \small\textit{2/3}}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \small\textbf{HLS: manifest dinàmic + segments sota demanda:}
-      \vspace{0.3em}
-
-      \begin{lstlisting}[style=jsonbox]
-GET /rec/cam1/manifest.m3u8
-HTTP/1.1 200 OK
-
-#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-TARGETDURATION:2
-#EXTINF:2.000, segment_001.ts
-#EXTINF:2.000, segment_002.ts
-#EXT-X-ENDLIST
-
-GET /rec/cam1/segment_001.ts
-HTTP/1.1 206 Partial Content
-[MPEG-TS: SPS+PPS+VPS | H.265 bitstream]
-      \end{lstlisting}
-
-      \vspace{0.3em}
+      \textbf{Manifest HLS dinàmic:}
       \begin{itemize}
-        \item \textbf{Range request}: accés directe per offset.
-        \item Memòria constant: no cal carregar tot el clip.
+        \item Angular demana \texttt{/hls-play.m3u8?start=\ldots\&end=\ldots}
+        \item Backend busca blocs \textbf{FS2} del rang i genera el manifest en temps real.
+        \item Tall de gravació ($>$3 s) $\to$ \texttt{\#EXT-X-DISCONTINUITY} $\to$ descodificador no es congela.
+      \end{itemize}
+
+      \vspace{0.8em}
+      \textbf{Línia de temps:}
+      \begin{itemize}
+        \item \textcolor{accentgreen!70!black}{\textbf{Verd/blau}}: gravació contínua.
+        \item \textcolor{accentred}{\textbf{Vermell/taronja}}: alarma, moviment o analítica.
       \end{itemize}
     \end{column}
 
     \begin{column}{0.48\textwidth}
-      \vspace{0.8em}
-      \small\textbf{Pipeline per cada segment:}
-      \vspace{0.4em}
+      \textbf{Per cada segment demanat:}
       \begin{enumerate}
-        \item Llegir bloc \textbf{FS2} per offset del disc.
-        \item Recuperar \textbf{SPS/PPS/VPS} del keyframe anterior.
-        \item Injectar capçaleres davant del bitstream.
-        \item Empaquetar en \textbf{MPEG-TS}.
-        \item Servir via HTTP \textbf{206}.
+        \item Llegir bloc \textbf{FS2} del disc (buffer 8 MB).
+        \item \textbf{Trans-muxing} $\neq$ transcoding:\\bitstream intacte, \textbf{CPU $\approx$ 0}.
+        \item \textbf{H.265}: si falten SPS/PPS/VPS al buffer, el backend les recupera del keyframe anterior i les injecta.
+        \item Servir \texttt{video/MP2T} al navegador.
       \end{enumerate}
-
-      \vspace{0.5em}
-      \begin{itemize}
-        \item SPS/PPS/VPS: necessàries al \textbf{primer frame} de cada segment.
-        \item Sense elles: descodificador cec.
-      \end{itemize}
     \end{column}
   \end{columns}
 
   \note{
     Expliquem el com del trans-muxing pas a pas.
 
-    Quan l'operador selecciona un rang temporal, Angular fa GET del manifest M3U8. La-video-engine calcula quins segments FS2 cobreixen el rang i genera el fitxer dinàmicament: cada entrada al manifest correspon a un interval de 2 segons.
+    Quan l'operador selecciona un rang temporal, Angular fa GET del manifest M3U8 passant el token de sessió, el timestamp d'inici i de fi. La-video-engine localitza els blocs FS2 que cobreixen el rang mitjançant la biblioteca d'indexació interna i genera el fitxer de manifest dinàmicament: cada entrada correspon a un interval de vídeo real. Si detecta un tall de més de 3 segons entre dos buffers ---per exemple, una gravació per events interrompuda--- injecta la directiva EXT-X-DISCONTINUITY, que informa el reproductor del navegador que la línia temporal s'ha trencat: sense això, el descodificador quedaria congelat.
 
-    Per cada segment, el pipeline fa cinc passes. Primera: llegir el bloc FS2 per offset directe —accés aleatori al disc, sense carregar tot el fitxer. Segona, la complicació tècnica important: H.265 no repeteix les capçaleres SPS, PPS i VPS a cada frame. Estan una vegada al principi del clip. Si l'operador comença en mig d'un clip, el descodificador del navegador no sap com interpretar el bitstream: necessita les capçaleres per conèixer la resolució, el perfil de codec, la cadència de frames. La-video-engine manté un índex dels keyframes i recupera les capçaleres del keyframe anterior al segment. Tercera: injectar-les davant del bitstream. Quarta: empaquetar en MPEG-TS. Cinquena: servir amb 206 Partial Content.
+    Per cada segment, la la-video-engine carrega el bloc FS2 en un buffer temporal de 8 MB. Trans-muxing significa empaquetar el bitstream en un contenidor MPEG-TS sense tocar ni un sol bit del vídeo: no hi ha decodificació, no hi ha recompressió. En un dispositiu embedded amb CPU limitada, això és crític.
 
-    En cap moment s'ha executat cap operació de codificació. El bitstream original passa intacte.
+    La complexitat de l'H.265 és que les capçaleres SPS, PPS i VPS ---que el descodificador necessita per inicialitzar-se--- no es repeteixen a cada frame: estan una sola vegada al principi del clip. Si l'operador fa un seek enmig d'un clip, el backend retrocedeix a l'índex del primer buffer del fitxer per recuperar les capçaleres de referència i les injecta davant del segment. Sense aquest mecanisme, el descodificador del navegador rebria un flux incomplet i no podria reproduir res.
   }
 \end{frame}
 
 % ---  DIAPOSITIVA — Gravacions 3/3  ---
 \begin{frame}{Gravacions \small\textit{3/3}}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \small\textbf{Durabilitat: \texttt{remote\_vfs} SQLite}
-
-      \vspace{0.5em}
+    \begin{column}{0.52\textwidth}
+      \textbf{Durabilitat: FS2 + \texttt{remote\_vfs}}
       \begin{itemize}
-        \item \textbf{Unix Domain Socket} $\to$ \texttt{la-db-engine}.
-        \item \textbf{Un sol procés} amb permisos d'escriptura.
-        \item Escriptures alineades a \textbf{512 B} $\to$ atomicitat HW.
-        \item Mode \textbf{WAL}: lectures i escriptures en paral·lel.
-        \item \textbf{Verificat} amb talls elèctrics forçats.
+        \item \textbf{FS2}: escriu directament a la partició \textit{raw} (sense ext4).\\Tall elèctric $\to$ el bloc anterior queda \textbf{íntegre}.
+        \item \textbf{\texttt{remote\_vfs}}: driver SQLite personalitzat que intercepta tot I/O.
+        \item Redirigeix via \textbf{Unix Domain Socket} $\to$ \texttt{la-video-engine}.
+        \item \texttt{la-video-engine}: \textbf{únic procés} amb permisos d'escriptura al disc.
+        \item Mode \textbf{WAL}: lectures i escriptures simultànies sense bloqueig.
       \end{itemize}
-
-      \vspace{0.5em}
-      \small Gravació contínua \textbf{sense corrupció} davant de qualsevol tall de corrent.
     \end{column}
 
-    \begin{column}{0.46\textwidth}
-      \small\textbf{Impacte emmagatzematge: H.265 vs H.264}
-
-      \vspace{0.5em}
-      \begin{center}
-        \begin{tabular}{lcc}
-          \toprule
-          & \textbf{H.264} & \textbf{H.265} \\
-          \midrule
-          Bits per frame    & 100\%        & \textbf{$\approx$50\%} \\
-          Retenció (1~TB)   & 10 dies      & \textbf{20 dies} \\
-          CPU descodificació & baix        & baix \\
-          \bottomrule
-        \end{tabular}
-      \end{center}
-
-      \vspace{0.5em}
+    \begin{column}{0.44\textwidth}
+      \textbf{H.265 vs H.264:}
       \begin{itemize}
-        \item \textbf{Mateixa qualitat}, la meitat d'espai.
-        \item Duplica la retenció \textbf{sense ampliar disc}.
+        \item Mateixa qualitat, \textbf{50\% menys disc}.
+        \item 1 TB: 10 dies $\to$ \textbf{20 dies} de retenció.
       \end{itemize}
+
+      \vspace{0.8em}
+      \begin{exampleblock}{Garantia}
+        \small Gravació contínua \textbf{sense corrupció} davant de qualsevol tall de corrent.
+      \end{exampleblock}
     \end{column}
   \end{columns}
 
   \note{
     La tercera diapositiva cobreix els dos aspectes que el tribunal probablement qüestionarà: la durabilitat i l'eficiència d'emmagatzematge.
 
-    Sobre la durabilitat: un gravador NVR és un dispositiu que pot perdre la llum en qualsevol moment. Si la base de dades SQLite que indexa les gravacions queda corrupta, es perden les metadades de tots els clips. La solució és el driver VFS personalitzat remote_vfs. SQLite té una capa d'abstracció de sistema de fitxers: totes les operacions d'I/O passen per funcions xRead, xWrite, xSync. El remote_vfs reimplementa aquesta interfície i redirigeix tota operació al la-db-engine per Unix Domain Socket. la-db-engine és l'únic procés del sistema amb permisos d'escriptura: cap altre procés pot comprometre la integritat.
+    Sobre la durabilitat: un gravador NVR és un dispositiu que pot perdre la llum en qualsevol moment. FS2 escriu els fotogrames en blocs contigus de mida fixa directament sobre la partició raw: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada per disseny.
 
-    Les escriptures s'alineen a sectors de 512 bytes: la mida mínima que un disc fa en una sola operació. Atomicitat a nivell de hardware: si el corrent cau a mig escriure, el sector és completament nou o completament vell, mai mig corrupte. El mode WAL permet que els operadors reprodueixin gravacions mentre el sistema continua gravant, sense bloquejos. Hem verificat tot amb simulacions de tall elèctric forçat.
+    Per a la base de dades d'índex de gravacions, la solució és el driver VFS personalitzat remote_vfs. SQLite té una capa d'abstracció de sistema de fitxers: totes les operacions d'I/O passen per funcions xRead, xWrite. El remote_vfs reimplementa aquesta interfície i redirigeix cada operació via Unix Domain Socket cap a la-video-engine, que és l'únic procés del sistema amb permisos d'escriptura al disc físic. Cap altre procés pot comprometre la integritat. El mode WAL permet que els operadors reprodueixin gravacions mentre el sistema continua gravant, sense cap bloqueig.
 
-    Sobre H.265: mateixa qualitat visual, la meitat de bits. En termes pràctics: un gravador amb 1 TB gravant 4 càmeres passa de 10 dies de retenció a 20 dies sense ampliar el disc. Per a un client d'infraestructura crítica que necessita conservar 30 dies, la diferència és comprar un disc addicional o no.
+    Sobre H.265: mateixa qualitat visual, la meitat de bits. En termes pràctics: un gravador amb 1 TB passa de 10 dies de retenció a 20 dies sense ampliar el disc. Per a un client d'infraestructura crítica que necessita conservar 30 dies, la diferència és comprar un disc addicional o no.
   }
 \end{frame}
 
@@ -464,29 +428,20 @@ HTTP/1.1 206 Partial Content
 \end{frame}
 
 % ---  DIAPOSITIVA — Alarmes 2/3  ---
-\begin{frame}[fragile]{Alarmes \small\textit{2/3}}
+\begin{frame}{Alarmes \small\textit{2/3}}
   \begin{columns}[T]
     \begin{column}{0.46\textwidth}
-      \small\textbf{Event WebSocket en temps real:}
-      \vspace{0.3em}
-
-      \begin{lstlisting}[style=jsonbox]
-// wss://nvr/ws/alarms
-{
-  "type":      "alarm",
-  "id":        "a3f8c2d1",
-  "camera":    "cam_003",
-  "severity":  "high",
-  "event":     "motion_detected",
-  "timestamp": "2024-03-01T10:23:45Z"
-}
-      \end{lstlisting}
-
+      \small
+      \textbf{\texttt{la-core-alarm} — pipeline de 3 fils:}
+      \begin{enumerate}
+        \item \textbf{D-Bus}: escolta \texttt{ALARM\_NOTIFY} $\to$ cua \textit{thread-safe}.
+        \item \textbf{Persistència}: escriu via \textbf{gRPC} a \texttt{la-db-engine}.
+        \item \textbf{Emissió}: difon JSON a tots els clients via \textbf{WSS}.
+      \end{enumerate}
       \vspace{0.3em}
       \begin{itemize}
-        \item \textbf{Push immediat}: zero polling.
-        \item Un sol WebSocket per tots els events del sistema.
-        \item \textbf{Signals}: re-render únicament de la càmera afectada.
+        \item Fils \textbf{desacoblats}: si gRPC es bloqueja, el WebSocket no s'atura.
+        \item Frontend \textbf{mai fa polling}: tot és \textit{push}.
       \end{itemize}
     \end{column}
 
@@ -499,61 +454,71 @@ HTTP/1.1 206 Partial Content
   \end{columns}
 
   \note{
-    El protocol de comunicació d'alarmes és WebSocket sobre TLS —WSS—, una connexió persistent bidireccional. Un sol canal per tots els events del sistema.
+    El cor del sistema d'alarmes és el microservei la-core-alarm, escrit en C++ multithreading. El disseny clau és un pipeline de tres fils independents que es comuniquen exclusivament a través de cues thread-safe.
 
-    El missatge d'alarma és un JSON net: identificador únic, càmera origen, severitat i tipus d'event. Angular rep aquest missatge al servei d'alarmes, actualitza el Signal corresponent a la càmera, i Angular re-renderitza únicament el component de la càmera afectada. La resta de la UI ni s'immuta.
+    El fil de D-Bus manté una connexió bloquejant al bus del sistema escoltant passivament qualsevol senyal ALARM_NOTIFY de la interfície com.lanaccess.sysevents. Quan el maquinari dispara una alarma —un sensor de moviment, una entrada digital, una pèrdua de senyal—, aquest fil construeix una estructura AlarmData i la diposita a la cua global_alarm_queue sense processar-la.
 
-    El diagrama de la dreta mostra el flux complet: des del sensor fins a la base de dades i des d'allà fins a la notificació a la UI. La persistència és unidireccional: els events s'escriuen al SQLite via remote_vfs per garantir que cap alarma es perd en un tall elèctric.
+    El fil de persistència es desperta immediatament, agafa l'element de la cua i el desa a la base de dades via gRPC cap a la-db-engine. Quan la persistència confirma èxit, l'event passa a la global_emission_queue.
 
-    La clau arquitectònica és que el frontend mai fa polling. Tota la iniciativa ve del backend: quan hi ha un event, el servidor l'empeny. Quan no hi ha res, el socket roman silent. Zero CPU gestionant temporitzadors de polling al gravador.
+    El fil d'emissió agafa l'event de la cua i el difon en JSON a tots els clients WebSocket connectats en aquell moment.
+
+    El benefici del desacoblament és clau: si la base de dades va lenta o gRPC es bloqueja temporalment, el fil de D-Bus continua rebent senyals del maquinari i no es perd cap event. Si el WebSocket d'un client és lent, no bloqueja la persistència. Cada fil és independent.
+
+    Angular rep els events per WebSocket, actualitza un Signal per a la fila afectada, i re-renderitza únicament aquell component. La resta de la UI no es toca.
   }
 \end{frame}
 
 % ---  DIAPOSITIVA — Alarmes 3/3  ---
-\begin{frame}[fragile]{Alarmes \small\textit{3/3}}
+\begin{frame}{Alarmes \small\textit{3/3}}
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
-      \small\textbf{Backoff exponencial: protegir la CPU del NVR:}
-      \vspace{0.3em}
+      \small
+      \textbf{Resiliència — Reconnexió WebSocket:}
+      \begin{itemize}
+        \item \textbf{50 operadors} alhora $\to$ \textbf{backoff exponencial}: 1 s, 2 s, 4 s\ldots màx \textbf{30 s}.
+        \item Reconnexions escalonades: NVR no es satura.
+      \end{itemize}
 
-      \begin{lstlisting}[style=tsbox]
-reconnect(attempt: number): void {
-  const delay = Math.min(
-    BASE_DELAY * Math.pow(2, attempt),
-    MAX_DELAY  // cap a 30 s
-  );
-  setTimeout(() => this.connect(), delay);
-}
-// attempt 0 ->  1 s
-// attempt 1 ->  2 s
-// attempt 2 ->  4 s  ...
-// attempt 5 -> 30 s (maxim)
-      \end{lstlisting}
+      \vspace{0.4em}
+      \textbf{Persistència:}
+      \begin{itemize}
+        \item \texttt{la-core-alarm} $\xrightarrow{\text{gRPC}}$ \texttt{la-db-engine}.
+        \item \texttt{remote\_vfs} $\xrightarrow{\text{UDS}}$ \texttt{la-video-engine} (únic amb permisos).
+        \item Mode \textbf{WAL}: historial consultable mentre s'escriu.
+      \end{itemize}
     \end{column}
 
     \begin{column}{0.46\textwidth}
-      \vspace{0.8em}
+      \small
+      \textbf{Poda automàtica:}
       \begin{itemize}
-        \item \textbf{50 operadors} reconnectant alhora $\to$ CPU colapsa.
-        \item Backoff: reconnexions \textbf{escalonades} en el temps.
-        \item \textbf{$\leq$ 30 s}: garantit per requisit.
+        \item SQL \textbf{Trigger}: màxim \textbf{10.000 registres}.
+        \item Evita desgast del flaix del NVR (24/7).
       \end{itemize}
 
-      \vspace{0.8em}
-      \small\textbf{Persistència d'events:}
+      \vspace{0.4em}
+      \textbf{Assentiment (\textit{Ack}):}
       \begin{itemize}
-        \item \texttt{remote\_vfs} $\to$ \texttt{la-db-engine} (UDS).
-        \item Mode \textbf{WAL}: log d'alarmes sense bloquejar la UI.
-        \item Cap event perdut davant de \textbf{tall elèctric}.
+        \item Clic \textit{Ack} $\to$ \texttt{ALARM\_READ} al backend.
+        \item \texttt{ALARM\_READ\_SUCCESS} $\to$ \textbf{tots} els operadors sincronitzats.
       \end{itemize}
+
+      \vspace{0.4em}
+      \begin{exampleblock}{Garantia}
+        \small Cap alarma perduda. Tots els operadors sempre sincronitzats.
+      \end{exampleblock}
     \end{column}
   \end{columns}
 
   \note{
-    El backoff exponencial és un patró de resiliència fonamental en sistemes distribuïts. El problema: si un gravador es reinicia i té 50 operadors connectats, tots ells intentaran reconnectar-se en el mateix segon. El servidor rebrà 50 connexions simultànies just quan la CPU encara està arrencant serveis. Resultat: el servidor cau de nou.
+    Tres aspectes de robustesa que un tribunal pot preguntar.
 
-    La solució és que cada client esperi un temps creixent entre intents: 1s, 2s, 4s, fins a un màxim de 30 segments. No és arbitrari: el requisit especificava reconnexió en menys de 30 segments. El màxim del backoff és just per sota d'aquest límit. El codi usa setTimeout fora de Zone.js per no disparar cicles de detecció de canvis innecessaris mentre s'espera.
+    Primer: el backoff exponencial. Si el NVR es reinicia i té 50 operadors connectats, tots intentarien reconnectar en el mateix segon. El servidor rebria 50 connexions simultànies just quan la CPU encara arrenca serveis. El backoff escala el temps d'espera: 1s, 2s, 4s fins a 30s. No és arbitrari: el requisit fixava reconnexió en menys de 30 segments, i el màxim del backoff queda per sota d'aquest límit.
 
-    Per a la persistència: la-core-alarm escriu cada event d'alarma al SQLite via remote_vfs. L'accés va per Unix Domain Socket al la-db-engine, l'únic procés amb permisos d'escriptura al disc. El mode WAL és crític: permet que els operadors consultin el historial d'alarmes —lectures— mentre el sistema escriu nous events —escriptures— sense cap bloqueig. I l'alineació a 512 bytes garanteix que cap event queda a mig escriure en cas de tall elèctric: el log d'alarmes sempre és consistent.
+    Segon: la cadena de persistència. la-core-alarm no escriu directament al disc. Envia l'event per gRPC cap a la-db-engine. la-db-engine usa el driver remote_vfs, que intercepta tota operació d'I/O i la redirigeix per Unix Domain Socket cap a la-video-engine. la-video-engine és l'únic procés del sistema amb permisos d'escriptura al disc físic. El mode WAL permet que les lectures de l'historial no bloquegin les escriptures de nous events: operador consultant i sistema registrant, simultàniament.
+
+    Tercer: la poda automàtica. El gravador funciona 24/7. Sense límit, el volum d'alarmes creixeria indefinidament i desgastaria el flaix NAND/NOR. Un SQL Trigger automàtic s'executa després de cada inserció i elimina els registres més antics si se superen 10.000 entrades. Zero codi especial al backend: el motor de base de dades s'autogestiona.
+
+    Quant a l'Ack: quan l'operador confirma una alarma, el backend no tan sols la marca com a llegida per a ell. Envia ALARM_READ_SUCCESS a tots els operadors connectats. Si n'hi ha cinc davant de cinc pantalles, tots cinc veuen la fila actualitzada en temps real. Consistència multi-operador garantida.
   }
 \end{frame}

@@ -1,46 +1,47 @@
-\frametitle{Alarmes \small \textit {3/3}}
+\frametitle{Vídeo en Directe \small \textit {4/4}}
 \begin{columns}[T]
     \begin{column}{0.50\textwidth}
-      \small\textbf{Backoff exponencial: protegir la CPU del NVR:}
+      \small\textbf{Panel I/O: event \texttt{IO\_NOTIFY} via WebSocket:}
       \vspace{0.3em}
 
-      \begin{lstlisting}[style=tsbox]
-reconnect(attempt: number): void {
-  const delay = Math.min(
-    BASE_DELAY * Math.pow(2, attempt),
-    MAX_DELAY  // cap a 30 s
-  );
-  setTimeout(() => this.connect(), delay);
-}
-// attempt 0 ->  1 s
-// attempt 1 ->  2 s
-// attempt 2 ->  4 s  ...
-// attempt 5 -> 30 s (maxim)
-      \end{lstlisting}
+      \begin{lstlisting}[style=jsonbox]
+// Subscripcio en obrir el panel
+{ "call": "filter_update",
+  "topics": ["device/notification", "io"] }
+
+// Quan un sensor o rele canvia d'estat:
+{ "call": "IO_NOTIFY",
+  "payload": [{
+    "id":    "1",
+    "idr":   "RELAY_1",
+    "data":  "on",
+    "topic": "io/output"
+  }]
+} \end{lstlisting}
+
+      \begin{itemize}
+        \item Physicial inputs/outputs, virtual inputs/outputs.
+      \end{itemize}
     \end{column}
 
     \begin{column}{0.46\textwidth}
-      \vspace{0.8em}
-      \begin{itemize}
-        \item \textbf{50 operadors} reconnectant alhora $\to$ CPU colapsa.
-        \item Backoff: reconnexions \textbf{escalonades} en el temps.
-        \item \textbf{$\leq$ 30 s}: garantit per requisit.
-      \end{itemize}
-
-      \vspace{0.8em}
-      \small\textbf{Persistència d'events:}
-      \begin{itemize}
-        \item \texttt{remote\_vfs} $\to$ \texttt{la-db-engine} (UDS).
-        \item Mode \textbf{WAL}: log d'alarmes sense bloquejar la UI.
-        \item Cap event perdut davant de \textbf{tall elèctric}.
-      \end{itemize}
+      \vspace{0.5em}
+      \small\textbf{Flux del senyal:}
+      \begin{enumerate}
+        \item Sensor o relé canvia d'estat al \textbf{maquinari}.
+        \item \textbf{D-Bus} publica l'esdeveniment.
+        \item \textbf{\texttt{la-core-notifier}} el rep i el converteix a JSON.
+        \item WebSocket $\to$ Angular $\to$ \textbf{Signal} $\to$ actualitza únicament l'element afectat.
+      \end{enumerate}
     \end{column}
   \end{columns}
 
   \note{
-    El backoff exponencial és un patró de resiliència fonamental en sistemes distribuïts. El problema: si un gravador es reinicia i té 50 operadors connectats, tots ells intentaran reconnectar-se en el mateix segon. El servidor rebrà 50 connexions simultànies just quan la CPU encara està arrencant serveis. Resultat: el servidor cau de nou.
+    El panel lateral d'I/O és una funcionalitat que molts sistemes de vigilància no ofereixen: la capacitat de veure l'estat dels sensors físics i relés del gravador directament des de la interfície web, en temps real.
 
-    La solució és que cada client esperi un temps creixent entre intents: 1s, 2s, 4s, fins a un màxim de 30 segments. No és arbitrari: el requisit especificava reconnexió en menys de 30 segments. El màxim del backoff és just per sota d'aquest límit. El codi usa setTimeout fora de Zone.js per no disparar cicles de detecció de canvis innecessaris mentre s'espera.
+    Quan l'operador obre el panel, Angular envia un missatge de subscripció al WebSocket de la-core-notifier demanant els tòpics "device/notification" i "io". A partir d'aquest moment, qualsevol canvi d'estat elèctric al hardware del gravador —un sensor que s'activa, un relé que commuta— arriba al frontend en mil·lisegons.
 
-    Per a la persistència: la-core-alarm escriu cada event d'alarma al SQLite via remote_vfs. L'accés va per Unix Domain Socket al la-db-engine, l'únic procés amb permisos d'escriptura al disc. El mode WAL és crític: permet que els operadors consultin el historial d'alarmes —lectures— mentre el sistema escriu nous events —escriptures— sense cap bloqueig. I l'alineació a 512 bytes garanteix que cap event queda a mig escriure en cas de tall elèctric: el log d'alarmes sempre és consistent.
+    El flux és: el hardware publica l'event al D-Bus intern del sistema operatiu Linux del NVR. La-core-notifier, que és un microservei subscrit a aquest bus, rep el senyal, el serialitza a JSON amb l'ID del dispositiu, el seu nom de referència, l'estat i el tòpic, i l'envia per WebSocket a tots els clients connectats. Angular actualitza via Signal únicament l'element IoItem corresponent, sense re-renderitzar tot el panel.
+
+    Un punt important de l'arquitectura: la-core-notifier i la-core-alarm són dos microserveis separats amb rols distincts. La-core-notifier s'ocupa d'events de sistema —estat I/O, errors de maquinari com un disc desconnectat o pèrdua de senyal de vídeo— que no es persisten. La-core-alarm s'ocupa d'alarmes de seguretat que sí que es guarden a base de dades via gRPC cap a la-db-engine.
   }
