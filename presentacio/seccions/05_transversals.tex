@@ -26,8 +26,8 @@
     \begin{column}{0.40\textwidth}
       \textbf{Causes de la desviació (+45 h):}
       \begin{itemize}
-        \item H.265: SPS/PPS/VPS injection $\to$ \textbf{+25 h}.
-        \item Motor Schema-Driven $\to$ \textbf{+20 h}.
+        \item H.265 $\to$ \textbf{+25 h}.
+        \item Sistema de configuració $\to$ \textbf{+20 h}.
       \end{itemize}
 
       \vspace{0.5em}
@@ -68,7 +68,7 @@
       \end{tabular}
     \end{column}
 
-    \begin{column}{0.40\textwidth}
+    \begin{column}{0.30\textwidth}
       \begin{exampleblock}{\centering Estalvi net}
         \centering \textbf{358,75 \euro} sota pressupost $\cdot$ contingència 76\% usada.
       \end{exampleblock}
@@ -97,9 +97,9 @@
     \begin{column}{0.3\textwidth}
       \begin{block}{Ambiental}
         \begin{itemize}
-          \item[\small$\bullet$] 35\% menys CPU $\to$ menys consum elèctric.
-          \item[\small$\bullet$] Gestió remota $\to$ menys desplaçaments de tècnics.
-          \item[\small$\bullet$] Hardware existent reutilitzat.
+          \item[\small$\bullet$] \textbf{35\% menys CPU} al terminal $\to$ menys consum energètic.
+          \item[\small$\bullet$] Gestió remota $\to$ menys desplaçaments $\to$ menys petjada de carboni.
+          \item[\small$\bullet$] Vida útil del hardware del client \textbf{allargada}.
         \end{itemize}
       \end{block}
     \end{column}
@@ -107,9 +107,9 @@
     \begin{column}{0.3\textwidth}
       \begin{block}{Social}
         \begin{itemize}
-          \item[\small$\bullet$] UI clara redueix estrès en torns 24/7.
-          \item[\small$\bullet$] Accessibilitat multiplataforma (Linux, Mac).
-          \item[\small$\bullet$] Privadesa per disseny (RGPD).
+          \item[\small$\bullet$] Redueix \textbf{càrrega cognitiva} i fatiga visual en torns.
+          \item[\small$\bullet$] Accessibilitat multiplataforma i multinavegador.
+          \item[\small$\bullet$] Decisions de seguretat sempre amb \textbf{judici humà}.
         \end{itemize}
       \end{block}
     \end{column}
@@ -117,9 +117,9 @@
     \begin{column}{0.3\textwidth}
       \begin{block}{Econòmica}
         \begin{itemize}
-          \item[\small$\bullet$] Schema-driven: zero cost per nou firmware.
-          \item[\small$\bullet$] PWA futura: diagnòstic offline en mòbils.
-          \item[\small$\bullet$] Vida útil prolongada del producte NXT.
+          \item[\small$\bullet$] \textbf{Schema-driven}: zero cost d'enginyeria per nou firmware.
+          \item[\small$\bullet$] Model \textit{single-NVR}: democratitza l'accés a \textbf{PIMEs}.
+          \item[\small$\bullet$] Vida útil prolongada del producte \textbf{NXT}.
         \end{itemize}
       \end{block}
     \end{column}
@@ -127,16 +127,18 @@
 
   \vspace{0.5em}
   \begin{center}
-    \textit{Zero biomètrica $\cdot$ Decisió humana sempre $\cdot$ Imatge mai fora de la xarxa local.}
+    \textit{Zero biomètrica $\cdot$ Esborrat RGPD als 30 dies $\cdot$ Audit Log $\cdot$ Imatge mai fora de la xarxa local.}
   \end{center}
 
   \note{
-    Analitzem les tres dimensions de sostenibilitat.
+    Analitzem les tres dimensions de sostenibilitat, tot basant-nos en dades mesurades del projecte.
 
-    Des del punt de vista ambiental, la reducció de CPU del 35\% té un impacte directe en el consum energètic dels terminals de vigilància que funcionen 24 hores al dia, 7 dies a la setmana. A escala de flota, la suma és significativa. A més, el sistema de gestió remota permet als tècnics fer moltes tasques de manteniment sense desplaçar-se físicament fins a la instal·lació.
+    Ambiental. La reducció del 35\% de CPU és una dada real, mesurada en un terminal Intel Core i3-8100T sota Windows 10 IoT, que és el perfil de màquina típica en una sala de control. Terminals que funcionen 24/7: la reducció de cicles de CPU es tradueix directament en menys watts consumits i menys calor generada. A escala d'una flota de terminals, l'impacte és significatiu. A més, el sistema de gestió remota permet als tècnics resoldre moltes incidències sense desplaçar-se físicament a la instal·lació del client.
 
-    Des del punt de vista social, la interfície moderna i accessible millora les condicions de treball dels operadors de seguretat que passen hores davant d'una pantalla. I la compatibilitat multiplataforma permet que professionals que treballen en Mac o Linux tinguin accés complet al sistema, que abans era exclusivament Windows.
+    Social. Abans, l'operador havia d'aguantar una interfície d'ActiveX dels anys 90. Ara té una SPA reactiva amb Signals: la pantalla s'actualitza exactament on canvia alguna cosa, sense parpadejos ni refrescs globals. Això redueix la càrrega cognitiva i la fatiga visual en situacions d'incident crític. I per primera vegada, tècnics en Mac o Linux poden accedir al sistema sense cap plugin.
 
-    Des del punt de vista ètic i de privadesa: el sistema compleix el RGPD per disseny. Les imatges mai surten de la xarxa local del client. No es guarda informació biomètrica. I totes les decisions de seguretat ---arxivar una alarma, bloquejar un accés--- les pren sempre una persona.
+    Econòmica. L'impacte més gran és el motor Schema-driven: quan el firmware afegeix un nou paràmetre, el frontend l'incorpora automàticament sense una sola línia de codi nou. Això elimina una font constant de deute tècnic i accelera el time-to-market. El model single-NVR, sense dependència de servidors externs ni llicències de núvol, democratitza l'accés a sistemes de vigilància professionals per a petites i mitjanes empreses.
+
+    Ètiques. La diapositiva tanca amb les quatre garanties ètiques del sistema: zero dades biomètriques emmagatzemades al terminal; esborrat automàtic de gravacions als 30 dies complint el RGPD; totes les accions queden registrades en un Audit Log auditable; i les imatges mai surten de la xarxa local del client.
   }
 \end{frame}

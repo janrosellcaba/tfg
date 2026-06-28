@@ -3,81 +3,58 @@
 % BLOC 5: DEMOSTRACIÓ  (diapositiva 14)
 % ============================================================
 
-% ---  DIAPOSITIVA 13 — Validació: Latència, Rendiment i Usabilitat (merged)  ---
+% ---  DIAPOSITIVA — Validació  ---
 \begin{frame}{Validació}
+  \vspace{0.5em}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \renewcommand{\arraystretch}{1.35}
-      \begin{tabular}{lcc}
-        \toprule
-        \textbf{Protocol} & \textbf{Latència} & \textbf{RNF} \\
-        \midrule
-        ActiveX + RTSP (legacy) & 800--2000 ms & --- \\
-        \textbf{WebRTC / WHEP} & \textbf{150--300 ms} & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
-        HLS (fallback/gravacions) & 2--5 s & \textcolor{accentgreen!70!black}{\textbf{$\checkmark$}} \\
-        \bottomrule
-      \end{tabular}
-
-      \vspace{0.5em}
+    \begin{column}{0.48\textwidth}
+      \textbf{Cicle de desplegament:}
       \begin{itemize}
-        \small
-        \item \textbf{35\% menys CPU} $\cdot$ 2 h: zero fuites $\cdot$ RAM 45--65 MB.
-        \item \textbf{25 connexions concurrents} validades.
+        \item \texttt{ng build} $\to$ compila l'aplicació.
+        \item Un script $\to$ carrega la web al NVR en xarxa local.
+        \item Actualització de firmware $\to$ actualitza els serveis del backend.
+      \end{itemize}
+
+      \vspace{0.9em}
+      \textbf{Proves en camp real:}
+      \begin{itemize}
+        \item Diverses unitats NVR enviades a \textbf{Mèxic}.
+        \item Feedback dels instal·ladors $\to$ millores iteratives.
+        \item Equip de Lanaccess provant l'eina des del primer dia.
       \end{itemize}
     \end{column}
 
-    \begin{column}{0.46\textwidth}
-      \begin{exampleblock}{\centering SUS: \textbf{85.6 / 100} --- Excel·lent}
-        \small 8 participants reals. Benchmark: $>80=$ Bo.\\[0.2em]
-        \textbf{40\% menys temps} en actualització firmware.
-      \end{exampleblock}
-
-      \vspace{0.4em}
-      \begin{exampleblock}{\centering Altres validacions}
-        \small Zero corrupció VFS en talls elèctrics simulats $\cdot$ WS reconnecta $\leq$ 30 s
-      \end{exampleblock}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Resultat}
+        \begin{itemize}
+          \item Sistema en \textbf{producció} a Lanaccess.
+          \item Validat per tècnics i operadors reals.
+          \item Feedback incorporat en cicles curts.
+        \end{itemize}
+      \end{block}
     \end{column}
   \end{columns}
 
   \note{
-    Els resultats de latència superen les expectatives. Amb WebRTC en xarxa local, hem obtingut entre 150 i 300 mil·lisegons. L'antiga plataforma ActiveX basada en RTSP oscil·lava entre 800 ms i 2 segments. Els rangs no se solapen: el pitjor cas de WebRTC és millor que el millor cas d'ActiveX. El requisit RNF-01 és complert amb marge.
+    La validació d'aquest projecte no ha estat un procés formal de laboratori: ha estat la posada en producció real.
 
-    En termes de CPU, la migració a Signals ha donat una reducció del 35\% de consum computacional al navegador. I en el test de streaming WebRTC de dues hores, no s'han detectat fuites de memòria.
+    El cicle de treball era directe. Amb ng build compilava l'aplicació Angular. Un script de desplegament copiava el bundle al directori del NVR a través de la xarxa local. Qualsevol actualització de firmware renovava els microserveis del backend. Amb dos comandaments tenia el sistema actualitzat i llest per provar.
 
-    Per a la usabilitat, vam aplicar el System Usability Scale amb 8 participants reals de Lanaccess. Hem obtingut 85.6 sobre 100, categoria Excel·lent. Destaca la dada dels firmwares: els tècnics van ser capaços d'actualitzar el firmware en un 40\% menys de temps que amb la plataforma legacy.
+    La validació en camp és el que dóna solidesa al projecte. Diverses unitats NVR s'han enviat a instal·ladors a Mèxic que treballaven en entorns reals: xarxes corporatives, condicions de maquinari diverses, casos d'ús que a l'oficina no s'havien contemplat. El feedback que retornaven —un paràmetre que no es mostrava bé, un flux que no era intuïtiu, un comportament inesperat en un tipus de càmera específic— s'incorporava en el cicle de desenvolupament següent.
 
-    En resum: tots els requisits no funcionals estan validats amb dades.
+    Paral·lelament, tot l'equip tècnic de Lanaccess ha estat provant l'eina des del primer dia: tècnics d'instal·lació, operadors de seguretat, el propi director del projecte. Això ha generat un feedback constant i diversificat que ha anat polint tant la UX com la robustesa del sistema.
+
+    El resultat és que el sistema que es presenta avui no és un prototip: és una eina en producció, validada per usuaris reals en entorns reals.
   }
 \end{frame}
 
 % ---  DIAPOSITIVA 14 — Demostració en Directe  ---
-\begin{frame}{Demo}
-  \vspace{0.4em}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Seqüència (5 minuts)}
-      \begin{enumerate}
-        \item \textbf{Login}: cookie HttpOnly, zero LocalStorage.
-        \item \textbf{Mosaic WebRTC}: 4 càmeres, latència $<$ 300 ms.
-        \item \textbf{Timeline HLS}: cerca en gravacions passades.
-        \item \textbf{Alarma push}: sensor salta $\to$ UI en $<$ 1 s, dos navegadors simultanis.
-        \item \textbf{Configuració Schema-Driven}: formulari auto-generat des del JSON.
-      \end{enumerate}
-    \end{column}
-
-    \begin{column}{0.44\textwidth}
-      \begin{exampleblock}{Entorn real}
-        \centering
-        NVR NXT en xarxa local $\cdot$ zero Internet.\\[0.3em]
-        \texttt{https://\textit{<ip-nvr>}/}
-      \end{exampleblock}
-
-      \vspace{0.5em}
-      \begin{block}{Pla B}
-        \small Screenshots de cada pas preparats si cau la connexió.
-      \end{block}
-    \end{column}
-  \end{columns}
+\begin{frame}[plain]
+  \begin{center}
+    \vspace{2.5cm}
+    {\Huge\bfseries\textcolor{upcblue}{Demo}}\\[1em]
+    {\large\textcolor{gray}{Videogravador NXT · xarxa local}}
+  \end{center}
 
   \note{
     DEMO EN DIRECTE --- Preparació prèvia (fer ABANS d'iniciar la presentació):
