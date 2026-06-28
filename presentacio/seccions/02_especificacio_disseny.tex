@@ -49,52 +49,47 @@
   }
 \end{frame}
 
-% ---  DIAPOSITIVA 6 — Requisits Crítics: Rendiment i Seguretat (merged)  ---
+% ---  DIAPOSITIVA 6 — Requisits per Actor (humà)  ---
 \begin{frame}{Requisits}
 
-  % Fila de mètriques clau
-  \begin{center}
-    \begin{tikzpicture}
-      \node[fill=accentgreen!15, draw=accentgreen!50, rounded corners=4pt,
-            minimum width=2.6cm, minimum height=1.1cm, align=center] at (0,0)
-        {{\large\bfseries\textcolor{accentgreen!70!black}{$<$300 ms}}\\[1pt]\scriptsize Latència WebRTC};
-      \node[fill=accentgreen!15, draw=accentgreen!50, rounded corners=4pt,
-            minimum width=2.6cm, minimum height=1.1cm, align=center] at (3.2,0)
-        {{\large\bfseries\textcolor{accentgreen!70!black}{$\leq$5 s}}\\[1pt]\scriptsize Fallback HLS/UDP};
-      \node[fill=upclight, draw=upcblue!40, rounded corners=4pt,
-            minimum width=2.6cm, minimum height=1.1cm, align=center] at (6.4,0)
-        {{\large\bfseries\textcolor{upcblue}{$\leq$30 s}}\\[1pt]\scriptsize Reconnexió WS};
-      \node[fill=upclight, draw=upcblue!40, rounded corners=4pt,
-            minimum width=2.6cm, minimum height=1.1cm, align=center] at (9.6,0)
-        {{\large\bfseries\textcolor{upcblue}{120 s}}\\[1pt]\scriptsize Config Lock};
-    \end{tikzpicture}
-  \end{center}
-
-  \vspace{0.5em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Arquitectura}
-      \begin{itemize}
-        \item \textbf{Zero polling}: arquitectura push event-driven (WebSocket).
-        \item SPA Angular: CPU al navegador, no al gravador.
-      \end{itemize}
+      \begin{block}{Administrador}
+        \begin{itemize}
+          \item[\small$\bullet$] Mantenir el dispositiu operatiu \textbf{sense desplaçar-se} al client
+          \item[\small$\bullet$] Nous paràmetres al \textit{firmware} $\rightarrow$ visibles a la web \textbf{sense recompilar}
+          \item[\small$\bullet$] Evitar que dos admins \textbf{sobreescriguin} la configuració alhora
+          \item[\small$\bullet$] Controlar accés, auditar accions i complir la normativa vigent
+        \end{itemize}
+      \end{block}
     \end{column}
+
     \begin{column}{0.48\textwidth}
-      \textbf{Seguretat — OWASP Top 10}
-      \begin{itemize}
-        \item \textbf{Zero LocalStorage}: cookies HttpOnly + SameSite=Strict.
-        \item TLS 1.2/1.3 · WSS · SRTP (WebRTC extrem a extrem).
-        \item Criteri d'acceptació \textbf{formal}.
-      \end{itemize}
+      \begin{block}{Operador}
+        \begin{itemize}
+          \item[\small$\bullet$] Visió global en temps real: \textbf{fins a 4 càmeres} simultànies
+          \item[\small$\bullet$] Investigar qualsevol incident passat amb \textbf{precisió temporal}
+          \item[\small$\bullet$] Rebre alertes de seguretat \textbf{a l'instant}, sense refrescar
+          \item[\small$\bullet$] Sessió contínua durant torns llargs \textbf{sense caducitat forçada}
+        \end{itemize}
+      \end{block}
     \end{column}
   \end{columns}
 
+  \vspace{0.6em}
+  \begin{center}
+    \small\textit{Extrets en sessions iteratives amb l'equip d'Embedded i anàlisi del sistema \textit{legacy} (ActiveX).
+    Formalitzats amb la plantilla VOLERE.}
+  \end{center}
+
   \note{
-    Traduïm l'objectiu de negoci en requisits mesurables. El més crític és el de latència: en una sala de control de seguretat, si el vídeo va amb 2 segments de retard, una intrusió pot passar desapercebuda. Per això vam fixar 300 ms com a límit dur.
+    Veiem ara el que cada persona necessita, més enllà del que fa. L'Administrador té una necessitat crítica que no és òbvia: quan l'equip d'Embedded afegeix nous paràmetres al firmware, no pot crear una tasca de frontend per a cada canvi. Necessita que la interfície s'adapti sola. Aquesta és la necessitat que va donar origen a tota la decisió d'arquitectura schema-driven.
 
-    Per cobrir les xarxes corporatives que bloquejen UDP, vam especificar un fallback automàtic a HLS en menys de 5 segments.
+    L'Administrador també necessita que dos admins no puguin sobreescriure's la configuració alhora — en instal·lacions amb múltiples tècnics connectats simultàniament, sense cap control d'accés concurrent, les escriptures conflictives podrien corrompre el dispositiu.
 
-    En seguretat, la decisió més important va ser no emmagatzemar mai credencials al LocalStorage del navegador. En el seu lloc, cookies HttpOnly, que el navegador envia automàticament però que cap JavaScript pot llegir. I el compliment de l'OWASP Top 10 no era un objectiu aspiracional: era un criteri d'acceptació formal del projecte.
+    L'Operador té un perfil completament diferent: és el vigilant de seguretat que porta torns llargs davant de les càmeres. Necessita veure fins a quatre càmeres a la vegada per tenir visió global. Necessita poder investigar un incident passat anant directament al segon exacte, no navegar per hores de vídeo. Necessita que les alarmes arribin al moment — no quan refresqui la pàgina. I necessita que la sessió no caduqui mentre treballa, perquè un timeout forçat podria fer que perdés un event crític.
+
+    Tots aquests requisits es van extreure en sessions iteratives amb l'equip d'Embedded i analitzant les limitacions del sistema legacy basat en ActiveX. Cada requisit no funcional s'ha formalitzat amb la plantilla VOLERE: descripció, justificació i criteri d'acceptació mesurable.
   }
 \end{frame}
 
