@@ -80,6 +80,26 @@
 \usepackage{pgfpages}
 \usepackage{tikz}
 \usepackage{eurosym}
+\usepackage{listings}
+\lstdefinelanguage{jsonbeamer}{%
+  morestring=[b]",%
+  showstringspaces=false,%
+}
+\lstdefinestyle{jsonbox}{%
+  language=jsonbeamer,%
+  basicstyle=\tiny\ttfamily,%
+  stringstyle=\color{upcblue!75!black},%
+  backgroundcolor=\color{gray!8},%
+  frame=single,%
+  framerule=0.5pt,%
+  rulecolor=\color{gray!35},%
+  showstringspaces=false,%
+  columns=flexible,%
+  keepspaces=true,%
+  breaklines=true,%
+  aboveskip=3pt,%
+  belowskip=3pt,%
+}
 
 % Logos: únicament a la portada i a l'última diapositiva (via \begin{frame}[plain])
 

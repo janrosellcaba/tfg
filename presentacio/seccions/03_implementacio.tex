@@ -3,43 +3,140 @@
 % Cada slide: pàgina real de l'aplicació + explicació sota el capó
 % ============================================================
 
-% ---  DIAPOSITIVA — Pàgina de Configuració  ---
-\begin{frame}{Configuració de Sistema}
+% ---  DIAPOSITIVA — Configuració de Sistema  ---
+\begin{frame}{Configuració de Sistema \small\textit{1/3}}
   \begin{columns}[T]
-    \begin{column}{0.45\textwidth}
-      \begin{block}{Motor Schema-Driven}
-        \small Backend: \texttt{\_type}, \texttt{\_allowedValues} $\to$ Angular \textbf{auto-genera} formulari.\\[0.1em]
-        Nou firmware $\Rightarrow$ \textbf{zero canvis al frontend}.
-      \end{block}
+    \begin{column}{0.58\textwidth}
+      \begin{center}
+        \includegraphics[width=\textwidth, height=0.74\textheight, keepaspectratio]{../figures/interficies/config1.png}
+      \end{center}
+    \end{column}
+
+    \begin{column}{0.38\textwidth}
+      \vspace{0.8em}
+      \small El backend envia \textbf{metadades}, no formularis.
+
+      \vspace{0.7em}
+      $\Rightarrow$ \texttt{ConfigInputComponent} renderitza \textbf{automàticament}.
+
+      \vspace{0.7em}
+      \begin{itemize}
+        \item \textbf{10 tipus} de camp $\cdot$ 100\% de la config coberta.
+        \item Nou firmware $\Rightarrow$ \textbf{zero canvis} al frontend.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \note{
+    La pantalla que veieu és la configuració d'una càmera IP. L'operador veu un formulari ben estructurat amb checkboxes, desplegables i camps de text. El que és sorprenent és com s'ha construït: Angular no té cap formulari definit al codi. No hi ha cap plantilla HTML que descrigui quins camps han d'existir.
+
+    Quan l'operador obre la configuració, Angular fa un GET al backend i rep un arbre JSON ple de metadades. Cada camp porta un \_type. El component ConfigInputComponent llegeix aquest \_type i renderitza l'element HTML correcte automàticament.
+
+    Hi ha 10 tipus que cobreixen el 100\% de la configuració. L'impacte directe: un NVR amb 20 paràmetres nous en el pròxim firmware és zero canvis al frontend. Zero PR. Zero deploy. El gravador és l'única font de veritat.
+  }
+\end{frame}
+
+% ---  DIAPOSITIVA — Schema JSON  ---
+\begin{frame}[fragile]{Configuració de Sistema \small\textit{2/3}}
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \begin{lstlisting}[style=jsonbox]
+{
+ "config.video.cam": {
+  "{camId}": {
+   "_rule": {
+    "indexFrom": 0, "indexTo": 151,
+    "padding": 3, "fixed": true
+   },
+   "base": {
+    "disabled": {
+     "_type": "boolean",
+     "_default": "false"
+    },
+    "ipcamera": {
+     "class": {
+      "_type": "list",
+      "_default": "ONVIF",
+      "_allowedValues": [
+       "VIVOTEK","ONVIF","RTSP"
+      ]
+     }, ...
+      \end{lstlisting}
+    \end{column}
+
+    \begin{column}{0.49\textwidth}
+      \begin{lstlisting}[style=jsonbox]
+     "connection": {
+      "address": {
+       "_type": "ipaddr",
+       "_default": "0.0.0.0"
+      },
+      "port": { "config": {
+       "_type": "numeric",
+       "_default": 80,
+       "_minValue": 1,
+       "_maxValue": 65535
+      }}
+     },
+     "account": {
+      "password": {
+       "_type": "password",
+       "_maxLength": 24,
+       "_policyLevel": 0
+      }
+     }
+    }}}}}
+      \end{lstlisting}
+    \end{column}
+  \end{columns}
+
+  \note{
+    Aquí veiem el schema real que envia el backend. La clau arrel és el node de configuració: config.video.cam. La clau \{camId\} és dinàmica: el backend substitueix el patró per cada índex de càmera, del 0 al 151, definit per \_rule. Això indexa tots els camps sense duplicar la definició.
+
+    Fixeu-vos en els cinc tipus que apareixen aquí. disabled és boolean: renderitza un checkbox. class és list: renderitza un select amb exactament les opcions d'\_allowedValues, sense cap codi addicional. address és ipaddr: un input amb validació regex d'IP. port és numeric, amb \_minValue i \_maxValue que Angular trasllada directament als atributs HTML5 min i max. I password és un input de tipus password amb restriccions de longitud i política de seguretat.
+
+    Cap d'aquesta lògica és codi Angular específic per a càmeres. És declaració pura: el schema diu QUÈ és cada camp, el ConfigInputComponent sap COM renderitzar-ho. Cinc tipus aquí, deu en total, cobrint el 100\% del sistema.
+  }
+\end{frame}
+
+% ---  DIAPOSITIVA — Config Lock Pessimista  ---
+\begin{frame}[fragile]{Configuració de Sistema \small\textit{3/3}}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \small\textbf{POST /lock $\to$ token d'escriptura exclusiva:}
+      \vspace{0.3em}
+
+      \begin{lstlisting}[style=jsonbox]
+{
+  "path":      "config",
+  "token":     "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+  "expiresIn": 60,
+  "seed":      "8b9f27cda0134e7f8a9bcdef01234567"
+}\end{lstlisting}
 
       \vspace{0.4em}
       \begin{itemize}
-        \item \texttt{ipaddr}, \texttt{list}, \texttt{integer}\ldots \textbf{10 tipus}.
-        \item 100\% de la config coberta.
+        \item Token: injectat per \textbf{interceptor}.
+        \item Renovació cada \texttt{expiresIn/2} segons.
+        \item Sessió concurrent: \textbf{HTTP 423} $\to$ mode lectura.
+        \item Sortir: expira i s'allibera sol.
       \end{itemize}
-
-      \vspace{0.4em}
-      \begin{alertblock}{Config Lock Pessimista}
-        \small \textbf{POST /lock} $\to$ token $\cdot$ expira \textbf{60--120 s}.\\
-        Concurrents: \textbf{HTTP 423 Locked}.
-      \end{alertblock}
     \end{column}
 
-    \begin{column}{0.5\textwidth}
+    \begin{column}{0.50\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth, keepaspectratio]{../figures/interficies/config1.png}
+        \vspace{-2cm}
+        \includegraphics[width=\textwidth, height=1\textheight, keepaspectratio]{../figures/diagrames/seq_config_lock.png}
       \end{center}
     \end{column}
   \end{columns}
 
   \note{
-    El formulari que l'usuari veu és 100\% generat automàticament. Cap enginyer de frontend ha escrit cap camp de configuració.
+    La concurrència és un problema real: un tècnic de camp i un administrador poden obrir la configuració simultàniament i sobreescriure els canvis de l'altre. El Pessimistic Lock ho elimina completament.
 
-    El motor Schema-Driven funciona així: el backend no envia només dades, envia metadades. Cada camp porta el tipus, els valors permesos, els límits. Angular llegeix l'esquema i renderitza el formulari complet. Un camp de tipus ipaddr genera un input amb regex de validació IP. Un camp de tipus list genera un select amb exactament les opcions permeses. Un integer genera un input numèric amb rang ja configurat. El motor té 10 tipus de camp que cobreixen el 100\% de la configuració.
+    En entrar a configuració, Angular fa automàticament POST a /lock. El servidor retorna un token de 32 caràcters i un temps de vida: 60 o 120 segons depenent del node. A partir d'aquí, tot PUT a /config.* porta el token: no ho fa el component ni el servei, sinó un interceptor HTTP global transparent. Cap component sap de la seva existència.
 
-    L'impacte empresarial és directe: un nou model de NVR amb 20 paràmetres nous → zero canvis al frontend. Zero PR, zero deploy.
-
-    El Config Lock pessimista resol el problema de concurrència. Quan un tècnic entra a configurar, fa POST a /lock i obté un token de 32 caràcters hexadecimals. Tota escriptura posterior ha d'incloure'l. Si tanca el portàtil, el lock expira en 60-120 segments sol. Altres usuaris reben HTTP 423 i resten en mode lectura automàticament.
+    La renovació és cada expiresIn/2 fora de Zone.js per no disparar cicles de detecció de canvis innecessaris. Si un segon operador intenta adquirir el lock: HTTP 423 Locked, i el frontend el posa automàticament en mode lectura via un Signal. Si el tècnic tanca l'ordinador, el lock expira sol i es lliura sense cap intervenció manual.
   }
 \end{frame}
 
@@ -134,4 +231,3 @@
     Per a la persistència: el driver VFS personalitzat remote\_vfs redirigeix totes les operacions d'SQLite a través d'un Unix Domain Socket cap al la-db-engine, l'únic procés amb permisos d'escriptura al disc. Les escriptures s'alineen a sectors de 512 bytes per garantir atomicitat davant de talls de corrent sobtats. El mode WAL ofereix garanties ACID completes, verificades en simulacions de tall elèctric forçat.
   }
 \end{frame}
-
