@@ -100,6 +100,30 @@
   aboveskip=3pt,%
   belowskip=3pt,%
 }
+\lstdefinelanguage{tsbeamer}{%
+  morekeywords={export,interface,Signal,Promise,void,string,null,const,let,return,async,await,extends,implements},%
+  morestring=[b]",%
+  morestring=[b]',%
+  morecomment=[l]{//},%
+  showstringspaces=false,%
+}
+\lstdefinestyle{tsbox}{%
+  language=tsbeamer,%
+  basicstyle=\tiny\ttfamily,%
+  keywordstyle=\color{upcblue}\bfseries,%
+  stringstyle=\color{accentgreen!55!black},%
+  commentstyle=\color{gray!65}\itshape,%
+  backgroundcolor=\color{gray!8},%
+  frame=single,%
+  framerule=0.5pt,%
+  rulecolor=\color{gray!35},%
+  showstringspaces=false,%
+  columns=flexible,%
+  keepspaces=true,%
+  breaklines=true,%
+  aboveskip=3pt,%
+  belowskip=3pt,%
+}
 
 % Logos: únicament a la portada i a l'última diapositiva (via \begin{frame}[plain])
 
