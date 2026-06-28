@@ -60,8 +60,7 @@
       "_allowedValues": [
        "VIVOTEK","ONVIF","RTSP"
       ]
-     }, ...
-      \end{lstlisting}
+     }, ... \end{lstlisting}
     \end{column}
 
     \begin{column}{0.49\textwidth}
@@ -85,8 +84,7 @@
        "_policyLevel": 0
       }
      }
-    }}}}}
-      \end{lstlisting}
+    }}}}} \end{lstlisting}
     \end{column}
   \end{columns}
 
@@ -141,7 +139,7 @@
 \end{frame}
 
 % ---  DIAPOSITIVA — Vídeo en Directe 1/3  ---
-\begin{frame}{Vídeo en Directe \small\textit{1/3}}
+\begin{frame}{Vídeo en Directe \small\textit{1/4}}
   \begin{columns}[T]
     \begin{column}{0.58\textwidth}
       \begin{center}
@@ -151,13 +149,12 @@
 
     \begin{column}{0.38\textwidth}
       \vspace{0.8em}
-      \small Protocol estàndard obert: \textbf{WHEP} (RFC~9716).
-
-      \vspace{0.7em}
       \begin{itemize}
-        \item Latència \textbf{150--300 ms} vs 800--2000 ms (ActiveX).
-        \item Fallback \textbf{HLS} automàtic si UDP bloquejat.
-        \item Signals: re-render selectiu $\to$ \textbf{35\% menys CPU}.
+        \item \textbf{WebRTC}.
+        \item Fallback \textbf{HLS}.
+        \item Panel lateral: sensors i relés en \textbf{temps real}.
+        \item Angular Signals: re-render selectiu $\to$ \textbf{35\% menys CPU}.
+        \item Fins a \textbf{4} càmeres simultànees.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -165,47 +162,32 @@
   \note{
     La pàgina de vídeo en directe és la més crítica del sistema: és on l'operador de seguretat passa la majoria del temps. Veieu un mosaic de càmeres amb drag-and-drop: l'operador arrossega una càmera del panell esquerre cap a qualsevol cel·la del mosaic.
 
-    El salt tecnològic respecte a la plataforma anterior és radical. L'ActiveX requeria Internet Explorer 11 i tenia latències de 800 ms a 2 segons. Ara usem WebRTC amb el protocol WHEP, un estàndard obert de l'IETF que estableix connexions de vídeo amb una latència de 150 a 300 mil·lisegons. Els rangs no se solapen: el pitjor cas de WebRTC és millor que el millor cas d'ActiveX.
+    Per al vídeo usem WebRTC, un estàndard obert del W3C que estableix connexions de vídeo directes entre el gravador i el navegador, sense cap plugin. Tot funciona des del Chrome, Firefox o Safari nadiu.
 
-    Si la xarxa corporativa bloqueja UDP, el sistema commuta automàticament a HLS en menys de 5 segons, sense que l'operador vegi cap error. I gràcies als Angular Signals, quan arriba un frame de la càmera 3, s'actualitza únicament aquella cel·la. Resultat mesurat: 35\% menys CPU en un Intel i3-8100T.
+    Si la xarxa corporativa bloqueja UDP —que és el transport natural de WebRTC—, el sistema commuta automàticament a HLS, que va per TCP sobre el port 443 de NGINX, sempre disponible. L'operador no veu cap error.
+
+    A la dreta de la vista de càmeres hi ha un panel lateral que mostra l'estat de les entrades i sortides físiques del gravador —sensors i relés— en temps real, que veurem amb detall a la propera diapositiva.
+
+    I gràcies als Angular Signals, quan canvia l'estat d'una càmera, s'actualitza únicament aquella cel·la del mosaic. Resultat mesurat: 35\% menys CPU en un Intel i3-8100T amb 4 càmeres en continu.
   }
 \end{frame}
 
-% ---  DIAPOSITIVA — Vídeo en Directe 2/3  ---
-\begin{frame}[fragile]{Vídeo en Directe \small\textit{2/3}}
+% ---  DIAPOSITIVA — Vídeo en Directe 2/4  ---
+\begin{frame}{Vídeo en Directe \small\textit{2/4}}
   \begin{columns}[T]
-    \begin{column}{0.46\textwidth}
-      \small\textbf{GStreamer $\to$ MediaMTX $\to$ WHEP $\to$ Browser:}
-      \vspace{0.3em}
-
-      \begin{lstlisting}[style=jsonbox]
-POST /stream/cam1/whep HTTP/1.1
-Content-Type: application/sdp
-
-v=0
-m=video 9 UDP/TLS/RTP/SAVPF 96
-a=rtpmap:96 H264/90000
-a=setup:actpass
-
-HTTP/1.1 201 Created
-Location: /stream/cam1/whep/session/1
-
-a=setup:passive
-a=candidate:1 1 udp 2130706431
-  192.168.1.100 60000 typ host
-      \end{lstlisting}
-
-      \vspace{0.3em}
+    \begin{column}{0.38\textwidth}
+      \vspace{1.5em}
       \begin{itemize}
-        \item ICE $\to$ DTLS handshake $\to$ \textbf{SRTP} (UDP).
-        \item \textbf{Una} sola crida HTTP per negociar la sessió.
+        \item Negociació: \textbf{SDP offer/answer}.
+        \item Xifrat: \textbf{DTLS} $\to$ \textbf{SRTP}.
+        \item UDP bloquejat $\to$ fallback \textbf{HLS/443}.
       \end{itemize}
     \end{column}
 
-    \begin{column}{0.50\textwidth}
+    \begin{column}{0.59\textwidth}
       \begin{center}
-        \vspace{-0.4cm}
-        \includegraphics[width=\textwidth, height=0.84\textheight, keepaspectratio]{../figures/diagrames/activity_video_connection.png}
+        \vspace{-2cm}
+        \includegraphics[width=\textwidth, height=1\textheight, keepaspectratio]{../figures/diagrames/activity_video_connection.png}
       \end{center}
     \end{column}
   \end{columns}
@@ -220,7 +202,7 @@ a=candidate:1 1 udp 2130706431
 \end{frame}
 
 % ---  DIAPOSITIVA — Vídeo en Directe 3/3  ---
-\begin{frame}[fragile]{Vídeo en Directe \small\textit{3/3}}
+\begin{frame}[fragile]{Vídeo en Directe \small\textit{3/4}}
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
       \small\textbf{Patró Strategy: una interfície, dos protocols:}
@@ -238,8 +220,7 @@ export interface StreamingStrategy {
   closeStream(): void;
 }
 // Angular injecta WebRTCService o HlsService
-// en funcio del protocol actiu
-      \end{lstlisting}
+// en funcio del protocol actiu \end{lstlisting}
     \end{column}
 
     \begin{column}{0.46\textwidth}
@@ -247,8 +228,6 @@ export interface StreamingStrategy {
       \begin{itemize}
         \item \texttt{GridVideoPlayerComponent} \textbf{mai} sap quin protocol usa.
         \item Fallback WebRTC $\to$ HLS: \textbf{canvi transparent}.
-        \item \textbf{Angular Signals}: \texttt{connectionState} re-renderitza \textbf{únicament} la cel·la afectada.
-        \item Mesurat: \textbf{35\% menys CPU} (i3-8100T, 4 càmeres en continu).
       \end{itemize}
     \end{column}
   \end{columns}
@@ -259,6 +238,56 @@ export interface StreamingStrategy {
     Quan Angular detecta el timeout de 5 segons per UDP, destrueix el WebRTCService i n'injecta un HlsService. El component no canvia ni una línia de codi. L'operador mai veu un error, simplement el vídeo continua. Això és el desacoblament real.
 
     L'altre punt és l'impacte de Signals. El connectionState és un Signal. Quan la càmera 3 canvia d'estat —connecting, connected, error—, Angular actualitza únicament el component de la cel·la 3 del mosaic. Zone.js hauria disparat un cicle de detecció de canvis global i rellegit tot el DOM. En un gravador amb CPU compartida entre vídeo, disc i web, aquesta diferència és real: 35\% menys CPU mesurat en un Intel Core i3-8100T amb 4 càmeres en continu sota Windows 10 IoT.
+  }
+\end{frame}
+
+% ---  DIAPOSITIVA — Vídeo en Directe 4/4  ---
+\begin{frame}[fragile]{Vídeo en Directe \small\textit{4/4}}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \small\textbf{Panel I/O: event \texttt{IO\_NOTIFY} via WebSocket:}
+      \vspace{0.3em}
+
+      \begin{lstlisting}[style=jsonbox]
+// Subscripcio en obrir el panel
+{ "call": "filter_update",
+  "topics": ["device/notification", "io"] }
+
+// Quan un sensor o rele canvia d'estat:
+{ "call": "IO_NOTIFY",
+  "payload": [{
+    "id":    "1",
+    "idr":   "RELAY_1",
+    "data":  "on",
+    "topic": "io/output"
+  }]
+} \end{lstlisting}
+
+      \begin{itemize}
+        \item Physicial inputs/outputs, virtual inputs/outputs.
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.46\textwidth}
+      \vspace{0.5em}
+      \small\textbf{Flux del senyal:}
+      \begin{enumerate}
+        \item Sensor o relé canvia d'estat al \textbf{maquinari}.
+        \item \textbf{D-Bus} publica l'esdeveniment.
+        \item \textbf{\texttt{la-core-notifier}} el rep i el converteix a JSON.
+        \item WebSocket $\to$ Angular $\to$ \textbf{Signal} $\to$ actualitza únicament l'element afectat.
+      \end{enumerate}
+    \end{column}
+  \end{columns}
+
+  \note{
+    El panel lateral d'I/O és una funcionalitat que molts sistemes de vigilància no ofereixen: la capacitat de veure l'estat dels sensors físics i relés del gravador directament des de la interfície web, en temps real.
+
+    Quan l'operador obre el panel, Angular envia un missatge de subscripció al WebSocket de la-core-notifier demanant els tòpics "device/notification" i "io". A partir d'aquest moment, qualsevol canvi d'estat elèctric al hardware del gravador —un sensor que s'activa, un relé que commuta— arriba al frontend en mil·lisegons.
+
+    El flux és: el hardware publica l'event al D-Bus intern del sistema operatiu Linux del NVR. La-core-notifier, que és un microservei subscrit a aquest bus, rep el senyal, el serialitza a JSON amb l'ID del dispositiu, el seu nom de referència, l'estat i el tòpic, i l'envia per WebSocket a tots els clients connectats. Angular actualitza via Signal únicament l'element IoItem corresponent, sense re-renderitzar tot el panel.
+
+    Un punt important de l'arquitectura: la-core-notifier i la-core-alarm són dos microserveis separats amb rols distincts. La-core-notifier s'ocupa d'events de sistema —estat I/O, errors de maquinari com un disc desconnectat o pèrdua de senyal de vídeo— que no es persisten. La-core-alarm s'ocupa d'alarmes de seguretat que sí que es guarden a base de dades via gRPC cap a la-db-engine.
   }
 \end{frame}
 

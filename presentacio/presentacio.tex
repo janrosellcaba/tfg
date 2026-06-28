@@ -48,7 +48,7 @@
 % Color per a la línia separadora del footer
 \setbeamercolor{footline separator}{bg=gray!35}
 
-% Footer ultra-minimalista: línia grisa prima + text net
+% Footer: línia grisa prima + logos + text
 \setbeamertemplate{footline}{%
   \leavevmode%
   \vbox{%
@@ -57,14 +57,14 @@
       \end{beamercolorbox}%
     }%
     \hbox{%
-      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1.2ex,left,leftskip=2ex]{}%
-        \textcolor{gray!80}{\footnotesize Jan Rosell Caba}%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=3.8ex,dp=1.4ex,left,leftskip=2ex]{}%
+        \textcolor{gray!80}{\scriptsize Jan Rosell Caba}%
       \end{beamercolorbox}%
-      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1.2ex,center]{}%
-        \textcolor{gray!80}{\footnotesize Web Core View}%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=3.8ex,dp=1.4ex,center]{}%
+        \textcolor{gray!80}{\scriptsize Web Core View}%
       \end{beamercolorbox}%
-      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.5ex,dp=1.2ex,right,rightskip=2ex]{}%
-        \textcolor{gray!80}{\footnotesize \insertframenumber{} / \inserttotalframenumber}%
+      \begin{beamercolorbox}[wd=.333333\paperwidth,ht=3.8ex,dp=1.4ex,right,rightskip=2ex]{}%
+        \textcolor{gray!80}{\scriptsize \insertframenumber{} / \inserttotalframenumber}\hspace{0.6em}\raisebox{-0.08cm}{\includegraphics[height=0.30cm]{../figures/logos/upc_icona.png}}\hspace{0.4em}\raisebox{-0.10cm}{\includegraphics[height=0.4cm]{../figures/logos/lanaccess_icona.png}}%
       \end{beamercolorbox}%
     }%
   }%

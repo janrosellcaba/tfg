@@ -7,11 +7,11 @@
 \begin{frame}{Validació}
   \vspace{0.5em}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.60\textwidth}
       \textbf{Cicle de desplegament:}
       \begin{itemize}
-        \item \texttt{ng build} $\to$ compila l'aplicació.
-        \item Un script $\to$ carrega la web al NVR en xarxa local.
+        \item \texttt{ng build ----configuration=production}.
+        \item \texttt{scp -r} $\to$ carrega la web al NVR en xarxa local.
         \item Actualització de firmware $\to$ actualitza els serveis del backend.
       \end{itemize}
 
