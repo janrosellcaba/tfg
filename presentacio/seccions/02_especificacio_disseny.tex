@@ -9,9 +9,9 @@
     \begin{column}{0.3\textwidth}
       \begin{block}{Administrador}
         \begin{itemize}
-          \item[\small$\bullet$] Configuració completa.
-          \item[\small$\bullet$] Gestió d'usuaris.
-          \item[\small$\bullet$] Actualitzacions de firmware.
+          \item[\small$\bullet$] Configuració del sistema.
+          \item[\small$\bullet$] Usuaris, rols i permisos.
+          \item[\small$\bullet$] Firmware, llicències i logs.
         \end{itemize}
       \end{block}
     \end{column}
@@ -20,18 +20,18 @@
       \begin{block}{Operador}
         \begin{itemize}
           \item[\small$\bullet$] Vídeo en directe.
-          \item[\small$\bullet$] Gravacions i timeline.
+          \item[\small$\bullet$] Reproducció de gravacions.
           \item[\small$\bullet$] Gestió d'alarmes.
         \end{itemize}
       \end{block}
     \end{column}
 
     \begin{column}{0.3\textwidth}
-      \begin{block}{Sistema NVR}
+      \begin{block}{Videogravador}
         \begin{itemize}
-          \item[\small$\bullet$] Emet esdeveniments push.
-          \item[\small$\bullet$] Dicta l'esquema JSON.
-          \item[\small$\bullet$] Gestiona els \textit{config locks}.
+          \item[\small$\bullet$] Microserveis del sistema.
+          \item[\small$\bullet$] NGINX.
+          \item[\small$\bullet$] Únic servidor: vídeo, config i alarmes.
         \end{itemize}
       \end{block}
     \end{column}
@@ -51,33 +51,43 @@
 
 % ---  DIAPOSITIVA 6 — Requisits Crítics: Rendiment i Seguretat (merged)  ---
 \begin{frame}{Requisits}
+
+  % Fila de mètriques clau
+  \begin{center}
+    \begin{tikzpicture}
+      \node[fill=accentgreen!15, draw=accentgreen!50, rounded corners=4pt,
+            minimum width=2.6cm, minimum height=1.1cm, align=center] at (0,0)
+        {{\large\bfseries\textcolor{accentgreen!70!black}{$<$300 ms}}\\[1pt]\scriptsize Latència WebRTC};
+      \node[fill=accentgreen!15, draw=accentgreen!50, rounded corners=4pt,
+            minimum width=2.6cm, minimum height=1.1cm, align=center] at (3.2,0)
+        {{\large\bfseries\textcolor{accentgreen!70!black}{$\leq$5 s}}\\[1pt]\scriptsize Fallback HLS/UDP};
+      \node[fill=upclight, draw=upcblue!40, rounded corners=4pt,
+            minimum width=2.6cm, minimum height=1.1cm, align=center] at (6.4,0)
+        {{\large\bfseries\textcolor{upcblue}{$\leq$30 s}}\\[1pt]\scriptsize Reconnexió WS};
+      \node[fill=upclight, draw=upcblue!40, rounded corners=4pt,
+            minimum width=2.6cm, minimum height=1.1cm, align=center] at (9.6,0)
+        {{\large\bfseries\textcolor{upcblue}{120 s}}\\[1pt]\scriptsize Config Lock};
+    \end{tikzpicture}
+  \end{center}
+
+  \vspace{0.5em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Rendiment i Vídeo}
+      \textbf{Arquitectura}
       \begin{itemize}
-        \item \textbf{RNF-01:} latència $<$ \textbf{300 ms} (P50), $<$ 350 ms (P95).
-        \item \textbf{RNF-02:} fallback HLS $\leq$ \textbf{5 s} si UDP bloquejat.
-        \item \textbf{RNF-03:} zero \textit{polling}, push granular.
+        \item \textbf{Zero polling}: arquitectura push event-driven (WebSocket).
+        \item SPA Angular: CPU al navegador, no al gravador.
       \end{itemize}
     \end{column}
-
     \begin{column}{0.48\textwidth}
-      \textbf{Seguretat (OWASP Top 10)}
+      \textbf{Seguretat — OWASP Top 10}
       \begin{itemize}
-        \item \textbf{Zero LocalStorage}: cookies \textbf{HttpOnly + Secure + SameSite=Strict}.
-        \item Xifratge \textbf{TLS 1.2/1.3} i WSS.
-        \item \textbf{Privacy by Design}: dades sensibles mai al disc del client.
-        \item \textbf{OWASP Top 10}: criteri d'acceptació formal.
+        \item \textbf{Zero LocalStorage}: cookies HttpOnly + SameSite=Strict.
+        \item TLS 1.2/1.3 · WSS · SRTP (WebRTC extrem a extrem).
+        \item Criteri d'acceptació \textbf{formal}.
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \vspace{0.5em}
-  \begin{center}
-    \begin{block}{}
-      \centering La seguretat és una \textbf{restricció de disseny}, no una capa afegida al final.
-    \end{block}
-  \end{center}
 
   \note{
     Traduïm l'objectiu de negoci en requisits mesurables. El més crític és el de latència: en una sala de control de seguretat, si el vídeo va amb 2 segments de retard, una intrusió pot passar desapercebuda. Per això vam fixar 300 ms com a límit dur.
@@ -97,19 +107,19 @@
         \item \texttt{la-db-engine}
         \item \texttt{la-core-alarm}
         \item \texttt{la-video-engine}
-        \item \texttt{NGINX}
+        % \item \texttt{NGINX}
       \end{itemize}
 
       \vspace{0.8em}
-      \begin{block}{}
-        \small\textbf{SPA Angular}: CPU al navegador $\cdot$ \textbf{UDS} intern $\cdot$ \textbf{systemd}.
-      \end{block}
+      \small\textcolor{gray}{NGINX únic punt d'entrada.}
+      \small\textcolor{gray}{\\Tot sota port \textbf{443}.}
     \end{column}
 
     \begin{column}{0.59\textwidth}
-      \begin{flushright}
-        \includegraphics[height=0.85\textheight, keepaspectratio]{../figures/diagrames/arquitectura_serveis.png}
-      \end{flushright}
+      \begin{center}
+        \vspace{-2cm}
+        \includegraphics[height=1\textheight, keepaspectratio]{../figures/diagrames/arquitectura_serveis.png}
+      \end{center}
     \end{column}
   \end{columns}
 
