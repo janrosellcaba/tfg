@@ -30,25 +30,22 @@
 \begin{frame}{Context}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \textbf{L'empresa i el producte}
       \begin{itemize}
         \item \textbf{Lanaccess Telecom}: videovigilància professional.
-        \item \textbf{NVR NXT}: captura, gravació i gestió càmeres.
+        \item \textbf{NVR NXT}: captura, gravació i gestió de càmeres.
         \item Clients: empreses i infraestructura crítica.
       \end{itemize}
 
       \vspace{0.6em}
-      \textbf{La restricció de disseny fonamental}
       \begin{itemize}
         \item \textbf{Standalone}: zero servidors externs, zero núvol.
         \item CPU compartida: vídeo + disc + web.
-        \item \textbf{L'NVR}: únic servidor disponible.
       \end{itemize}
     \end{column}
 
     \begin{column}{0.44\textwidth}
       \begin{center}
-        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{../figures/interficies/cameras.png}
+        \includegraphics[width=\textwidth, height=0.6\textheight, keepaspectratio]{../figures/presentacio/grabadores-ip_lanaccess_real.png}
       \end{center}
     \end{column}
   \end{columns}
@@ -67,26 +64,26 @@
       \begin{alertblock}{L'herència: ActiveX (anys 90)}
         \begin{itemize}
           \item Dependent de \textbf{IE11} (tancat juny 2022).
-          \item Incompatible: macOS, Linux, Chrome, mòbils.
+          \item Incompatible: macOS, Linux, Chrome.
           \item Vulnerabilitats \textbf{OWASP} documentades.
         \end{itemize}
       \end{alertblock}
 
       \vspace{0.5em}
       \begin{itemize}
-        \item \textbf{Firmware $\to$ frontend}: edició manual forçada.
+        \item \textbf{Firmware $\to$ frontend}: acoblament manual.
         \item Fre al \textit{time-to-market}.
       \end{itemize}
     \end{column}
 
     \begin{column}{0.40\textwidth}
-      \begin{block}{La pressió del mercat}
-        \small Clients exigien accés des de qualsevol navegador i dispositiu modern.
+      \begin{block}{Mercat}
+        \small Accés des de qualsevol navegador i dispositiu.
       \end{block}
 
       \vspace{0.8em}
-      \begin{block}{L'amenaça competitiva}
-        \small Competidors amb interfícies web natives guanyaven terreny al catàleg NXT.
+      \begin{block}{Competència}
+        \small Interfícies web natives guanyaven terreny.
       \end{block}
     \end{column}
   \end{columns}
@@ -103,9 +100,9 @@
 
   \begin{center}
     \begin{tikzpicture}
-      \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (browser) at (0,0) {\textbf{Navegador}\\\small Chrome/Firefox/Safari};
-      \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (nvr) at (7,0) {\textbf{NVR NXT}\\\small Serveix tot};
-      \draw[->, thick, upcblue] (browser.east) -- node[above]{\small HTTPS / WSS / WebRTC} (nvr.west);
+      \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (browser) at (0,0) {\textbf{Navegador}};
+      \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (nvr) at (8.5,0) {\textbf{NVR NXT}};
+      \draw[->, thick, upcblue] (browser.east) -- node[above, inner sep=6pt]{\small HTTPS / WSS / WebRTC / HLS} (nvr.west);
     \end{tikzpicture}
   \end{center}
 
@@ -118,7 +115,7 @@
     \end{column}
     \begin{column}{0.3\textwidth}
       \begin{exampleblock}{Autònom}
-        L'NVR serveix l'app i el vídeo. Sense núvol.
+        L'NVR serveix tota l'aplicació.
       \end{exampleblock}
     \end{column}
     \begin{column}{0.3\textwidth}
