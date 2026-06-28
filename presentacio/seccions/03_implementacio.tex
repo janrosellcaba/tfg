@@ -14,15 +14,11 @@
 
     \begin{column}{0.38\textwidth}
       \vspace{0.8em}
-      \small El backend envia \textbf{metadades}, no formularis.
-
-      \vspace{0.7em}
-      $\Rightarrow$ \texttt{ConfigInputComponent} renderitza \textbf{automàticament}.
-
-      \vspace{0.7em}
       \begin{itemize}
-        \item \textbf{10 tipus} de camp $\cdot$ 100\% de la config coberta.
-        \item Nou firmware $\Rightarrow$ \textbf{zero canvis} al frontend.
+        \item Configurar \textbf{xarxa}, càmeres, usuaris i sistema.
+        \item Controls adequats per a cada paràmetre: checkbox, desplegable, IP\ldots
+        \item \textbf{Lock automàtic}: un sol editor a la vegada.
+        \item Formulari generat \textbf{automàticament} pel firmware.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -150,11 +146,10 @@
     \begin{column}{0.38\textwidth}
       \vspace{0.8em}
       \begin{itemize}
-        \item \textbf{WebRTC}.
-        \item Fallback \textbf{HLS}.
-        \item Panel lateral: sensors i relés en \textbf{temps real}.
-        \item Angular Signals: re-render selectiu $\to$ \textbf{35\% menys CPU}.
-        \item Fins a \textbf{4} càmeres simultànees.
+        \item Veure fins a \textbf{4 càmeres} en directe.
+        \item \textbf{Drag-and-drop} per composar el mosaic.
+        \item Consultar sensors i relés en \textbf{temps real}.
+        \item Accés des de \textbf{qualsevol navegador}, sense plugins.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -178,9 +173,10 @@
     \begin{column}{0.38\textwidth}
       \vspace{1.5em}
       \begin{itemize}
-        \item Negociació: \textbf{SDP offer/answer}.
-        \item Xifrat: \textbf{DTLS} $\to$ \textbf{SRTP}.
-        \item UDP bloquejat $\to$ fallback \textbf{HLS/443}.
+        \item Reproductor inicialitzat: \textbf{WebRTC} o \textbf{HLS}.
+        \item Fallada $\to$ reintent cada \textbf{2 s}.
+        \item Límit superat $\to$ \textbf{"NO SIGNAL"}.
+        \item Operador tanca $\to$ recursos \textbf{alliberats}.
       \end{itemize}
     \end{column}
 
@@ -226,8 +222,9 @@ export interface StreamingStrategy {
     \begin{column}{0.46\textwidth}
       \vspace{0.8em}
       \begin{itemize}
-        \item \texttt{GridVideoPlayerComponent} \textbf{mai} sap quin protocol usa.
-        \item Fallback WebRTC $\to$ HLS: \textbf{canvi transparent}.
+        \item El component crida \texttt{startStream()} \textbf{sempre igual}.
+        \item Angular injecta \texttt{WebRTCService} o \texttt{HlsService} \textbf{sense que el component ho sàpiga}.
+        \item Nou protocol futur $\Rightarrow$ \textbf{zero canvis} al component.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -302,13 +299,11 @@ export interface StreamingStrategy {
 
     \begin{column}{0.38\textwidth}
       \vspace{0.8em}
-      \small Format intern \textbf{FS2}: blocs bruts, cap reproductor web pot llegir-los.
-
-      \vspace{0.7em}
       \begin{itemize}
-        \item \textbf{Trans-muxing}: FS2 $\to$ MPEG-TS en temps real.
-        \item $\neq$ Transcoding: bitstream intacte, \textbf{CPU $\approx$ 0}.
-        \item \textbf{H.265}: 50\% menys disc que H.264.
+        \item Navegar per la \textbf{línia de temps} interactiva.
+        \item Reproduir qualsevol moment des del navegador.
+        \item \textbf{Descarregar} segments de vídeo.
+        \item Accés simultani a \textbf{múltiples càmeres}.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -448,13 +443,11 @@ HTTP/1.1 206 Partial Content
 
     \begin{column}{0.40\textwidth}
       \vspace{0.8em}
-      \small \textbf{WebSocket push}: sensor $\to$ operadors en temps real.
-
-      \vspace{0.7em}
       \begin{itemize}
-        \item Reconnexió: \textbf{backoff exponencial} (cap allau).
-        \item \textbf{Signals}: actualització selectiva de la UI.
-        \item Persistència: SQLite \textbf{remote\_vfs} + WAL.
+        \item Rebre \textbf{notificacions en temps real} quan salta un sensor.
+        \item Consultar l'\textbf{historial} d'alarmes per càmera.
+        \item \textbf{Reconèixer} i gestionar alarmes actives.
+        \item Accedir al \textbf{clip de vídeo} associat a l'alarma.
       \end{itemize}
     \end{column}
   \end{columns}
