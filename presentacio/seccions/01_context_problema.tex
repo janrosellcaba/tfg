@@ -32,7 +32,7 @@
     \begin{column}{0.52\textwidth}
       \begin{itemize}
         \item \textbf{Lanaccess Telecom}: videovigilància professional.
-        \item \textbf{NVR NXT}: captura, gravació i gestió de càmeres.
+        \item \textbf{Videogravador NXT}: configuració, manteniment i visualització de càmeres.
         \item Clients: empreses i infraestructura crítica.
       \end{itemize}
 
@@ -49,36 +49,32 @@
       \end{center}
     \end{column}
   \end{columns}
-
-  \note{
-    Lanaccess és una empresa especialitzada en seguretat electrònica i videovigilància professional. El seu producte de referència és la família de gravadors NVR NXT: dispositius que capturen, graven i gestionen càmeres IP.
-
-    La restricció de disseny més important és que el sistema és \textit{standalone}: tot ha de funcionar sense dependre d'un servidor extern ni del núvol. L'NVR és l'únic servidor disponible. A més, la seva CPU és compartida entre tres tasques intensives: descodificar el vídeo de les càmeres, escriure al disc, i servir la interfície web. Cada cicle de CPU compta.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA 3 — El Problema: Fi d'una Era  ---
 \begin{frame}{Problema}
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
-      \begin{alertblock}{L'herència: ActiveX (anys 90)}
+      \begin{alertblock}{ActiveX (anys 90)}
         \begin{itemize}
           \item Dependent de \textbf{IE11} (tancat juny 2022).
           \item Incompatible: macOS, Linux, Chrome.
-          \item Vulnerabilitats \textbf{OWASP} documentades.
+          \item Vulnerabilitats \textbf{OWASP}.
         \end{itemize}
       \end{alertblock}
 
       \vspace{0.5em}
       \begin{itemize}
-        \item \textbf{Firmware $\to$ frontend}: acoblament manual.
+        \item Arquitectura molt \textbf{rídiga}.
+        \item Manteniment i actualitzacions manuals/díficils. 
+        \item UX obsoleta
         \item Fre al \textit{time-to-market}.
       \end{itemize}
     \end{column}
 
     \begin{column}{0.40\textwidth}
       \begin{block}{Mercat}
-        \small Accés des de qualsevol navegador i dispositiu.
+        \small Accés des de qualsevol navegador i dispositiu. Exigeix web modern.
       \end{block}
 
       \vspace{0.8em}
@@ -87,12 +83,6 @@
       \end{block}
     \end{column}
   \end{columns}
-
-  \note{
-    La situació de partida era crítica. Lanaccess tenia una plataforma web construïda als anys 90 basada en tecnologia ActiveX de Microsoft. El problema és que Internet Explorer 11 va arribar al final de la seva vida el juny del 2022. I amb ell, va morir qualsevol possibilitat d'accedir als gravadors NXT des d'un Mac, un Linux, un mòbil, o simplement des de Chrome.
-
-    A més, l'arquitectura era rígida: si el firmware canviava un paràmetre de configuració, un enginyer havia de modificar el frontend manualment. Això generava deute tècnic creixent i una velocitat d'iteració molt lenta. La competència ja oferia interfícies web natives. Els clients ho demanaven.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA 4 — L'Objectiu: Sistema Web Autònom  ---
@@ -124,6 +114,11 @@
       \end{exampleblock}
     \end{column}
   \end{columns}
+
+  \vspace{0.5em}
+  \begin{center}
+    \small Manteniment fàcil \quad\textcolor{gray}{$\cdot$}\quad UX web moderna
+  \end{center}
 
   \note{
     L'objectiu del projecte es pot resumir en tres paraules: 100\% web, autònom i escalable. Una SPA Angular 19 que es descarrega des del propi gravador i s'executa al navegador del client.

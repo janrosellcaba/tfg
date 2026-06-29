@@ -3,47 +3,40 @@
 % ============================================================
 
 % ---  DIAPOSITIVA 5 — Els Actors del Sistema  ---
-\begin{frame}{Actors}
-  \vspace{0.2em}
-  \begin{columns}[T]
-    \begin{column}{0.3\textwidth}
-      \begin{block}{Administrador}
-        \begin{itemize}
-          \item[\small$\bullet$] Configuració del sistema.
-          \item[\small$\bullet$] Usuaris, rols i permisos.
-          \item[\small$\bullet$] Firmware, llicències i logs.
-        \end{itemize}
-      \end{block}
-    \end{column}
-
-    \begin{column}{0.3\textwidth}
-      \begin{block}{Operador}
-        \begin{itemize}
-          \item[\small$\bullet$] Vídeo en directe.
-          \item[\small$\bullet$] Reproducció de gravacions.
-          \item[\small$\bullet$] Gestió d'alarmes.
-        \end{itemize}
-      \end{block}
-    \end{column}
-
-    \begin{column}{0.3\textwidth}
-      \begin{block}{Videogravador}
-        \begin{itemize}
-          \item[\small$\bullet$] Microserveis del sistema.
-          \item[\small$\bullet$] NGINX.
-          \item[\small$\bullet$] Únic servidor: vídeo, config i alarmes.
-        \end{itemize}
-      \end{block}
-    \end{column}
-  \end{columns}
-
-  \vspace{0.8em}
+\begin{frame}{Stakeholders}
+  \vspace{0.4em}
   \begin{center}
-    \textbf{6 casos d'ús principals:} Autenticació $\cdot$ Vídeo directe $\cdot$ Gravacions $\cdot$ Alarmes $\cdot$ Configuració dinàmica $\cdot$ Administració
+  \renewcommand{\arraystretch}{1.55}
+  \begin{tabular}{@{}p{0.30\textwidth}p{0.62\textwidth}@{}}
+    \toprule
+    \textbf{Actor} & \textbf{Interès principal} \\
+    \midrule
+    Operador de seguretat   & Monitorització RT $\cdot$ resposta àgil a incidents \\
+    Administrador / Tècnic  & Configuració remota $\cdot$ firmware sense desplaçaments \\
+    Lanaccess               & Reducció costos suport $\cdot$ producte competitiu \\
+    Director / Ponent (FIB) & Rigor metodològic $\cdot$ estàndards qualitat FIB \\
+    Estudiant               & Arquitectura robusta $\cdot$ integració tecnologies \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+
+  \vspace{0.5em}
+  \begin{center}
+    \small\textbf{6 casos d'ús:} Autenticació $\cdot$ Vídeo directe $\cdot$ Gravacions $\cdot$ Alarmes $\cdot$ Configuració dinàmica $\cdot$ Administració
   \end{center}
 
   \note{
-    L'anàlisi d'actors va revelar tres rols principals. L'Administrador té accés total. L'Operador és el vigilant del dia a dia. I el Sistema NVR actua com a tercer actor: és qui dicta les regles del joc mitjançant l'esquema JSON, qui emet els esdeveniments d'alarma, i qui gestiona els mecanismes de control d'accés a la configuració.
+    Tenim cinc actors implicats en el projecte.
+
+    L'Operador de seguretat és l'usuari final: treballa en torns llargs davant de les càmeres i necessita temps de resposta mínims. Cada segon que tarda a localitzar un incident és crític.
+
+    L'Administrador o tècnic necessita poder canviar paràmetres crítics ---xarxa, càmeres, alarmes--- i actualitzar firmware de forma remota i segura, sense desplaçar-se físicament a la instal·lació.
+
+    Lanaccess, com a empresa, té un interès directe en reduir els costos de suport postvenda: cada cop que un client necessita ajuda per configurar el sistema, hi ha un cost. Un frontend intuïtiu i autònom redueix aquest cost. A més, el mercat demana mobilitat i web: ActiveX no és una opció el 2024.
+
+    El Director i Ponent del TFG vetllen pel rigor metodològic: que les decisions d'arquitectura estiguin justificades, que hi hagi un procés de validació rigorós, i que el document compleixi els estàndards de la FIB.
+
+    I finalment, l'estudiant ---jo mateix--- sóc l'actor principal i executor integral: analista, dissenyador i desenvolupador. La meva funció ha estat transformar els requisits de negoci de Lanaccess en una arquitectura de software que funcioni en producció.
 
     A partir d'aquests actors vam derivar 6 casos d'ús que cobreixen tot el cicle de vida de la vigilància.
   }
@@ -56,10 +49,10 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{Administrador}
         \begin{itemize}
-          \item[\small$\bullet$] Mantenir el dispositiu operatiu \textbf{sense desplaçar-se} al client
-          \item[\small$\bullet$] Nous paràmetres al \textit{firmware} $\rightarrow$ visibles a la web \textbf{sense recompilar}
-          \item[\small$\bullet$] Evitar que dos admins \textbf{sobreescriguin} la configuració alhora
-          \item[\small$\bullet$] Controlar accés, auditar accions i complir la normativa vigent
+          \item[\small$\bullet$] Gestió remota \textbf{sense desplaçaments}
+          \item[\small$\bullet$] Firmware nou $\to$ web \textbf{sense recompilar}
+          \item[\small$\bullet$] \textbf{Config Lock}: zero sobreescriptura concurrent
+          \item[\small$\bullet$] RBAC + auditoria + \textbf{RGPD}
         \end{itemize}
       \end{block}
     \end{column}
@@ -67,20 +60,14 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{Operador}
         \begin{itemize}
-          \item[\small$\bullet$] Visió global en temps real: \textbf{fins a 4 càmeres} simultànies
-          \item[\small$\bullet$] Investigar qualsevol incident passat amb \textbf{precisió temporal}
-          \item[\small$\bullet$] Rebre alertes de seguretat \textbf{a l'instant}, sense refrescar
-          \item[\small$\bullet$] Sessió contínua durant torns llargs \textbf{sense caducitat forçada}
+          \item[\small$\bullet$] Fins a \textbf{4 càmeres} simultànies
+          \item[\small$\bullet$] Timeline: \textbf{precisió temporal} exacta
+          \item[\small$\bullet$] Alarmes \textbf{push} $<$ 1\,s
+          \item[\small$\bullet$] Sessió \textbf{persistent} per a torns
         \end{itemize}
       \end{block}
     \end{column}
   \end{columns}
-
-  \vspace{0.6em}
-  \begin{center}
-    \small\textit{Extrets en sessions iteratives amb l'equip d'Embedded i anàlisi del sistema \textit{legacy} (ActiveX).
-    Formalitzats amb la plantilla VOLERE.}
-  \end{center}
 
   \note{
     Veiem ara el que cada persona necessita, més enllà del que fa. L'Administrador té una necessitat crítica que no és òbvia: quan l'equip d'Embedded afegeix nous paràmetres al firmware, no pot crear una tasca de frontend per a cada canvi. Necessita que la interfície s'adapti sola. Aquesta és la necessitat que va donar origen a tota la decisió d'arquitectura schema-driven.
@@ -98,11 +85,10 @@
   \begin{columns}[T]
     \begin{column}{0.38\textwidth}
       \begin{itemize}
-        \item \texttt{la-core-legacy}
-        \item \texttt{la-db-engine}
-        \item \texttt{la-core-alarm}
-        \item \texttt{la-video-engine}
-        % \item \texttt{NGINX}
+        \item \texttt{la-core-legacy} \textcolor{gray}{\small Config + Auth}
+        \item \texttt{la-db-engine} \textcolor{gray}{\small SQLite via gRPC}
+        \item \texttt{la-core-alarm} \textcolor{gray}{\small WebSocket push}
+        \item \texttt{la-video-engine} \textcolor{gray}{\small WebRTC + HLS}
       \end{itemize}
 
       \vspace{0.8em}
