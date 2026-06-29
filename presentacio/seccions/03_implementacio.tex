@@ -342,18 +342,19 @@ segment.ts?id=540983296&buffer=10&t1=2025-11-12T09:39:21Z&t2=2025-11-12T09:40:17
   \end{columns}
 \end{frame}
 
-% ---  DIAPOSITIVA — Alarmes 3/3  ---
-\begin{frame}{Alarmes \small\textit{3/3}}
+% ---  DIAPOSITIVA — Alarmes 3/4  ---
+\begin{frame}{Alarmes \small\textit{3/4}}
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
       \small
       \textbf{Persistència — \texttt{la-db-engine}:}
       \begin{itemize}
         \item \texttt{la-core-alarm} $\xrightarrow{\text{gRPC}}$ \textbf{SQLite3} + \texttt{remote\_vfs}
-        \item \texttt{remote\_vfs}: driver \textbf{VFS} personalitzat — tot I/O $\xrightarrow{\text{UDS}}$ \texttt{la-video-engine}
-        \item \texttt{la-video-engine}: únic procés amb accés \textbf{raw} al disc físic
-        \item \textbf{WAL} (\texttt{PRAGMA synchronous=NORMAL}): registre transaccional previ a cada escriptura — \textbf{ACID} davant talls de corrent
-        \item SQL \textbf{Trigger}: poda automàtica $\leq$ \textbf{10.000} registres
+        \item \texttt{remote\_vfs}: driver \textbf{VFS} personalitzat\\
+              {\footnotesize\textcolor{gray}{intercepta tot I/O $\to$ reencamina per UDS}}
+        \item \textbf{WAL} (\texttt{PRAGMA synchronous=NORMAL}):\\
+              registre transaccional previ
+        \item SQL \textbf{Trigger}: poda automàtica $\leq$ \textbf{10.000} reg.
       \end{itemize}
     \end{column}
 
@@ -373,6 +374,37 @@ segment.ts?id=540983296&buffer=10&t1=2025-11-12T09:39:21Z&t2=2025-11-12T09:40:17
       \begin{exampleblock}{\small Garantia}
         \small Cap alarma perduda.\\
         Consistència multi-operador.
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---  DIAPOSITIVA — Alarmes 4/4  ---
+\begin{frame}{Alarmes \small\textit{4/4}}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \small
+      \textbf{Socket Unix (\texttt{UDS}) — \texttt{remote\_vfs} $\to$ \texttt{la-video-engine}:}
+      \begin{itemize}
+        \item \texttt{remote\_vfs} envia operacions VFS binàries:\\
+              {\footnotesize\textcolor{gray}{\texttt{xRead} · \texttt{xWrite} · \texttt{xSync} · \texttt{xTruncate}}}
+        \item \texttt{la-video-engine} les executa.
+        \item Escriptures \textbf{alineades a 512 B}\\
+              {\footnotesize\textcolor{gray}{\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR)} $\to$ atomicitat per sector}}
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.46\textwidth}
+      \small
+      \textbf{FS2 — vídeo a la mateixa partició:}
+      \begin{itemize}
+        \item Sistema de fitxers \textbf{propietari} Lanaccess
+      \end{itemize}
+
+      \vspace{0.4em}
+      \begin{exampleblock}{\small Un disc, dos serveis}
+        \small \textbf{SQLite3} (alarmes) + \textbf{FS2} (vídeo)\\
+        \texttt{la-video-engine}: únic escriptor.
       \end{exampleblock}
     \end{column}
   \end{columns}
