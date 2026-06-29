@@ -27,25 +27,15 @@
       \textbf{Causes de la desviació (+45 h):}
       \begin{itemize}
         \item H.265 $\to$ \textbf{+25 h}.
-        \item Sistema de configuració $\to$ \textbf{+20 h}.
+        \item Configuració $\to$ \textbf{+20 h}.
       \end{itemize}
 
-      \vspace{0.5em}
-      \begin{exampleblock}{Resultat}
-        \small Desviació absorbida dins del \textbf{10\% de contingència} previst. Cap feina tallada.
-      \end{exampleblock}
+      % \vspace{0.5em}
+      % \begin{exampleblock}{Resultat}
+      %   \small Desviació absorbida dins del \textbf{10\% de contingència} previst. Cap feina tallada.
+      % \end{exampleblock}
     \end{column}
   \end{columns}
-
-  \note{
-    La planificació del projecte va ser bastant precisa en la majoria de fases. Les desviacions es van concentrar en dos punts, que curiosament coincideixen amb les dues aportacions tècniques més innovadores del projecte.
-
-    La primera desviació de 25 hores va ser la integració de l'H.265. Inicialment estimàvem que bastaria amb canviar el contenidor, però la realitat del sistema de fitxers FS2 ---que no desa les capçaleres SPS/PPS/VPS en cada segment--- va requerir un algorisme de recuperació de capçaleres des del keyframe anterior. Això no estava previst i va ser complexe.
-
-    La segona desviació de 20 hores va ser el disseny del motor Schema-Driven. A mesura que avançàvem, vam adonar-nos que el nombre de tipus de camp necessaris era superior a l'estimat ---llistes dinàmiques, camps condicionats, adreces IP en formats múltiples. Va valer la pena cada hora extra.
-
-    En total, +45 hores sobre les 540 previstes: un 8.3\% de desviació, que cau perfectament dins del marge de contingència del 10\% que havíem reservat. El resultat és que cap funcionalitat va ser retallada ni ajornada.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA 24 — Pressupost  ---
@@ -61,7 +51,7 @@
         Personal (hores) & 13.567,50 \euro & 14.701,50 \euro \\
         Amortització HW & 210,00 \euro & 210,00 \euro \\
         Costos indirectes & 1.150,00 \euro & 1.150,00 \euro \\
-        Contingència (10\%) & 1.492,75 \euro & 1.134,00 \euro \\
+        Contingència & 1.492,75 \euro & \textcolor{gray}{\textit{(1.134,00 \euro)}} \\
         \midrule
         \textbf{Total} & \textbf{16.420,25 \euro} & \textbf{16.061,50 \euro} \\
         \bottomrule
@@ -79,16 +69,6 @@
       \end{block}
     \end{column}
   \end{columns}
-
-  \note{
-    El pressupost final és de 16.061 euros, per sota dels 16.420 euros previstos. Com veiem a la taula, el cost de personal va pujar degut a les 45 hores extra, però la contingència que havíem reservat no va caldre consumir-la completament.
-
-    El perfil de costos és el típic d'un projecte de software: més del 90\% del cost és personal. El maquinari és amortització d'equipament de desenvolupament existent i representa una fracció petita.
-
-    Cal destacar que la contingència s'ha usat de forma parcial ---el 76\%--- per cobrir les desviacions de les fases de vídeo i configuració. Que no s'hagi exhaurit completament és un bon indicador de gestió: la contingència existeix per ser usada davant de riscos materialitzats, no per ser conservada com un trofeu.
-
-    El projecte ha entregat tot l'abast previst, a temps, i per sota del pressupost màxim.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA 25 — Sostenibilitat  ---
@@ -97,7 +77,7 @@
     \begin{column}{0.3\textwidth}
       \begin{block}{Ambiental}
         \begin{itemize}
-          \item[\small$\bullet$] \textbf{35\% menys CPU} $\to$ consum (24/7)
+          \item[\small$\bullet$] \textbf{35\% menys CPU} $\to$ consum
           \item[\small$\bullet$] Gestió remota $\to$ zero desplaçaments
           \item[\small$\bullet$] Hardware: vida útil \textbf{allargada}
         \end{itemize}

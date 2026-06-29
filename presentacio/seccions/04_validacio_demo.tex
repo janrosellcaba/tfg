@@ -6,45 +6,26 @@
 % ---  DIAPOSITIVA — Validació  ---
 \begin{frame}{Validació}
   \vspace{0.5em}
-  \begin{columns}[T]
-    \begin{column}{0.60\textwidth}
-      \textbf{Cicle de desplegament:}
-      \begin{itemize}
-        \item \texttt{ng build} + \texttt{scp} $\to$ \textbf{NVR en xarxa local}
-        \item Firmware update $\to$ serveis backend
-      \end{itemize}
 
-      \vspace{0.9em}
-      \textbf{Proves en camp real:}
-      \begin{itemize}
-        \item NVR desplegats a \textbf{Mèxic}
-        \item Feedback instal·ladors $\to$ millores iteratives
-        \item Ús real des del \textbf{dia 1}
-      \end{itemize}
-    \end{column}
+  \textbf{Cicle de desplegament:}
+  \begin{itemize}
+    \item \texttt{ng build} + \texttt{scp} $\to$ \textbf{NVR en xarxa local}
+    \item Firmware update $\to$ serveis backend
+  \end{itemize}
 
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Resultat}
-        \begin{itemize}
-          \item Sistema en \textbf{producció} a Lanaccess.
-          \item Validat per tècnics i operadors reals.
-          \item Feedback incorporat en cicles curts.
-        \end{itemize}
-      \end{block}
-    \end{column}
-  \end{columns}
+  \vspace{0.7em}
+  \textbf{Proves en camp real:}
+  \begin{itemize}
+    \item NVR desplegats a \textbf{Mèxic}
+    \item Feedback instal·ladors $\to$ millores iteratives
+    \item Ús real des del \textbf{dia 1}
+  \end{itemize}
 
-  \note{
-    La validació d'aquest projecte no ha estat un procés formal de laboratori: ha estat la posada en producció real.
-
-    El cicle de treball era directe. Amb ng build compilava l'aplicació Angular. Un script de desplegament copiava el bundle al directori del NVR a través de la xarxa local. Qualsevol actualització de firmware renovava els microserveis del backend. Amb dos comandaments tenia el sistema actualitzat i llest per provar.
-
-    La validació en camp és el que dóna solidesa al projecte. Diverses unitats NVR s'han enviat a instal·ladors a Mèxic que treballaven en entorns reals: xarxes corporatives, condicions de maquinari diverses, casos d'ús que a l'oficina no s'havien contemplat. El feedback que retornaven —un paràmetre que no es mostrava bé, un flux que no era intuïtiu, un comportament inesperat en un tipus de càmera específic— s'incorporava en el cicle de desenvolupament següent.
-
-    Paral·lelament, tot l'equip tècnic de Lanaccess ha estat provant l'eina des del primer dia: tècnics d'instal·lació, operadors de seguretat, el propi director del projecte. Això ha generat un feedback constant i diversificat que ha anat polint tant la UX com la robustesa del sistema.
-
-    El resultat és que el sistema que es presenta avui no és un prototip: és una eina en producció, validada per usuaris reals en entorns reals.
-  }
+  % \vspace{0.8em}
+  % \begin{exampleblock}{}
+  %   \centering\small
+  %   WebRTC $\leq$300\,ms mesurat en camp $\cdot$ CPU \textbf{$-$35\%} vs.\ ActiveX $\cdot$ cap regressió crítica en producció
+  % \end{exampleblock}
 \end{frame}
 
 % ---  DIAPOSITIVA 14 — Demostració en Directe  ---
@@ -54,19 +35,4 @@
     {\Huge\bfseries\textcolor{upcblue}{Demo}}\\[1em]
     {\large\textcolor{gray}{Videogravador NXT · xarxa local}}
   \end{center}
-
-  \note{
-    DEMO EN DIRECTE --- Preparació prèvia (fer ABANS d'iniciar la presentació):
-    - Navegador obert a https://<ip-nvr>/ en una finestra separada, minimitzada.
-    - NVR connectat a la xarxa local de la sala.
-    - Un segon navegador en pestanya incògnit per simular el segon operador.
-    - Carpeta de screenshots com a pla B.
-
-    Seqüència (5 min en directe):
-    1. Login: "La URL és la IP directa del gravador. No hi ha cap servidor intermedi ni núvol." Si el tribunal pregunta per les cookies: F12 → Application → Cookies → mostrar HttpOnly = true.
-    2. Mosaic WebRTC: obrir 4 càmeres. "Fixeu-vos en la latència: moure un objecte davant la càmera. La imatge respon en menys de 300 ms. L'antiga plataforma tardava entre 800 ms i 2 segments."
-    3. Timeline HLS: navegar a gravacions. "Aquí la línia de temps interactiva. Busco un moment d'ahir..." Fer un seek i reproduir uns segments.
-    4. Alarma push: activar un sensor o relay manual. "Sense que l'operador faci res, la icona canvia en temps real." Passar al segon navegador. "Si hi ha un segon operador connectat, tots dos ho veuen alhora."
-    5. Schema-Driven: Configuració → Xarxa. "El formulari que veieu --- IP, màscara, gateway, DNS --- no l'ha escrit cap enginyer de frontend. Angular l'ha generat automàticament a partir del JSON Schema del firmware."
-  }
 \end{frame}
