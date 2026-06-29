@@ -15,21 +15,12 @@
     \begin{column}{0.38\textwidth}
       \vspace{0.8em}
       \begin{itemize}
-        \item Configurar \textbf{xarxa}, càmeres, usuaris i sistema.
-        \item Controls adequats per a cada paràmetre: checkbox, desplegable, IP\ldots
-        \item \textbf{Lock automàtic}: un sol editor a la vegada.
-        \item Formulari generat \textbf{automàticament} pel firmware.
+        \item Configuració de tot el \textbf{sistema}.
+        \item \textbf{Lock}: un sol editor a la vegada.
+        \item Formulari generat \textbf{automàticament}.
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \note{
-    La pantalla que veieu és la configuració d'una càmera IP. L'operador veu un formulari ben estructurat amb checkboxes, desplegables i camps de text. El que és sorprenent és com s'ha construït: Angular no té cap formulari definit al codi. No hi ha cap plantilla HTML que descrigui quins camps han d'existir.
-
-    Quan l'operador obre la configuració, Angular fa un GET al backend i rep un arbre JSON ple de metadades. Cada camp porta un \_type. El component ConfigInputComponent llegeix aquest \_type i renderitza l'element HTML correcte automàticament.
-
-    Hi ha 10 tipus que cobreixen el 100\% de la configuració. L'impacte directe: un NVR amb 20 paràmetres nous en el pròxim firmware és zero canvis al frontend. Zero PR. Zero deploy. El gravador és l'única font de veritat.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Schema JSON  ---
@@ -83,21 +74,13 @@
     }}}}} \end{lstlisting}
     \end{column}
   \end{columns}
-
-  \note{
-    Aquí veiem el schema real que envia el backend. La clau arrel és el node de configuració: config.video.cam. La clau \{camId\} és dinàmica: el backend substitueix el patró per cada índex de càmera, del 0 al 151, definit per \_rule. Això indexa tots els camps sense duplicar la definició.
-
-    Fixeu-vos en els cinc tipus que apareixen aquí. disabled és boolean: renderitza un checkbox. class és list: renderitza un select amb exactament les opcions d'\_allowedValues, sense cap codi addicional. address és ipaddr: un input amb validació regex d'IP. port és numeric, amb \_minValue i \_maxValue que Angular trasllada directament als atributs HTML5 min i max. I password és un input de tipus password amb restriccions de longitud i política de seguretat.
-
-    Cap d'aquesta lògica és codi Angular específic per a càmeres. És declaració pura: el schema diu QUÈ és cada camp, el ConfigInputComponent sap COM renderitzar-ho. Cinc tipus aquí, deu en total, cobrint el 100\% del sistema.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Config Lock Pessimista  ---
 \begin{frame}[fragile]{Sistema de Configuració \small\textit{3/3}}
   \begin{columns}[T]
     \begin{column}{0.46\textwidth}
-      \small\textbf{POST /lock $\to$ token d'escriptura exclusiva:}
+      \small\textbf{POST /lock}
       \vspace{0.3em}
 
       \begin{lstlisting}[style=jsonbox]
@@ -110,10 +93,10 @@
 
       \vspace{0.4em}
       \begin{itemize}
-        \item Token: injectat per \textbf{interceptor}.
+        \item Injectat per \textbf{interceptor}.
         \item Renovació cada \texttt{expiresIn/2} segons.
         \item Sessió concurrent: \textbf{HTTP 423} $\to$ mode lectura.
-        \item Sortir: expira i s'allibera sol.
+        \item Sortir: s'allibera sol.
       \end{itemize}
     \end{column}
 
@@ -124,14 +107,6 @@
       \end{center}
     \end{column}
   \end{columns}
-
-  \note{
-    La concurrència és un problema real: un tècnic de camp i un administrador poden obrir la configuració simultàniament i sobreescriure els canvis de l'altre. El Pessimistic Lock ho elimina completament.
-
-    En entrar a configuració, Angular fa automàticament POST a /lock. El servidor retorna un token de 32 caràcters i un temps de vida: 60 o 120 segons depenent del node. A partir d'aquí, tot PUT a /config.* porta el token: no ho fa el component ni el servei, sinó un interceptor HTTP global transparent. Cap component sap de la seva existència.
-
-    La renovació és cada expiresIn/2 fora de Zone.js per no disparar cicles de detecció de canvis innecessaris. Si un segon operador intenta adquirir el lock: HTTP 423 Locked, i el frontend el posa automàticament en mode lectura via un Signal. Si el tècnic tanca l'ordinador, el lock expira sol i es lliura sense cap intervenció manual.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Vídeo en Directe 1/3  ---
@@ -153,18 +128,6 @@
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \note{
-    La pàgina de vídeo en directe és la més crítica del sistema: és on l'operador de seguretat passa la majoria del temps. Veieu un mosaic de càmeres amb drag-and-drop: l'operador arrossega una càmera del panell esquerre cap a qualsevol cel·la del mosaic.
-
-    Per al vídeo usem WebRTC, un estàndard obert del W3C que estableix connexions de vídeo directes entre el gravador i el navegador, sense cap plugin. Tot funciona des del Chrome, Firefox o Safari nadiu.
-
-    Si la xarxa corporativa bloqueja UDP —que és el transport natural de WebRTC—, el sistema commuta automàticament a HLS, que va per TCP sobre el port 443 de NGINX, sempre disponible. L'operador no veu cap error.
-
-    A la dreta de la vista de càmeres hi ha un panel lateral que mostra l'estat de les entrades i sortides físiques del gravador —sensors i relés— en temps real, que veurem amb detall a la propera diapositiva.
-
-    I gràcies als Angular Signals, quan canvia l'estat d'una càmera, s'actualitza únicament aquella cel·la del mosaic. Resultat mesurat: 35\% menys CPU en un Intel i3-8100T amb 4 càmeres en continu.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Vídeo en Directe 2/4  ---
@@ -187,14 +150,6 @@
       \end{center}
     \end{column}
   \end{columns}
-
-  \note{
-    El protocol WHEP és la peça clau que fa possible WebRTC sense cap configuració al client. Tota la negociació es fa amb una sola crida HTTP POST estàndard.
-
-    Angular envia un SDP offer al backend: descriu les capacitats del navegador —codec H.264, transport UDP/TLS. MediaMTX respon amb 201 Created i un SDP answer amb els candidats ICE: les adreces IP i ports UDP disponibles per establir la connexió. A partir d'aquí, el navegador i el servidor fan el handshake DTLS per intercanviar les claus de xifratge, i a partir d'aquest moment tot el vídeo va per SRTP sobre UDP, xifrat extrem a extrem.
-
-    El diagrama de la dreta és la lògica de reconnexió. Angular monitoritza contínuament l'estat ICE de la connexió. Si la connexió cau, comença un cicle de reconnexió automàtic. Si detecta que UDP és bloquejat —el timeout és de 5 segons—, commuta al camí de fallback HLS, que és TCP sobre el port 443 de NGINX, sempre disponible.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Vídeo en Directe 3/3  ---
@@ -228,14 +183,6 @@ export interface StreamingStrategy {
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \note{
-    El patró Strategy és el que permet tenir fallback transparent. Tant WebRTCService com HlsService implementen la mateixa interfície StreamingStrategy. El component de la graella no sap ni li importa quin dels dos està usant: crida startStream i espera events de connectionState.
-
-    Quan Angular detecta el timeout de 5 segons per UDP, destrueix el WebRTCService i n'injecta un HlsService. El component no canvia ni una línia de codi. L'operador mai veu un error, simplement el vídeo continua. Això és el desacoblament real.
-
-    L'altre punt és l'impacte de Signals. El connectionState és un Signal. Quan la càmera 3 canvia d'estat —connecting, connected, error—, Angular actualitza únicament el component de la cel·la 3 del mosaic. Zone.js hauria disparat un cicle de detecció de canvis global i rellegit tot el DOM. En un gravador amb CPU compartida entre vídeo, disc i web, aquesta diferència és real: 35\% menys CPU mesurat en un Intel Core i3-8100T amb 4 càmeres en continu sota Windows 10 IoT.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Vídeo en Directe 4/4  ---
@@ -276,16 +223,6 @@ export interface StreamingStrategy {
       \end{enumerate}
     \end{column}
   \end{columns}
-
-  \note{
-    El panel lateral d'I/O és una funcionalitat que molts sistemes de vigilància no ofereixen: la capacitat de veure l'estat dels sensors físics i relés del gravador directament des de la interfície web, en temps real.
-
-    Quan l'operador obre el panel, Angular envia un missatge de subscripció al WebSocket de la-core-notifier demanant els tòpics "device/notification" i "io". A partir d'aquest moment, qualsevol canvi d'estat elèctric al hardware del gravador —un sensor que s'activa, un relé que commuta— arriba al frontend en mil·lisegons.
-
-    El flux és: el hardware publica l'event al D-Bus intern del sistema operatiu Linux del NVR. La-core-notifier, que és un microservei subscrit a aquest bus, rep el senyal, el serialitza a JSON amb l'ID del dispositiu, el seu nom de referència, l'estat i el tòpic, i l'envia per WebSocket a tots els clients connectats. Angular actualitza via Signal únicament l'element IoItem corresponent, sense re-renderitzar tot el panel.
-
-    Un punt important de l'arquitectura: la-core-notifier i la-core-alarm són dos microserveis separats amb rols distincts. La-core-notifier s'ocupa d'events de sistema —estat I/O, errors de maquinari com un disc desconnectat o pèrdua de senyal de vídeo— que no es persisten. La-core-alarm s'ocupa d'alarmes de seguretat que sí que es guarden a base de dades via gRPC cap a la-db-engine.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Gravacions 1/3  ---
@@ -301,99 +238,60 @@ export interface StreamingStrategy {
       \vspace{0.8em}
       \begin{itemize}
         \item Navegar per la \textbf{línia de temps} interactiva.
-        \item Reproduir qualsevol moment i qualsevol càmera i stream des del navegador.
+        \item Reproduir qualsevol moment, càmera i stream.
         \item Fins a \textbf{x8} de velocitat.
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \note{
-    La pàgina de gravacions permet a l'operador seleccionar un rang temporal i reproduir el clip al navegador. La línia de temps és interactiva: es pot avançar, retrocedir i descarregar el segment.
-
-    El repte és que les gravacions al disc estan en format FS2, un format propietari de Lanaccess: blocs de bitstream bruts sense capçaleres estàndard. Cap MediaSource Extensions, cap hls.js, cap reproductor web pot llegir-los directament.
-
-    La solució és trans-muxing en temps real: la-video-engine converteix FS2 a MPEG-TS sobre la marxa, sense mai recomprimir el vídeo. El bitstream H.264 o H.265 passa intacte: l'únic cost és l'empaquetament. Gràcies a H.265, les gravacions de 24 hores ocupen un 50\% menys de disc que amb H.264: factor crític en gravadors que funcionen contínuament.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Gravacions 2/3  ---
 \begin{frame}{Gravacions \small\textit{2/3}}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Manifest HLS dinàmic:}
+      \textbf{Playlist HLS:}
       \begin{itemize}
-        \item Angular demana \texttt{/hls-play.m3u8?start=\ldots\&end=\ldots}
-        \item Backend busca blocs \textbf{FS2} del rang i genera el manifest en temps real.
+        \item Angular demana \texttt{\ldots?token=\ldots\&start=\ldots\&end=\ldots}
+        \item \texttt{la-video-engine} busca blocs \textbf{FS2} del rang i composa la playlist
         \item Tall de gravació ($>$3 s) $\to$ \texttt{\#EXT-X-DISCONTINUITY} $\to$ descodificador no es congela.
       \end{itemize}
 
       \vspace{0.8em}
-      \textbf{Línia de temps:}
-      \begin{itemize}
-        \item \textcolor{accentgreen!70!black}{\textbf{Verd/blau}}: gravació contínua.
-        \item \textcolor{accentred}{\textbf{Vermell/taronja}}: alarma, moviment o analítica.
-      \end{itemize}
     \end{column}
 
     \begin{column}{0.48\textwidth}
       \textbf{Per cada segment demanat:}
       \begin{enumerate}
         \item Llegir bloc \textbf{FS2} del disc (buffer 8 MB).
-        \item \textbf{Trans-muxing} $\neq$ transcoding:\\bitstream intacte, \textbf{CPU $\approx$ 0}.
-        \item \textbf{H.265}: si falten SPS/PPS/VPS al buffer, el backend les recupera del keyframe anterior i les injecta.
-        \item Servir \texttt{video/MP2T} al navegador.
+        \item Blocs \textbf{FS2} $\to$ \textbf{MPEG-TS}: bitstream intacte, CPU $\approx$ 0.
+        \item \textbf{H.265}: si falten SPS/PPS/VPS al buffer, el \texttt{la-video-engine} les recupera del keyframe anterior i les injecta.
+        \item Servir \texttt{segment.ts} al navegador.
       \end{enumerate}
     \end{column}
   \end{columns}
-
-  \note{
-    Expliquem el com del trans-muxing pas a pas.
-
-    Quan l'operador selecciona un rang temporal, Angular fa GET del manifest M3U8 passant el token de sessió, el timestamp d'inici i de fi. La-video-engine localitza els blocs FS2 que cobreixen el rang mitjançant la biblioteca d'indexació interna i genera el fitxer de manifest dinàmicament: cada entrada correspon a un interval de vídeo real. Si detecta un tall de més de 3 segons entre dos buffers ---per exemple, una gravació per events interrompuda--- injecta la directiva EXT-X-DISCONTINUITY, que informa el reproductor del navegador que la línia temporal s'ha trencat: sense això, el descodificador quedaria congelat.
-
-    Per cada segment, la la-video-engine carrega el bloc FS2 en un buffer temporal de 8 MB. Trans-muxing significa empaquetar el bitstream en un contenidor MPEG-TS sense tocar ni un sol bit del vídeo: no hi ha decodificació, no hi ha recompressió. En un dispositiu embedded amb CPU limitada, això és crític.
-
-    La complexitat de l'H.265 és que les capçaleres SPS, PPS i VPS ---que el descodificador necessita per inicialitzar-se--- no es repeteixen a cada frame: estan una sola vegada al principi del clip. Si l'operador fa un seek enmig d'un clip, el backend retrocedeix a l'índex del primer buffer del fitxer per recuperar les capçaleres de referència i les injecta davant del segment. Sense aquest mecanisme, el descodificador del navegador rebria un flux incomplet i no podria reproduir res.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Gravacions 3/3  ---
-\begin{frame}{Gravacions \small\textit{3/3}}
-  \begin{columns}[T]
-    \begin{column}{0.52\textwidth}
-      \textbf{Durabilitat: FS2 + \texttt{remote\_vfs}}
-      \begin{itemize}
-        \item \textbf{FS2}: escriu directament a la partició \textit{raw} (sense ext4).\\Tall elèctric $\to$ el bloc anterior queda \textbf{íntegre}.
-        \item \textbf{\texttt{remote\_vfs}}: driver SQLite personalitzat que intercepta tot I/O.
-        \item Redirigeix via \textbf{Unix Domain Socket} $\to$ \texttt{la-video-engine}.
-        \item \texttt{la-video-engine}: \textbf{únic procés} amb permisos d'escriptura al disc.
-        \item Mode \textbf{WAL}: lectures i escriptures simultànies sense bloqueig.
-      \end{itemize}
-    \end{column}
+\begin{frame}[fragile]{Gravacions \small\textit{3/3}}
+  \small\textbf{GET} \texttt{\small /video-engine/hls-play.m3u8?token=R.D0.C0.S0\&start=1762939800\&end=1762940400}
 
-    \begin{column}{0.44\textwidth}
-      \textbf{H.265 vs H.264:}
-      \begin{itemize}
-        \item Mateixa qualitat, \textbf{50\% menys disc}.
-        \item 1 TB: 10 dies $\to$ \textbf{20 dies} de retenció.
-      \end{itemize}
-
-      \vspace{0.8em}
-      \begin{exampleblock}{Garantia}
-        \small Gravació contínua \textbf{sense corrupció} davant de qualsevol tall de corrent.
-      \end{exampleblock}
-    \end{column}
-  \end{columns}
-
-  \note{
-    La tercera diapositiva cobreix els dos aspectes que el tribunal probablement qüestionarà: la durabilitat i l'eficiència d'emmagatzematge.
-
-    Sobre la durabilitat: un gravador NVR és un dispositiu que pot perdre la llum en qualsevol moment. FS2 escriu els fotogrames en blocs contigus de mida fixa directament sobre la partició raw: si l'alimentació es perd a meitat d'una escriptura, la integritat del bloc anterior queda preservada per disseny.
-
-    Per a la base de dades d'índex de gravacions, la solució és el driver VFS personalitzat remote_vfs. SQLite té una capa d'abstracció de sistema de fitxers: totes les operacions d'I/O passen per funcions xRead, xWrite. El remote_vfs reimplementa aquesta interfície i redirigeix cada operació via Unix Domain Socket cap a la-video-engine, que és l'únic procés del sistema amb permisos d'escriptura al disc físic. Cap altre procés pot comprometre la integritat. El mode WAL permet que els operadors reprodueixin gravacions mentre el sistema continua gravant, sense cap bloqueig.
-
-    Sobre H.265: mateixa qualitat visual, la meitat de bits. En termes pràctics: un gravador amb 1 TB passa de 10 dies de retenció a 20 dies sense ampliar el disc. Per a un client d'infraestructura crítica que necessita conservar 30 dies, la diferència és comprar un disc addicional o no.
-  }
+  \vspace{0.3em}
+  \begin{lstlisting}[style=jsonbox]
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-TARGETDURATION:57
+#EXTINF:55.8032,
+segment.ts?id=540983296&buffer=0&t1=2025-11-12T09:30:01Z&t2=2025-11-12T09:30:57Z&token=R.D0.C0.S0
+#EXTINF:55.9275,
+segment.ts?id=540983296&buffer=1&t1=2025-11-12T09:30:57Z&t2=2025-11-12T09:31:53Z&token=R.D0.C0.S0
+#EXTINF:56.3945,
+segment.ts?id=540983296&buffer=2&t1=2025-11-12T09:31:53Z&t2=2025-11-12T09:32:49Z&token=R.D0.C0.S0
+; ... 7 segments mes ...
+#EXTINF:55.9306,
+segment.ts?id=540983296&buffer=10&t1=2025-11-12T09:39:21Z&t2=2025-11-12T09:40:17Z&token=R.D0.C0.S0
+#EXT-X-ENDLIST
+  \end{lstlisting}
 \end{frame}
 
 % ---  DIAPOSITIVA — Alarmes 1/3  ---
@@ -408,23 +306,13 @@ export interface StreamingStrategy {
     \begin{column}{0.40\textwidth}
       \vspace{0.8em}
       \begin{itemize}
-        \item Rebre \textbf{notificacions en temps real} quan salta un sensor.
-        \item Consultar l'\textbf{historial} d'alarmes per càmera.
-        \item \textbf{Reconèixer} i gestionar alarmes actives.
-        \item Accedir al \textbf{clip de vídeo} associat a l'alarma.
+        \item \textbf{Notificacions en temps real} quan salta un relé.
+        \item Consultar informació d'una alarma.
+        \item Consultar l'\textbf{historial} d'alarmes.
+        \item \textbf{Gestionar} alarmes actives.
       \end{itemize}
     \end{column}
   \end{columns}
-
-  \note{
-    La pàgina d'alarmes és la vista de reactivitat en temps real del sistema. Quan salta un sensor —moviment, intrusió, pèrdua de senyal de càmera—, la notificació ha d'arribar a tots els operadors connectats en mil·lisegons.
-
-    L'arquitectura és push pura: el microservei la-core-alarm manté una connexió WebSocket segura permanent amb cada client Angular. Quan el sensor dispara, la-core-alarm emet l'event immediatament per WebSocket a tots els operadors. Cap polling. Cap latència de cicle.
-
-    Si la connexió cau —per exemple, un reinici del gravador—, la reconnexió usa backoff exponencial: 1s, 2s, 4s, fins a un màxim de 30s. Sense backoff, en un entorn amb 50 operadors, tots intentarien reconnectar-se alhora i colapsarien la CPU del gravador just quan encara està arrencant serveis.
-
-    Gràcies als Signals, quan arriba un event d'alarma, s'actualitza únicament la icona de l'alarma afectada. El component no sap de les altres càmeres: total isolament de re-render.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Alarmes 2/3  ---
@@ -432,7 +320,7 @@ export interface StreamingStrategy {
   \begin{columns}[T]
     \begin{column}{0.46\textwidth}
       \small
-      \textbf{\texttt{la-core-alarm} — pipeline de 3 fils:}
+      \textbf{\texttt{la-core-alarm} — pipeline de 3 threads:}
       \begin{enumerate}
         \item \textbf{D-Bus}: escolta \texttt{ALARM\_NOTIFY} $\to$ cua \textit{thread-safe}.
         \item \textbf{Persistència}: escriu via \textbf{gRPC} a \texttt{la-db-engine}.
@@ -452,75 +340,42 @@ export interface StreamingStrategy {
       \end{center}
     \end{column}
   \end{columns}
-
-  \note{
-    El cor del sistema d'alarmes és el microservei la-core-alarm, escrit en C++ multithreading. El disseny clau és un pipeline de tres fils independents que es comuniquen exclusivament a través de cues thread-safe.
-
-    El fil de D-Bus manté una connexió bloquejant al bus del sistema escoltant passivament qualsevol senyal ALARM_NOTIFY de la interfície com.lanaccess.sysevents. Quan el maquinari dispara una alarma —un sensor de moviment, una entrada digital, una pèrdua de senyal—, aquest fil construeix una estructura AlarmData i la diposita a la cua global_alarm_queue sense processar-la.
-
-    El fil de persistència es desperta immediatament, agafa l'element de la cua i el desa a la base de dades via gRPC cap a la-db-engine. Quan la persistència confirma èxit, l'event passa a la global_emission_queue.
-
-    El fil d'emissió agafa l'event de la cua i el difon en JSON a tots els clients WebSocket connectats en aquell moment.
-
-    El benefici del desacoblament és clau: si la base de dades va lenta o gRPC es bloqueja temporalment, el fil de D-Bus continua rebent senyals del maquinari i no es perd cap event. Si el WebSocket d'un client és lent, no bloqueja la persistència. Cada fil és independent.
-
-    Angular rep els events per WebSocket, actualitza un Signal per a la fila afectada, i re-renderitza únicament aquell component. La resta de la UI no es toca.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Alarmes 3/3  ---
 \begin{frame}{Alarmes \small\textit{3/3}}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
+    \begin{column}{0.55\textwidth}
       \small
-      \textbf{Resiliència — Reconnexió WebSocket:}
+      \textbf{Persistència — \texttt{la-db-engine}:}
       \begin{itemize}
-        \item \textbf{50 operadors} alhora $\to$ \textbf{backoff exponencial}: 1 s, 2 s, 4 s\ldots màx \textbf{30 s}.
-        \item Reconnexions escalonades: NVR no es satura.
-      \end{itemize}
-
-      \vspace{0.4em}
-      \textbf{Persistència:}
-      \begin{itemize}
-        \item \texttt{la-core-alarm} $\xrightarrow{\text{gRPC}}$ \texttt{la-db-engine}.
-        \item \texttt{remote\_vfs} $\xrightarrow{\text{UDS}}$ \texttt{la-video-engine} (únic amb permisos).
-        \item Mode \textbf{WAL}: historial consultable mentre s'escriu.
+        \item \texttt{la-core-alarm} $\xrightarrow{\text{gRPC}}$ \textbf{SQLite3} + \texttt{remote\_vfs}
+        \item \texttt{remote\_vfs}: driver \textbf{VFS} personalitzat — tot I/O $\xrightarrow{\text{UDS}}$ \texttt{la-video-engine}
+        \item \texttt{la-video-engine}: únic procés amb accés \textbf{raw} al disc físic
+        \item \textbf{WAL} (\texttt{PRAGMA synchronous=NORMAL}): registre transaccional previ a cada escriptura — \textbf{ACID} davant talls de corrent
+        \item SQL \textbf{Trigger}: poda automàtica $\leq$ \textbf{10.000} registres
       \end{itemize}
     \end{column}
 
-    \begin{column}{0.46\textwidth}
+    \begin{column}{0.41\textwidth}
       \small
-      \textbf{Poda automàtica:}
+      \textbf{Protocol \texttt{/ws/la-core-alarm/}:}
       \begin{itemize}
-        \item SQL \textbf{Trigger}: màxim \textbf{10.000 registres}.
-        \item Evita desgast del flaix del NVR (24/7).
+        \item[$\leftarrow$] \texttt{DB\_ENGINE\_ALARM\_NOTIFY}
+        \item[$\rightarrow$] \texttt{ALARMS\_GET}
+        \item[$\rightarrow$] \texttt{ALARM\_READ}\\
+          {\footnotesize\textcolor{gray}{\{db\_id: "1054", read: true\}}}
+        \item[$\leftarrow$] \texttt{ALARM\_READ\_SUCCESS}\\
+          {\footnotesize\textcolor{gray}{broadcast $\to$ tots els operadors}}
       \end{itemize}
 
       \vspace{0.4em}
-      \textbf{Assentiment (\textit{Ack}):}
-      \begin{itemize}
-        \item Clic \textit{Ack} $\to$ \texttt{ALARM\_READ} al backend.
-        \item \texttt{ALARM\_READ\_SUCCESS} $\to$ \textbf{tots} els operadors sincronitzats.
-      \end{itemize}
-
-      \vspace{0.4em}
-      \begin{exampleblock}{Garantia}
-        \small Cap alarma perduda. Tots els operadors sempre sincronitzats.
+      \begin{exampleblock}{\small Garantia}
+        \small Cap alarma perduda.\\
+        Consistència multi-operador.
       \end{exampleblock}
     \end{column}
   \end{columns}
-
-  \note{
-    Tres aspectes de robustesa que un tribunal pot preguntar.
-
-    Primer: el backoff exponencial. Si el NVR es reinicia i té 50 operadors connectats, tots intentarien reconnectar en el mateix segon. El servidor rebria 50 connexions simultànies just quan la CPU encara arrenca serveis. El backoff escala el temps d'espera: 1s, 2s, 4s fins a 30s. No és arbitrari: el requisit fixava reconnexió en menys de 30 segments, i el màxim del backoff queda per sota d'aquest límit.
-
-    Segon: la cadena de persistència. la-core-alarm no escriu directament al disc. Envia l'event per gRPC cap a la-db-engine. la-db-engine usa el driver remote_vfs, que intercepta tota operació d'I/O i la redirigeix per Unix Domain Socket cap a la-video-engine. la-video-engine és l'únic procés del sistema amb permisos d'escriptura al disc físic. El mode WAL permet que les lectures de l'historial no bloquegin les escriptures de nous events: operador consultant i sistema registrant, simultàniament.
-
-    Tercer: la poda automàtica. El gravador funciona 24/7. Sense límit, el volum d'alarmes creixeria indefinidament i desgastaria el flaix NAND/NOR. Un SQL Trigger automàtic s'executa després de cada inserció i elimina els registres més antics si se superen 10.000 entrades. Zero codi especial al backend: el motor de base de dades s'autogestiona.
-
-    Quant a l'Ack: quan l'operador confirma una alarma, el backend no tan sols la marca com a llegida per a ell. Envia ALARM_READ_SUCCESS a tots els operadors connectats. Si n'hi ha cinc davant de cinc pantalles, tots cinc veuen la fila actualitzada en temps real. Consistència multi-operador garantida.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA — Altres mòduls implementats  ---
@@ -530,15 +385,15 @@ export interface StreamingStrategy {
     \begin{column}{0.48\textwidth}
       \textbf{\small Autenticació i Core}
       \begin{itemize}\setlength\itemsep{0pt}
-        \item[\small$\bullet$] Login · Keep-Alive · RBAC
-        \item[\small$\bullet$] Alertes en temps real (badge)
+        \item[\small$\bullet$] Login · Keep-Alive
+        \item[\small$\bullet$] Alertes en temps real
         \item[\small$\bullet$] Panells NVR i usuari
       \end{itemize}
 
       \vspace{0.5em}
       \textbf{\small Manteniment}
       \begin{itemize}\setlength\itemsep{0pt}
-        \item[\small$\bullet$] Actualització de Firmware (dual-boot)
+        \item[\small$\bullet$] Actualització de Firmware
         \item[\small$\bullet$] Backup · Restore · Factory Reset
         \item[\small$\bullet$] Registre d'Esdeveniments (Logs)
         \item[\small$\bullet$] Ajuda i Documentació integrada
@@ -557,10 +412,9 @@ export interface StreamingStrategy {
       \vspace{0.5em}
       \textbf{\small Infraestructura i Xarxa}
       \begin{itemize}\setlength\itemsep{0pt}
-        \item[\small$\bullet$] NGINX: TLS · WebSocket · Proxy
+        \item[\small$\bullet$] NGINX
         \item[\small$\bullet$] Assistents de configuració (Wizards)
         \item[\small$\bullet$] Eina de xarxa (Web Proxy tunnels)
-        \item[\small$\bullet$] Control I/O digital en temps real
       \end{itemize}
     \end{column}
   \end{columns}
