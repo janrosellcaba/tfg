@@ -11,11 +11,11 @@
     \toprule
     \textbf{Actor} & \textbf{Interès principal} \\
     \midrule
-    Operador de seguretat   & Monitorització RT $\cdot$ resposta àgil a incidents \\
-    Administrador / Tècnic  & Configuració remota $\cdot$ firmware sense desplaçaments \\
+    Operador de seguretat   & Monitorització video/alarmes\\
+    Administrador / Tècnic  & Configuració/Actualització remota \\
     Lanaccess               & Reducció costos suport $\cdot$ producte competitiu \\
     Director / Ponent (FIB) & Rigor metodològic $\cdot$ estàndards qualitat FIB \\
-    Estudiant               & Arquitectura robusta $\cdot$ integració tecnologies \\
+    Estudiant               & Arquitectura robusta $\cdot$ integració noves tecnologies \\
     \bottomrule
   \end{tabular}
   \end{center}
@@ -24,22 +24,6 @@
   \begin{center}
     \small\textbf{6 casos d'ús:} Autenticació $\cdot$ Vídeo directe $\cdot$ Gravacions $\cdot$ Alarmes $\cdot$ Configuració dinàmica $\cdot$ Administració
   \end{center}
-
-  \note{
-    Tenim cinc actors implicats en el projecte.
-
-    L'Operador de seguretat és l'usuari final: treballa en torns llargs davant de les càmeres i necessita temps de resposta mínims. Cada segon que tarda a localitzar un incident és crític.
-
-    L'Administrador o tècnic necessita poder canviar paràmetres crítics ---xarxa, càmeres, alarmes--- i actualitzar firmware de forma remota i segura, sense desplaçar-se físicament a la instal·lació.
-
-    Lanaccess, com a empresa, té un interès directe en reduir els costos de suport postvenda: cada cop que un client necessita ajuda per configurar el sistema, hi ha un cost. Un frontend intuïtiu i autònom redueix aquest cost. A més, el mercat demana mobilitat i web: ActiveX no és una opció el 2024.
-
-    El Director i Ponent del TFG vetllen pel rigor metodològic: que les decisions d'arquitectura estiguin justificades, que hi hagi un procés de validació rigorós, i que el document compleixi els estàndards de la FIB.
-
-    I finalment, l'estudiant ---jo mateix--- sóc l'actor principal i executor integral: analista, dissenyador i desenvolupador. La meva funció ha estat transformar els requisits de negoci de Lanaccess en una arquitectura de software que funcioni en producció.
-
-    A partir d'aquests actors vam derivar 6 casos d'ús que cobreixen tot el cicle de vida de la vigilància.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA 6 — Requisits per Actor (humà)  ---
@@ -49,10 +33,10 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{Administrador}
         \begin{itemize}
-          \item[\small$\bullet$] Gestió remota \textbf{sense desplaçaments}
-          \item[\small$\bullet$] Firmware nou $\to$ web \textbf{sense recompilar}
-          \item[\small$\bullet$] \textbf{Config Lock}: zero sobreescriptura concurrent
-          \item[\small$\bullet$] RBAC + auditoria + \textbf{RGPD}
+          \item[\small$\bullet$] Configuració remota
+          \item[\small$\bullet$] Actualització \textbf{firmware} en remot
+          \item[\small$\bullet$] Llicències: \textbf{consulta i renovació}
+          \item[\small$\bullet$] Logs del sistema: \textbf{filtre + descàrrega}
         \end{itemize}
       \end{block}
     \end{column}
@@ -60,24 +44,13 @@
     \begin{column}{0.48\textwidth}
       \begin{block}{Operador}
         \begin{itemize}
-          \item[\small$\bullet$] Fins a \textbf{4 càmeres} simultànies
-          \item[\small$\bullet$] Timeline: \textbf{precisió temporal} exacta
-          \item[\small$\bullet$] Alarmes \textbf{push} $<$ 1\,s
-          \item[\small$\bullet$] Sessió \textbf{persistent} per a torns
+          \item[\small$\bullet$] \textbf{4 càmeres} en directe simultànies
+          \item[\small$\bullet$] Visualització \textbf{gravacions}
+          \item[\small$\bullet$] Gestió Alarmes 
         \end{itemize}
       \end{block}
     \end{column}
   \end{columns}
-
-  \note{
-    Veiem ara el que cada persona necessita, més enllà del que fa. L'Administrador té una necessitat crítica que no és òbvia: quan l'equip d'Embedded afegeix nous paràmetres al firmware, no pot crear una tasca de frontend per a cada canvi. Necessita que la interfície s'adapti sola. Aquesta és la necessitat que va donar origen a tota la decisió d'arquitectura schema-driven.
-
-    L'Administrador també necessita que dos admins no puguin sobreescriure's la configuració alhora — en instal·lacions amb múltiples tècnics connectats simultàniament, sense cap control d'accés concurrent, les escriptures conflictives podrien corrompre el dispositiu.
-
-    L'Operador té un perfil completament diferent: és el vigilant de seguretat que porta torns llargs davant de les càmeres. Necessita veure fins a quatre càmeres a la vegada per tenir visió global. Necessita poder investigar un incident passat anant directament al segon exacte, no navegar per hores de vídeo. Necessita que les alarmes arribin al moment — no quan refresqui la pàgina. I necessita que la sessió no caduqui mentre treballa, perquè un timeout forçat podria fer que perdés un event crític.
-
-    Tots aquests requisits es van extreure en sessions iteratives amb l'equip d'Embedded i analitzant les limitacions del sistema legacy basat en ActiveX. Cada requisit no funcional s'ha formalitzat amb la plantilla VOLERE: descripció, justificació i criteri d'acceptació mesurable.
-  }
 \end{frame}
 
 % ---  DIAPOSITIVA 7 — Arquitectura Global  ---
@@ -85,10 +58,10 @@
   \begin{columns}[T]
     \begin{column}{0.38\textwidth}
       \begin{itemize}
-        \item \texttt{la-core-legacy} \textcolor{gray}{\small Config + Auth}
-        \item \texttt{la-db-engine} \textcolor{gray}{\small SQLite via gRPC}
-        \item \texttt{la-core-alarm} \textcolor{gray}{\small WebSocket push}
-        \item \texttt{la-video-engine} \textcolor{gray}{\small WebRTC + HLS}
+        \item \texttt{la-core-legacy}
+        \item \texttt{la-db-engine}
+        \item \texttt{la-core-alarm}
+        \item \texttt{la-video-engine}
       \end{itemize}
 
       \vspace{0.8em}
@@ -103,12 +76,4 @@
       \end{center}
     \end{column}
   \end{columns}
-
-  \note{
-    El disseny arquitectònic respon directament als requisits de recursos limitats. L'Angular és una Single-Page Application: es descarrega una vegada i s'executa completament al navegador del client. Això significa que el processament de la interfície recau al PC de l'operador, no en la CPU del gravador.
-
-    Al backend, quatre microserveis C++ especialitzats: la-core-legacy gestiona la configuració i l'autenticació; la-db-engine exposa SQLite; la-core-alarm emet les alarmes per WebSocket; i la-video-engine conjuntament amb MediaMTX gestionen tot el pipeline de vídeo. Cada procés gestiona un domini aïllat: si el motor de vídeo falla, la configuració continua funcionant.
-
-    La comunicació interna va per Unix Domain Sockets: el canal IPC més ràpid de Linux. NGINX és l'únic punt d'entrada visible des de l'exterior, concentrant tots els serveis sota el port 443.
-  }
 \end{frame}

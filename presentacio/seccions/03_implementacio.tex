@@ -291,3 +291,56 @@
     La renovació és cada expiresIn/2 fora de Zone.js per no disparar cicles de detecció de canvis innecessaris. Si un segon operador intenta adquirir el lock: HTTP 423 Locked, i el frontend el posa automàticament en mode lectura via un Signal. Si el tècnic tanca l'ordinador, el lock expira sol i es lliura sense cap intervenció manual.
   }
 \end{frame}
+
+% ---  DIAPOSITIVA — Altres mòduls implementats  ---
+\begin{frame}{Altres Mòduls Implementats}
+  \vspace{0.3em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{\small Autenticació i Core}
+      \begin{itemize}\setlength\itemsep{0pt}
+        \item[\small$\bullet$] Login · Keep-Alive · RBAC
+        \item[\small$\bullet$] Alertes en temps real (badge)
+        \item[\small$\bullet$] Panells NVR i usuari
+      \end{itemize}
+
+      \vspace{0.5em}
+      \textbf{\small Manteniment}
+      \begin{itemize}\setlength\itemsep{0pt}
+        \item[\small$\bullet$] Actualització de Firmware (dual-boot)
+        \item[\small$\bullet$] Backup · Restore · Factory Reset
+        \item[\small$\bullet$] Registre d'Esdeveniments (Logs)
+        \item[\small$\bullet$] Ajuda i Documentació integrada
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textbf{\small Interfície i UX}
+      \begin{itemize}\setlength\itemsep{0pt}
+        \item[\small$\bullet$] Tauler principal (Home)
+        \item[\small$\bullet$] Disseny responsiu (SCSS modular)
+        \item[\small$\bullet$] Internacionalització (EN · ES · FR)
+        \item[\small$\bullet$] Llicències: consulta i renovació
+      \end{itemize}
+
+      \vspace{0.5em}
+      \textbf{\small Infraestructura i Xarxa}
+      \begin{itemize}\setlength\itemsep{0pt}
+        \item[\small$\bullet$] NGINX: TLS · WebSocket · Proxy
+        \item[\small$\bullet$] Assistents de configuració (Wizards)
+        \item[\small$\bullet$] Eina de xarxa (Web Proxy tunnels)
+        \item[\small$\bullet$] Control I/O digital en temps real
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \note{
+    Fins ara hem vist els mòduls tècnicament més complexos: vídeo, gravacions, alarmes i configuració schema-driven. Però l'aplicació és un producte complet que l'empresa ja utilitza en producció, i inclou molts altres mòduls que hem implementat.
+
+    A la columna esquerra, el core d'autenticació gestiona el login amb cookie HttpOnly, el keep-alive cada 60 segons per mantenir la sessió activa durant torns llargs, i el sistema de badges que notifica alertes de hardware en temps real. El panell NVR mostra l'estat dels discs, la IP i el firmware en una sola pantalla.
+
+    Al manteniment, el mòdul de firmware implementa un procés de dual-boot: el binari s'escriu primer a la partició secundària i, un cop verificat, es promou com a activa. Si alguna cosa falla, el dispositiu fa rollback automàtic. Backup i restore permeten exportar i importar tota la configuració, amb la particularitat que les contrasenyes es mascaren al fitxer exportat. El visor de logs gestiona fins a 500.000 línies setmanals amb filtres de columna per expressions regulars, tot sense cap petició addicional al servidor gràcies a SheetJS.
+
+    A la dreta, la internacionalització suporta tres idiomes complets amb ngx-translate: l'URL reflecteix la llengua activa, cosa que permet desar i compartir adreces per idioma. I el Web Proxy resol un problema real: permet als tècnics accedir als portals web natius de càmeres que estan en subxarxes aïllades, sense trencar l'aïllament de seguretat.
+  }
+\end{frame}
