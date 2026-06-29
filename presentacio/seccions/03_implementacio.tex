@@ -389,8 +389,9 @@ segment.ts?id=540983296&buffer=10&t1=2025-11-12T09:39:21Z&t2=2025-11-12T09:40:17
         \item \texttt{remote\_vfs} envia operacions VFS binàries:\\
               {\footnotesize\textcolor{gray}{\texttt{xRead} · \texttt{xWrite} · \texttt{xSync} · \texttt{xTruncate}}}
         \item \texttt{la-video-engine} les executa.
-        \item Escriptures \textbf{alineades a 512 B}\\
-              {\footnotesize\textcolor{gray}{\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR)} $\to$ atomicitat per sector}}
+        \item Escriptures \textbf{alineades a 512 B}.
+        % \\
+              % {\footnotesize\textcolor{gray}{\texttt{aligned\_alloc(HD\_BYTES\_PER\_SECTOR)} $\to$ atomicitat per sector}}
       \end{itemize}
     \end{column}
 
