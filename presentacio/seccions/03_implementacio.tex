@@ -28,51 +28,57 @@
 \begin{frame}[fragile]{Sistema de Configuració \small\textit{2/3}}
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
+      \small\hfill\textcolor{gray}{\tiny GET /properties/schema?node=config.video.cam}
+      \vspace{-0.2em}
       \begin{lstlisting}[style=jsonbox]
-{
- "config.video.cam": {
-  "{camId}": {
-   "_rule": {
-    "indexFrom": 0, "indexTo": 151,
-    "padding": 3, "fixed": true
+"{camId}": {
+ "_rule": {
+  "indexFrom": 0, "indexTo": 151, "padding": 3, "fixed": true
+ },
+ "base": {
+  "name": {
+   "_type": "string",
+   "_maxLength": 32
+  },
+  "connection": {
+   "address": {
+    "_type": "ipaddr",
+    "_default": "0.0.0.0"
    },
-   "base": {
-    "disabled": {
-     "_type": "boolean",
-     "_default": "false"
-    },
-    "ipcamera": {
-     "class": {
-      "_type": "list",
-      "_default": "ONVIF",
-      "_allowedValues": [
-       "VIVOTEK","ONVIF","RTSP"
-      ]
-     }, ... \end{lstlisting}
+   "port": {
+    "_type": "numeric",
+    "_default": 80,
+    "_minValue": 1,
+    "_maxValue": 65535
+   }
+  },
+  "account": {
+   "password": {
+    "_type": "password",
+    "_maxLength": 24
+   }}}}\end{lstlisting}
     \end{column}
 
     \begin{column}{0.49\textwidth}
+      \small\hfill\textcolor{gray}{\tiny GET /config.video.cam.000}
+      \vspace{-0.2em}
       \begin{lstlisting}[style=jsonbox]
-     "connection": {
-      "address": {
-       "_type": "ipaddr",
-       "_default": "0.0.0.0"
-      },
-      "port": { "config": {
-       "_type": "numeric",
-       "_default": 80,
-       "_minValue": 1,
-       "_maxValue": 65535
-      }}
-     },
-     "account": {
-      "password": {
-       "_type": "password",
-       "_maxLength": 24,
-       "_policyLevel": 0
-      }
-     }
-    }}}}} \end{lstlisting}
+"000": {
+ "base": {
+  "name": "Cam Exterior",
+  "connection": {
+   "address": "192.168.1.42",
+   "port": 80
+  },
+  "account": {
+   "password": "__password__"
+  }
+ }
+}\end{lstlisting}
+
+      \vspace{0.6em}
+      % \small Angular llegeix \texttt{\_type} $\to$ renderitza el\\
+      % component correcte \textbf{sense codi addicional}.
     \end{column}
   \end{columns}
 \end{frame}
