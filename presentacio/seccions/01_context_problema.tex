@@ -59,7 +59,7 @@
         \begin{itemize}
           \item Dependent de \textbf{IE11} (tancat juny 2022).
           \item Incompatible: macOS, Linux, Chrome.
-          \item Vulnerabilitats \textbf{OWASP}.
+          \item Vulnerabilitats \textbf{OWASP Top 10}.
         \end{itemize}
       \end{alertblock}
 
@@ -68,7 +68,6 @@
         \item Arquitectura molt \textbf{rígida}.
         \item Manteniment i actualitzacions manuals/difícils. 
         \item UX obsoleta.
-        \item Fre al \textit{time-to-market}.
       \end{itemize}
     \end{column}
 
@@ -78,8 +77,8 @@
       \end{block}
 
       \vspace{0.8em}
-      \begin{block}{Competència}
-        \small Interfícies web natives guanyaven terreny.
+      \begin{block}{Clientes}
+        \small Necessitat d'una web nativa.
       \end{block}
     \end{column}
   \end{columns}
@@ -93,6 +92,7 @@
       \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (browser) at (0,0) {\textbf{Navegador}};
       \node[draw=upcblue, rounded corners, fill=upclight, minimum width=2.5cm, minimum height=1.2cm, align=center] (nvr) at (8.5,0) {\textbf{NVR NXT}};
       \draw[->, thick, upcblue] (browser.east) -- node[above, inner sep=6pt]{\small HTTPS / WSS / WebRTC / HLS} (nvr.west);
+      \draw[->, thick, upcblue] (browser.east) -- node[below, inner sep=6pt]{\tiny\color{gray} 443} (nvr.west);
     \end{tikzpicture}
   \end{center}
 
